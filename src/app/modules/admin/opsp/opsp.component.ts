@@ -1,12 +1,13 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 
 @Component({
-    selector     : 'example',
+    selector     : 'opsp',
     standalone   : true,
-    templateUrl  : './example.component.html',
+    templateUrl  : './opsp.component.html',
+    styleUrls: ['./opsp.component.scss'],
     encapsulation: ViewEncapsulation.None,
 })
-export class ExampleComponent
+export class OpspComponent
 {
     /**
      * Constructor

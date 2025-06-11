@@ -1,0 +1,120 @@
+<div class="max-w-7xl mx-auto p-6 sm:p-10 space-y-10">
+    <!-- Encabezado -->
+    <div class="text-center">
+        <h2 class="text-3xl font-extrabold text-[#003660]">Factor X</h2>
+        <p class="mt-1 text-sm text-gray-500">Descubriendo su ventaja 10X</p>
+    </div>
+
+    <!-- Atributos -->
+    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm w-full max-w-3xl mx-auto">
+        <h3 class="font-semibold text-[#003660]">Atributos del Factor-X:</h3>
+        <ul class="list-disc list-inside text-sm text-gray-700 mt-2 space-y-1">
+            <li>Provee ventajas competitivas 10 veces mayores</li>
+            <li>Resuelve cuellos de botella “aceptados” por la industria</li>
+            <li>Cambia con el tiempo; los competidores lo copiarán</li>
+        </ul>
+    </div>
+
+    <!-- Grid de pasos con instrucciones -->
+    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm w-full max-w-3xl mx-auto">
+        <!-- Instrucciones dentro del card -->
+        <div class="text-sm">
+            <p class="font-semibold text-[#003660]">Instrucciones:</p>
+            <ul class="list-disc list-inside text-gray-700 mt-1 space-y-1">
+                <li>🟦 Identificar y etiquetar elementos internos y externos que afectan la oferta</li>
+                <li>➡️ Graficar cada paso del proceso de inicio a fin</li>
+                <li>❌ Marcar cada punto con obstáculos o cuellos de botella</li>
+            </ul>
+        </div><br>
+
+        <!-- Cuadros -->
+        <div class="grid grid-cols-4 gap-6 justify-items-center">
+            <ng-container *ngFor="let box of stepGrid">
+                <!-- Cuadro fijo (INICIO o $$$) -->
+                <div *ngIf="box.type !== 'step'"
+                    class="w-24 h-24 bg-blue-100 border-2 border-blue-300 rounded-lg flex flex-col items-center justify-center text-center">
+                    <div class="text-2xl">{{ box.icon }}</div>
+                    <div class="text-xs font-semibold mt-1">{{ box.label }}</div>
+                </div>
+
+                <!-- Cuadro editable -->
+                <div *ngIf="box.type === 'step'"
+                    class="relative w-24 h-24 bg-white border border-gray-300 rounded-lg overflow-hidden group">
+                    <!-- Textarea editable -->
+                    <textarea [(ngModel)]="box.step_label" [placeholder]="'Paso ' + box.step_order"
+                        class="w-full h-full text-xs text-center p-2 resize-none focus:ring-2 focus:ring-blue-400">
+          </textarea>
+
+                    <!-- Botón X en esquina -->
+                    <button (click)="toggleInefficiency(box)"
+                        class="absolute top-1 right-1 w-4 h-4 text-sm text-red-600 font-bold rounded-full border border-red-300 bg-red-50 hover:bg-red-100 shadow-sm transition"
+                        title="Marcar como ineficiencia">
+                    </button>
+
+                    <!-- ❌ en el centro -->
+                    <div *ngIf="box.has_inefficiency"
+                        class="absolute inset-0 flex items-center justify-center text-3xl text-red-500 pointer-events-none">
+                        ❌
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+
+
+    <!-- Card: Cuellos de botella -->
+    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm w-full max-w-3xl mx-auto">
+        <div class="space-y-1">
+            <h3 class="text-sm font-semibold text-[#003660]">Cuellos de botella:</h3>
+            <ul class="list-disc list-inside text-sm text-gray-700">
+                <li>Hacer una lista de los 3 principales cuellos de botella (ej: costos, regulaciones, restricciones)
+                </li>
+                <li>Asignar un líder responsable y fecha</li>
+            </ul>
+        </div>
+        <ng-container *ngFor="let cuello of bottlenecks; let i = index">
+            <div class="grid grid-cols-4 gap-4 items-start">
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cuello de botella {{ i + 1 }}</label>
+                    <textarea [(ngModel)]="cuello.descripcion"
+                        class="w-full p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-blue-400"
+                        rows="3" placeholder="Describa el cuello de botella..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Líder</label>
+                    <input [(ngModel)]="cuello.lider" type="text"
+                        class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                    <input [(ngModel)]="cuello.fecha" type="date"
+                        class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400" />
+                </div>
+            </div>
+        </ng-container>
+    </div>
+
+    <!-- Card: Acción Feria Comercial -->
+    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm w-full max-w-3xl mx-auto">
+        <p class="text-sm text-gray-700 font-medium">ACCIÓN: Designar un líder para asistir a una feria comercial este
+            año</p>
+        <div class="grid grid-cols-4 gap-4 items-start">
+            <div class="col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Feria Comercial</label>
+                <textarea [(ngModel)]="feria.descripcion"
+                    class="w-full p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-blue-400"
+                    rows="3" placeholder="Nombre o detalles de la feria..."></textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Líder</label>
+                <input [(ngModel)]="feria.lider" type="text"
+                    class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400" />
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
+                <input [(ngModel)]="feria.fecha" type="date"
+                    class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400" />
+            </div>
+        </div>
+    </div>
+</div>

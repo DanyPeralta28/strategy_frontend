@@ -1,0 +1,149 @@
+<div class="max-w-7xl mx-auto p-6 sm:p-10 space-y-12" [formGroup]="visionForm">
+
+  <!-- Título -->
+  <div class="text-center">
+    <h2 class="text-3xl font-extrabold text-[#003660]">Visión</h2>
+    <p class="mt-1 text-sm text-gray-500">Define tu futuro organizacional con claridad</p>
+  </div>
+
+  <!-- Fundamentos -->
+  <div class="space-y-6">
+    <h3 class="text-lg font-bold text-[#003660] border-b pb-2">Fundamentos de la Visión</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Valores Centrales</label>
+        <textarea formControlName="valores" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="5"></textarea>
+      </div>
+      <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Propósito</label>
+        <textarea formControlName="proposito" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="5"></textarea>
+      </div>
+      <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Promesas de Marca</label>
+        <textarea formControlName="promesas" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="5"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- BHAG -->
+  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+    <label class="block text-sm font-semibold text-[#003660] mb-2">BHAG</label>
+    <textarea formControlName="bhag" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="3"></textarea>
+  </div>
+
+  <!-- Prioridades Estratégicas -->
+  <div formGroupName="prioridades" class="space-y-6">
+    <h3 class="text-lg font-bold text-[#003660] border-b pb-2">Prioridades Estratégicas</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+        <label class="block text-sm font-medium text-gray-700 mb-2">3-5 AÑOS</label>
+        <textarea formControlName="largo" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="4"></textarea>
+      </div>
+      <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+        <label class="block text-sm font-medium text-gray-700 mb-2">1 AÑO</label>
+        <textarea formControlName="medio" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="4"></textarea>
+      </div>
+      <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+        <label class="block text-sm font-medium text-gray-700 mb-2">TRIMESTRE</label>
+        <textarea formControlName="corto" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="4"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="space-y-6">
+    <h3 class="text-xl font-bold text-[#003660] border-b pb-2">Sus KPIs</h3>
+    <div class="overflow-auto bg-white border border-gray-200 rounded-xl shadow-sm">
+      <table class="min-w-full text-sm text-gray-800">
+        <thead class="bg-gray-100 text-[#003660] font-semibold">
+          <tr>
+            <th class="p-3 text-left">#</th>
+            <th class="p-3 text-left">KPI</th>
+            <th class="p-3 text-left">Meta</th>
+          </tr>
+        </thead>
+        <tbody formArrayName="kpis">
+          <tr *ngFor="let kpi of kpis.controls; let i = index" [formGroupName]="i" class="border-t hover:bg-gray-50 transition">
+            <td class="p-3 font-medium">{{ i + 1 }}</td>
+            <td class="p-3">
+              <input formControlName="kpi" type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]" />
+            </td>
+            <td class="p-3">
+              <input formControlName="meta" type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Ganar el Juego -->
+  <div class="space-y-6 pt-10">
+    <h3 class="text-xl font-bold text-[#003660] border-b pb-2">Ganar el Juego</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Tarjeta 1 -->
+      <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
+        <div class="text-center py-2 font-semibold border-b text-[#003660]">Ganar el Juego</div>
+        <table class="w-full text-sm" formArrayName="ganarJuego1">
+          <tbody>
+            <tr *ngFor="let item of ganarJuego1.controls; let i = index" [formGroupName]="i">
+              <td class="p-3 w-10 text-xl">{{ estados[i].icono }}</td>
+              <td class="p-3">
+                <input formControlName="descripcion" type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]" [placeholder]="estados[i].placeholder" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Tarjeta 2 -->
+      <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
+        <div class="text-center py-2 font-semibold border-b text-[#003660]">Ganar el Juego</div>
+        <table class="w-full text-sm" formArrayName="ganarJuego2">
+          <tbody>
+            <tr *ngFor="let item of ganarJuego2.controls; let i = index" [formGroupName]="i">
+              <td class="p-3 w-10 text-xl">{{ estados[i].icono }}</td>
+              <td class="p-3">
+                <input formControlName="descripcion" type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]" [placeholder]="estados[i].placeholder" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prioridades Trimestrales -->
+  <div class="space-y-6 pt-10">
+    <h3 class="text-xl font-bold text-[#003660] border-b pb-2">Sus Prioridades Trimestrales</h3>
+    <div class="overflow-auto bg-white border border-gray-200 rounded-xl shadow-sm">
+      <table class="min-w-full text-sm text-gray-800">
+        <thead class="bg-gray-100 text-[#003660] font-semibold">
+          <tr>
+            <th class="p-3 text-left">#</th>
+            <th class="p-3 text-left">Prioridad</th>
+            <th class="p-3 text-left">Plazo</th>
+          </tr>
+        </thead>
+        <tbody formArrayName="prioridadesTrimestrales">
+          <tr *ngFor="let prioridad of prioridadesTrimestrales.controls; let i = index" [formGroupName]="i" class="border-t hover:bg-gray-50 transition">
+            <td class="p-3 font-medium">{{ i + 1 }}</td>
+            <td class="p-3">
+              <input formControlName="prioridad" type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]" />
+            </td>
+            <td class="p-3">
+              <input formControlName="plazo" type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Botón Guardar -->
+  <div class="text-right pt-6">
+    <button (click)="save()" class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
+      {{ visionForm.dirty ? 'Actualizar' : 'Guardar' }}
+    </button>
+  </div>
+</div>

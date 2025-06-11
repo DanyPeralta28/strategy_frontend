@@ -1,0 +1,109 @@
+<div class="max-w-7xl mx-auto p-6 sm:p-10 space-y-10" [formGroup]="sevenForm">
+
+    <!-- Título -->
+    <div class="text-center">
+        <h2 class="text-3xl font-extrabold text-[#003660]">7 Estratos</h2>
+        <p class="mt-1 text-sm text-gray-500">Define con claridad tu diferenciación estratégica</p>
+    </div>
+
+    <!-- Palabras Propias -->
+    <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6">
+        <label class="text-sm font-semibold text-[#003660] block mb-2">Palabras Propias</label>
+        <textarea formControlName="palabrasPropias" rows="4"
+            class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+    </div>
+
+    <!-- Territorio y Promesa -->
+    <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6">
+        <label class="text-sm font-semibold text-[#003660] block mb-2">Territorio y Promesa de Marca</label>
+        <div class="overflow-auto rounded-lg">
+            <table class="min-w-full text-sm text-gray-800">
+                <thead class="bg-gray-100 font-semibold text-[#003660]">
+                    <tr>
+                        <th class="p-3">Cliente Central</th>
+                        <th class="p-3">Qué</th>
+                        <th class="p-3">Dónde</th>
+                        <th class="p-3">Promesas con KPIs</th>
+                    </tr>
+                </thead>
+                <tbody formGroupName="territorio">
+                    <tr>
+                        <td class="p-2">
+                            <textarea formControlName="cliente" rows="3"
+                                class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+                        </td>
+                        <td class="p-2">
+                            <textarea formControlName="que" rows="3"
+                                class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+                        </td>
+                        <td class="p-2">
+                            <textarea formControlName="donde" rows="3"
+                                class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+                        </td>
+                        <td class="p-2">
+                            <textarea formControlName="promesas" rows="3"
+                                class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Garantía -->
+    <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6">
+        <label class="text-sm font-semibold text-[#003660] block mb-2">
+            Garantía asociada a la Promesa de Marca (Mecanismo Catalizador)
+        </label>
+        <textarea formControlName="garantia" rows="3"
+            class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+    </div>
+
+    <!-- Estrategia -->
+    <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6">
+        <label class="text-sm font-semibold text-[#003660] block mb-2">
+            La estrategia en una frase (Clave para generar dinero)
+        </label>
+        <textarea formControlName="estrategia" rows="3"
+            class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+    </div>
+
+    <!-- Actividades Diferenciadoras -->
+    <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6">
+        <label class="text-sm font-semibold text-[#003660] block mb-2">Actividades Diferenciadoras</label>
+        <textarea formControlName="actividades" rows="3"
+            class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+    </div>
+
+    <!-- Factor X -->
+    <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6">
+        <label class="text-sm font-semibold text-[#003660] block mb-2">Factor X (10x - 100x Ventaja Fundamental)</label>
+        <textarea formControlName="factorX" rows="3"
+            class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+    </div>
+
+    <!-- Utilidad por X y BHAG (en una sola fila como en el PDF) -->
+    <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="text-sm font-semibold text-[#003660] block mb-2">Utilidad por X (Motor Económico)</label>
+                <textarea formControlName="utilidadX" rows="3"
+                    class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-[#003660] block mb-2">BHAG* (Objetivo a largo plazo 10-25
+                    años)</label>
+                <textarea formControlName="bhag" rows="3"
+                    class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón Guardar -->
+    <div class="text-right pt-4">
+        <button (click)="save()"
+            class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
+            {{ sevenForm.dirty ? 'Actualizar' : 'Guardar' }}
+        </button>
+    </div>
+</div>
