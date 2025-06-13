@@ -1,0 +1,95 @@
+<div class="max-w-6xl mx-auto p-6 sm:p-10 space-y-10">
+  <!-- Título e instrucciones -->
+  <div class="text-center">
+    <h2 class="text-3xl font-extrabold text-[#003660]">Promesa de Marca</h2>
+    <p class="mt-1 text-sm text-gray-500">El compromiso medible hacia tu cliente</p>
+  </div>
+
+  <!-- Instrucciones -->
+  <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+    <h3 class="text-md font-semibold text-[#003660] mb-2">Criterios de Promesa de Marca:</h3>
+    <ul class="list-disc list-inside text-sm text-gray-700 space-y-1">
+      <li>¿Crea una diferencia?</li>
+      <li>¿Es medible?</li>
+      <li>¿Logra cumplir con la necesidad fundamental de los Clientes (no lo que quieren)?</li>
+    </ul>
+  </div>
+
+  <!-- Cliente Central y Promesa Líder -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Cliente Central -->
+    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+      <label class="block text-sm font-semibold text-[#003660] mb-2">Cliente Central</label>
+      <textarea [(ngModel)]="clienteCentral" rows="5"
+        class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#56B4DA]"
+        placeholder="Describe al cliente central..."></textarea>
+    </div>
+
+    <!-- Promesa Líder -->
+    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+      <label class="block text-sm font-semibold text-[#003660] mb-2">Promesa Líder</label>
+      <textarea [(ngModel)]="promesaLider" rows="5"
+        class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#56B4DA]"
+        placeholder="Describe la promesa líder..."></textarea>
+    </div>
+  </div>
+
+  <!-- Triángulo visual -->
+  <div class="flex justify-center items-center">
+    <div class="relative w-48 h-48 mt-4">
+      <!-- Promesa Líder (arriba) -->
+      <div class="absolute top-0 left-1/2 transform -translate-x-1/2 text-center">
+        <div class="bg-blue-100 rounded-full px-3 py-1 text-xs font-semibold text-[#003660] shadow">
+          Promesa Líder
+        </div>
+      </div>
+
+      <!-- Cliente Central (centro) -->
+      <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+        <div class="bg-white border border-blue-200 rounded-full px-4 py-1 text-xs font-semibold text-[#003660] shadow">
+          Cliente Central
+        </div>
+      </div>
+
+      <!-- Promesa #2 (abajo izquierda) -->
+      <div class="absolute bottom-0 left-0 transform -translate-x-1/4 text-center">
+        <div class="bg-blue-50 rounded-full px-3 py-1 text-xs font-medium text-[#003660] shadow">
+          Promesa #2
+        </div>
+      </div>
+
+      <!-- Promesa #3 (abajo derecha) -->
+      <div class="absolute bottom-0 right-0 transform translate-x-1/4 text-center">
+        <div class="bg-blue-50 rounded-full px-3 py-1 text-xs font-medium text-[#003660] shadow">
+          Promesa #3
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Promesas 2 y 3 -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Promesa #2 -->
+    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+      <label class="block text-sm font-semibold text-[#003660] mb-2">Promesa #2</label>
+      <textarea [(ngModel)]="promesa2" rows="5"
+        class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#56B4DA]"
+        placeholder="Describe la promesa 2..."></textarea>
+    </div>
+
+    <!-- Promesa #3 -->
+    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+      <label class="block text-sm font-semibold text-[#003660] mb-2">Promesa #3</label>
+      <textarea [(ngModel)]="promesa3" rows="5"
+        class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#56B4DA]"
+        placeholder="Describe la promesa 3..."></textarea>
+    </div>
+  </div>
+
+  <!-- Botón Guardar -->
+  <div class="text-right pt-6">
+    <button (click)="save()" class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
+      Guardar
+    </button>
+  </div>
+</div>

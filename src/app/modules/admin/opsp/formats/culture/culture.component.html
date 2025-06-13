@@ -1,0 +1,33 @@
+<div class="max-w-4xl mx-auto p-6 sm:p-10 space-y-10">
+    <!-- Encabezado -->
+    <div class="text-center">
+        <h2 class="text-3xl font-extrabold text-[#003660]">Cultura</h2>
+        <p class="mt-1 text-sm text-gray-500">Describe los principios y características culturales que definen tu
+            organización</p>
+    </div>
+
+    <!-- Card con inputs -->
+    <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 space-y-6">
+        <div>
+            <label class="block text-sm font-semibold text-[#003660] mb-2">Nombre de cultura</label>
+            <input [(ngModel)]="form.nombre" type="text"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]"
+                placeholder="Ej: Cultura de Excelencia, Cultura del Servicio, etc." />
+        </div>
+
+        <div>
+            <label class="block text-sm font-semibold text-[#003660] mb-2">Descripción</label>
+            <textarea [(ngModel)]="form.descripcion" rows="6"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]"
+                placeholder="Describe a detalle cómo se vive esta cultura dentro de la organización..."></textarea>
+        </div>
+    </div>
+
+    <!-- Botón Guardar -->
+    <div class="text-right">
+        <button (click)="save()"
+            class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
+            Guardar
+        </button>
+    </div>
+</div>

@@ -1,0 +1,62 @@
+<div class="max-w-7xl mx-auto p-6 sm:p-10 space-y-10">
+    <!-- Título -->
+    <div class="text-center">
+        <h2 class="text-3xl font-extrabold text-[#003660]">Balance de KPIs</h2>
+        <p class="mt-1 text-sm text-gray-500">Indicadores clave de rendimiento</p>
+    </div>
+
+    <!-- Fecha de cumplimiento -->
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 max-w-md mx-auto">
+        <label class="block text-sm font-semibold text-[#003660] mb-2">Fecha de cumplimiento</label>
+        <input type="date" [(ngModel)]="fechaCumplimiento"
+            class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]" />
+    </div>
+
+    <ng-container *ngFor="let categoria of categorias">
+        <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-4">
+            <h3 class="text-lg font-semibold text-[#003660]">{{ categoria.label }}</h3>
+
+            <div class="space-y-3">
+                <div *ngFor="let kpi of kpisBalance[categoria.key]; let i = index"
+                    class="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
+                    <div class="md:col-span-2">
+                        <label class="text-sm font-medium text-gray-700">KPI</label>
+                        <input [(ngModel)]="kpi.kpi" type="text"
+                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]" />
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Resultado</label>
+                        <input [(ngModel)]="kpi.resultado" type="text"
+                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]" />
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-700">Color</label>
+                        <select [(ngModel)]="kpi.color"
+                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]">
+                            <option value="">Seleccione</option>
+                            <option value="verde-oscuro">🟢 Excelente</option>
+                            <option value="verde-claro">🟢 Bien</option>
+                            <option value="rojo">🔴 En problemas</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón agregar -->
+            <div class="text-right">
+                <button (click)="agregarKPI(categoria.key)"
+                    class="bg-[#003660] hover:bg-[#005f8c] text-white text-sm font-medium px-4 py-2 rounded-xl shadow">
+                    + Agregar KPI
+                </button>
+            </div>
+        </div>
+    </ng-container>
+
+    <!-- Guardar -->
+    <div class="text-right pt-6">
+        <button (click)="guardarKPIs()"
+            class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
+            Guardar
+        </button>
+    </div>
+</div>

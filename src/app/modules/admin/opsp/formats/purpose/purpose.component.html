@@ -1,0 +1,44 @@
+<div class="max-w-4xl mx-auto p-6 sm:p-10 space-y-10">
+  <!-- Encabezado -->
+  <div class="text-center">
+    <h2 class="text-3xl font-extrabold text-[#003660]">Propósito</h2>
+    <p class="mt-1 text-sm text-gray-500">
+      Define claramente el propósito central de tu organización
+    </p>
+  </div>
+
+  <!-- Card -->
+  <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 space-y-6">
+    <!-- Propósito -->
+    <div>
+      <label class="block text-sm font-semibold text-[#003660] mb-2">Propósito</label>
+      <input
+        type="text"
+        [(ngModel)]="form.purpose"
+        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]"
+        placeholder="Escribe el propósito aquí..."
+      />
+    </div>
+
+    <!-- Explicación -->
+    <div>
+      <label class="block text-sm font-semibold text-[#003660] mb-2">Explicación</label>
+      <textarea
+        [(ngModel)]="form.explanation"
+        rows="5"
+        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]"
+        placeholder="Explica el propósito con mayor detalle..."
+      ></textarea>
+    </div>
+  </div>
+
+  <!-- Botón Guardar -->
+  <div class="text-right">
+    <button
+      (click)="save()"
+      class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow"
+    >
+      Guardar
+    </button>
+  </div>
+</div>

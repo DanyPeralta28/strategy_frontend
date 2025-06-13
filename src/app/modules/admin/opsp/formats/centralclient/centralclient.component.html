@@ -1,0 +1,47 @@
+<div class="max-w-7xl mx-auto p-6 sm:p-10 space-y-10">
+    <!-- Título -->
+    <div class="text-center">
+        <h2 class="text-3xl font-extrabold text-[#003660]">Cliente Central</h2>
+        <p class="mt-1 text-sm text-gray-500">Describe a detalle el perfil de tu cliente ideal</p>
+    </div>
+
+    <!-- Grid de preguntas -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <ng-container *ngFor="let campo of preguntas; let i = index">
+            <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+                <label class="block text-sm font-semibold text-[#003660] mb-2">{{ campo.pregunta }}</label>
+                <textarea [(ngModel)]="campo.respuesta" rows="4"
+                    class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#56B4DA]"
+                    placeholder="Escribe aquí..."></textarea>
+            </div>
+        </ng-container>
+    </div>
+
+    <!-- Sección: Resumen del Cliente Central -->
+    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4 mt-10">
+        <h3 class="text-lg font-semibold text-[#003660]">Resumen del Cliente Central <span
+                class="text-sm text-gray-500">(25 palabras)</span></h3>
+
+        <div>
+            <label class="block text-sm font-medium text-[#003660] mb-1">Nombre</label>
+            <input type="text" [(ngModel)]="nombreResumen"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]"
+                placeholder="Ej: Cliente Ideal, Usuario Meta, etc." />
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-[#003660] mb-1">Descripción</label>
+            <textarea rows="4" [(ngModel)]="descripcionResumen"
+                class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#56B4DA]"
+                placeholder="Describe a tu cliente central en aproximadamente 25 palabras..."></textarea>
+        </div>
+    </div>
+
+    <!-- Botón Guardar -->
+    <div class="text-right">
+        <button (click)="save()"
+            class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
+            Guardar
+        </button>
+    </div>
+</div>

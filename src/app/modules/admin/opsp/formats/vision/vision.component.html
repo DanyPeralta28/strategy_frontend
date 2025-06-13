@@ -10,24 +10,31 @@
   <div class="space-y-6">
     <h3 class="text-lg font-bold text-[#003660] border-b pb-2">Fundamentos de la Visión</h3>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-        <label class="block text-sm font-medium text-gray-700 mb-2">Valores Centrales</label>
+      <!-- Valores -->
+      <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
+        <h4 class="text-[#003660] font-semibold text-lg mb-2">Valores Centrales</h4>
+        <p class="text-sm text-gray-400 mb-3">Describe los valores clave que guían a tu organización</p>
         <textarea formControlName="valores" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="5"></textarea>
       </div>
-      <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-        <label class="block text-sm font-medium text-gray-700 mb-2">Propósito</label>
+      <!-- Propósito -->
+      <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
+        <h4 class="text-[#003660] font-semibold text-lg mb-2">Propósito</h4>
+        <p class="text-sm text-gray-400 mb-3">¿Cuál es la razón de existir de tu organización?</p>
         <textarea formControlName="proposito" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="5"></textarea>
       </div>
-      <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-        <label class="block text-sm font-medium text-gray-700 mb-2">Promesas de Marca</label>
+      <!-- Promesas -->
+      <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
+        <h4 class="text-[#003660] font-semibold text-lg mb-2">Promesas de Marca</h4>
+        <p class="text-sm text-gray-400 mb-3">¿Qué compromiso haces con tus clientes y colaboradores?</p>
         <textarea formControlName="promesas" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="5"></textarea>
       </div>
     </div>
   </div>
 
   <!-- BHAG -->
-  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-    <label class="block text-sm font-semibold text-[#003660] mb-2">BHAG</label>
+  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
+    <h4 class="text-[#003660] font-semibold text-lg mb-2">BHAG</h4>
+    <p class="text-sm text-gray-400 mb-3">Meta audaz a largo plazo que transforma tu organización</p>
     <textarea formControlName="bhag" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="3"></textarea>
   </div>
 
@@ -35,16 +42,16 @@
   <div formGroupName="prioridades" class="space-y-6">
     <h3 class="text-lg font-bold text-[#003660] border-b pb-2">Prioridades Estratégicas</h3>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-        <label class="block text-sm font-medium text-gray-700 mb-2">3-5 AÑOS</label>
+      <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
+        <h4 class="text-[#003660] font-semibold text-lg mb-2">3-5 AÑOS</h4>
         <textarea formControlName="largo" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="4"></textarea>
       </div>
-      <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-        <label class="block text-sm font-medium text-gray-700 mb-2">1 AÑO</label>
+      <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
+        <h4 class="text-[#003660] font-semibold text-lg mb-2">1 AÑO</h4>
         <textarea formControlName="medio" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="4"></textarea>
       </div>
-      <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-        <label class="block text-sm font-medium text-gray-700 mb-2">TRIMESTRE</label>
+      <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
+        <h4 class="text-[#003660] font-semibold text-lg mb-2">TRIMESTRE</h4>
         <textarea formControlName="corto" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="4"></textarea>
       </div>
     </div>
@@ -53,7 +60,7 @@
   <!-- KPIs -->
   <div class="space-y-6">
     <h3 class="text-xl font-bold text-[#003660] border-b pb-2">Sus KPIs</h3>
-    <div class="overflow-auto bg-white border border-gray-200 rounded-xl shadow-sm">
+    <div class="overflow-auto bg-white border border-gray-200 rounded-xl shadow-md">
       <table class="min-w-full text-sm text-gray-800">
         <thead class="bg-gray-100 text-[#003660] font-semibold">
           <tr>
@@ -81,8 +88,7 @@
   <div class="space-y-6 pt-10">
     <h3 class="text-xl font-bold text-[#003660] border-b pb-2">Ganar el Juego</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Tarjeta 1 -->
-      <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
+      <div class="bg-white border border-gray-200 rounded-xl shadow-md">
         <div class="text-center py-2 font-semibold border-b text-[#003660]">Ganar el Juego</div>
         <table class="w-full text-sm" formArrayName="ganarJuego1">
           <tbody>
@@ -95,9 +101,7 @@
           </tbody>
         </table>
       </div>
-
-      <!-- Tarjeta 2 -->
-      <div class="bg-white border border-gray-200 rounded-xl shadow-sm">
+      <div class="bg-white border border-gray-200 rounded-xl shadow-md">
         <div class="text-center py-2 font-semibold border-b text-[#003660]">Ganar el Juego</div>
         <table class="w-full text-sm" formArrayName="ganarJuego2">
           <tbody>
@@ -116,7 +120,7 @@
   <!-- Prioridades Trimestrales -->
   <div class="space-y-6 pt-10">
     <h3 class="text-xl font-bold text-[#003660] border-b pb-2">Sus Prioridades Trimestrales</h3>
-    <div class="overflow-auto bg-white border border-gray-200 rounded-xl shadow-sm">
+    <div class="overflow-auto bg-white border border-gray-200 rounded-xl shadow-md">
       <table class="min-w-full text-sm text-gray-800">
         <thead class="bg-gray-100 text-[#003660] font-semibold">
           <tr>
@@ -142,7 +146,7 @@
 
   <!-- Botón Guardar -->
   <div class="text-right pt-6">
-    <button (click)="save()" class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
+    <button (click)="save()" class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow transition-all">
       {{ visionForm.dirty ? 'Actualizar' : 'Guardar' }}
     </button>
   </div>

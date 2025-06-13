@@ -1,0 +1,32 @@
+<div class="max-w-4xl mx-auto p-6 sm:p-10 space-y-10">
+    <!-- Encabezado -->
+    <div class="text-center">
+        <h2 class="text-3xl font-extrabold text-[#003660]">Territorios</h2>
+        <p class="mt-1 text-sm text-gray-500">Gestión de lugares geográficos clave para la operación</p>
+    </div>
+
+    <!-- Formulario de nuevo territorio -->
+    <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 space-y-4">
+        <h3 class="text-lg font-semibold text-[#003660]">Agregar nuevo territorio</h3>
+        <input [(ngModel)]="newTerritory" type="text"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]"
+            placeholder="Nombre del territorio" />
+        <button (click)="addTerritory()"
+            class="bg-[#003660] hover:bg-[#005f8c] text-white text-sm px-4 py-2 rounded-xl shadow">
+            + Agregar
+        </button>
+    </div>
+
+    <!-- Listado -->
+    <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 space-y-4">
+        <h3 class="text-lg font-semibold text-[#003660]">Listado de territorios</h3>
+        <div class="space-y-4">
+            <div *ngFor="let t of territories; let i = index"
+                class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
+                <input [(ngModel)]="t.name"
+                    class="flex-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400" />
+                <button (click)="removeTerritory(i)" class="text-sm text-red-600 ml-4 hover:underline">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>

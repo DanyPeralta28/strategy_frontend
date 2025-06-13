@@ -1,37 +1,43 @@
 <div class="max-w-7xl mx-auto p-6 sm:p-10 space-y-10" [formGroup]="fdtForm">
-    <!-- Título -->
-    <div class="text-center mb-10">
-        <h2 class="text-3xl font-extrabold text-[#003660]">FDT – Fortalezas, Debilidades y Tendencias</h2>
-        <p class="mt-1 text-sm text-gray-500">Reflexiona sobre el entorno y las capacidades internas de tu organización
-        </p>
-    </div>
 
-    <!-- Tendencias -->
-    <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6">
-        <label class="block text-sm font-bold text-[#003660] mb-2">Tendencias</label>
-        <textarea formControlName="tendencias" rows="5"
-            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" placeholder="¿Cuáles son los cambios más significativos en tecnología, distribución, innovación de producto, mercados, consumidor y tendencias sociales en todo el mundo que pueden impactar en su empresa?"></textarea>
-    </div>
+  <!-- Título -->
+  <div class="text-center mb-10">
+    <h2 class="text-3xl font-extrabold text-[#003660]">FDT – Fortalezas, Debilidades y Tendencias</h2>
+    <p class="mt-1 text-sm text-gray-500">Reflexiona sobre el entorno y las capacidades internas de tu organización</p>
+  </div>
 
-    <!-- Fortalezas -->
-    <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6">
-        <label class="block text-sm font-bold text-[#003660] mb-2">Fortalezas / Competencias Clave</label>
-        <textarea formControlName="fortalezas" rows="5"
-            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" placeholder="¿Cuáles son las fortalezas propias de la organización que han sido la clave del éxito?"></textarea>
-    </div>
+  <!-- Tendencias -->
+  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
+    <h4 class="text-[#003660] font-semibold text-lg mb-2">Tendencias</h4>
+    <p class="text-sm text-gray-400 mb-3">
+      ¿Cuáles son los cambios más significativos en tecnología, distribución, innovación de producto, mercados,
+      consumidor y tendencias sociales en todo el mundo que pueden impactar en su empresa?
+    </p>
+    <textarea formControlName="tendencias" rows="5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+  </div>
 
-    <!-- Debilidades -->
-    <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6">
-        <label class="block text-sm font-bold text-[#003660] mb-2">Debilidades</label>
-        <textarea formControlName="debilidades" rows="5"
-            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" placeholder="¿Cuáles son las debilidades propias de la organización que cuestan mucho cambiar?"></textarea>
-    </div>
+  <!-- Fortalezas -->
+  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
+    <h4 class="text-[#003660] font-semibold text-lg mb-2">Fortalezas / Competencias Clave</h4>
+    <p class="text-sm text-gray-400 mb-3">
+      ¿Cuáles son las fortalezas propias de la organización que han sido la clave del éxito?
+    </p>
+    <textarea formControlName="fortalezas" rows="5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+  </div>
 
-    <!-- Botón Guardar -->
-    <div class="text-right pt-6">
-        <button (click)="save()"
-            class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
-            {{ fdtForm.dirty ? 'Actualizar' : 'Guardar' }}
-        </button>
-    </div>
+  <!-- Debilidades -->
+  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
+    <h4 class="text-[#003660] font-semibold text-lg mb-2">Debilidades</h4>
+    <p class="text-sm text-gray-400 mb-3">
+      ¿Cuáles son las debilidades propias de la organización que cuestan mucho cambiar?
+    </p>
+    <textarea formControlName="debilidades" rows="5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+  </div>
+
+  <!-- Botón Guardar -->
+  <div class="text-right pt-6">
+    <button (click)="save()" class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow transition-all">
+      {{ fdtForm.dirty ? 'Actualizar' : 'Guardar' }}
+    </button>
+  </div>
 </div>
