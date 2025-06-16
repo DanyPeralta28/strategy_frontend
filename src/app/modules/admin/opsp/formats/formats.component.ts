@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
 
 export class FormatsComponent {
   formatos = [
-    { nombre: 'BHAG', descripcion: 'Meta grande, audaz y a largo plazo', link: '' },
+    { nombre: 'BHAG', descripcion: 'Meta grande, audaz y a largo plazo', link: 'bhag' },
     { nombre: 'Visión', descripcion: 'Describe el estado futuro deseado', link: 'vision' },
     { nombre: '7 Estratos', descripcion: 'Estrategia organizacional distribuida', link: 'strata' },
     { nombre: 'FDT', descripcion: 'Fortalezas, Debilidades y Tendencias', link: 'fdt' },

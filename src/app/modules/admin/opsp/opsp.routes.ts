@@ -15,6 +15,7 @@ import { TerritoryComponent } from 'app/modules/admin/opsp/formats/territory/ter
 import { CultureComponent } from 'app/modules/admin/opsp/formats/culture/culture.component';
 import { CentralclientComponent } from 'app/modules/admin/opsp/formats/centralclient/centralclient.component';
 import { BrandpromisesComponent } from 'app/modules/admin/opsp/formats/brandpromises/brandpromises.component';
+import { BhagComponent } from 'app/modules/admin/opsp/formats/bhag/bhag.component';
 
 export default [
     {
@@ -81,5 +82,9 @@ export default [
     {
         path: 'formats/brandpromises',
         component: BrandpromisesComponent
+    },
+    {
+        path: 'formats/bhag',
+        component: BhagComponent
     }
 ] as Routes;
