@@ -12,14 +12,13 @@ import Swal from 'sweetalert2';
 })
 export class BhagComponent {
   form = {
-    bhag: '',
-    description: ''
+    bhag: ''
   };
 
   save(): void {
-    const { bhag, description } = this.form;
+    const { bhag } = this.form;
 
-    if (!bhag.trim() || !description.trim()) {
+    if (!bhag.trim()) {
       Swal.fire({
         icon: 'warning',
         title: 'Campos incompletos',

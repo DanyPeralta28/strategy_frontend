@@ -1,0 +1,67 @@
+<div class="max-w-5xl mx-auto p-6 space-y-6">
+  <!-- Título -->
+  <div class="text-center">
+    <h2 class="text-3xl font-extrabold text-[#003660]">Flywheel - Editor</h2>
+    <p class="mt-1 text-sm text-gray-500">Organiza tus elementos clave en el orden del ciclo</p>
+    <p class="mt-2 text-xs text-gray-400 italic">💡 Arrastra los bloques para reordenar el ciclo</p>
+  </div>
+
+  <!-- Lista con drag-and-drop -->
+  <div cdkDropList (cdkDropListDropped)="reordenar($event)" class="space-y-10 relative">
+    <ng-container *ngFor="let item of flywheelItems; let i = index">
+      
+      <!-- Card -->
+      <div cdkDrag class="bg-white border border-gray-200 shadow-md rounded-xl p-6 relative">
+        <!-- Drag Handle Visual -->
+        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 text-gray-300 text-sm select-none">
+          ⠿ Arrastra aquí
+        </div>
+
+        <div class="flex justify-between items-center mb-3">
+          <h4 class="text-[#003660] font-semibold">Elemento {{ i + 1 }}</h4>
+          <button (click)="eliminarItem(i)" class="text-red-500 hover:underline text-sm">Eliminar</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="text-sm font-medium text-[#003660]">Descripción</label>
+            <textarea [(ngModel)]="item.descripcion" rows="3"
+                      class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+          </div>
+          <div>
+            <label class="text-sm font-medium text-[#003660]">KPI</label>
+            <input [(ngModel)]="item.kpi" type="text"
+                   class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+          </div>
+          <div>
+            <label class="text-sm font-medium text-[#003660]">Responsable</label>
+            <input [(ngModel)]="item.responsable" type="text"
+                   class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Flecha -->
+      <svg *ngIf="i < flywheelItems.length - 1" height="40" class="mx-auto block">
+        <defs>
+          <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <polygon points="0 0, 6 3, 0 6" fill="#56B4DA" />
+          </marker>
+        </defs>
+        <line x1="50%" y1="0" x2="50%" y2="40" stroke="#56B4DA" stroke-width="2" marker-end="url(#arrowhead)" />
+      </svg>
+    </ng-container>
+  </div>
+
+  <!-- Botones -->
+  <div class="flex justify-between pt-6">
+    <button (click)="agregarItem()"
+            class="bg-[#56B4DA] hover:bg-[#3ba7d2] text-white font-medium py-2 px-6 rounded-xl shadow">
+      + Agregar Item
+    </button>
+    <button (click)="guardar()"
+            class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
+      Guardar
+    </button>
+  </div>
+</div>

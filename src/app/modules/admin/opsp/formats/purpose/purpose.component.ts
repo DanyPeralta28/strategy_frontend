@@ -13,13 +13,12 @@ import Swal from 'sweetalert2';
 export class PurposeComponent {
   form = {
     purpose: '',
-    explanation: ''
   };
 
   save(): void {
-    const { purpose, explanation } = this.form;
+    const { purpose } = this.form;
 
-    if (!purpose.trim() || !explanation.trim()) {
+    if (!purpose.trim()) {
       Swal.fire({
         icon: 'warning',
         title: 'Campos incompletos',

@@ -2,8 +2,407 @@
     <!-- Main -->
     <div class="flex-auto p-6 sm:p-10">
         <!-- CONTENT GOES HERE -->
-        <div
-            class="red h-400 max-h-400 min-h-400 rounded-2xl border-2 border-dashed border-gray-300"
-        ></div>
+        <div class="rounded-2xl border-2 border-dashed border-gray-300 p-4 bg-white">
+            <div class="flex flex-wrap items-center justify-between bg-[#003660] text-white p-4 rounded-t-lg">
+                <div class="font-semibold">ESTRATEGIA <span class="font-normal">Scaling</span><br><br></div>
+
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto mt-4 sm:mt-0">
+                    <label class="text-sm font-semibold" for="entidad">Entidad</label>
+                    <select id="entidad" [(ngModel)]="selectedEntidad"
+                        class="bg-white text-black rounded px-2 py-1 w-64">
+                        <option *ngFor="let entidad of entidades" [value]="entidad">{{ entidad }}</option>
+                    </select>
+
+                    <!-- <label class="text-sm font-semibold" for="equipo">Equipo</label>
+                    <select id="equipo" [(ngModel)]="selectedEquipo" class="bg-white text-black rounded px-2 py-1 w-48">
+                        <option *ngFor="let equipo of equipos" [value]="equipo">{{ equipo }}</option>
+                    </select> -->
+
+                    <!-- <label class="text-sm font-semibold" for="usuario">Usuario</label>
+                    <select id="usuario" [(ngModel)]="selectedUsuario"
+                        class="bg-white text-black rounded px-2 py-1 w-48">
+                        <option *ngFor="let usuario of usuarios" [value]="usuario">{{ usuario }}</option>
+                    </select> -->
+                </div>
+            </div>
+
+            <!-- KPIs - Tarjetas por categoría -->
+            <div class="mt-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+                    <div *ngFor="let categoria of balanceCategorias"
+                        class="rounded-xl bg-white p-4 shadow border border-gray-200">
+                        <div class="font-bold text-slate-700 text-center mb-4">{{ categoria.nombre }}</div>
+
+                        <div *ngFor="let kpi of categoria.kpis"
+                            class="flex flex-col gap-1 mb-3 border border-gray-100 rounded-lg p-3 bg-gray-50">
+                            <div class="text-sm font-semibold text-slate-600">{{ kpi.nombre }}</div>
+                            <div class="text-sm text-slate-500">Resultado: {{ kpi.resultado }}</div>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="h-3 w-3 rounded-full" [ngClass]="{
+                  'bg-green-500': kpi.color === 'excelente',
+                  'bg-yellow-400': kpi.color === 'riesgo',
+                  'bg-red-500': kpi.color === 'problemas'
+                }">
+                                </span>
+                                <span class="text-xs text-slate-500 capitalize">
+                                    {{
+                                    kpi.color === 'excelente' ? 'Excelente' :
+                                    kpi.color === 'riesgo' ? 'En riesgo' :
+                                    kpi.color === 'problemas' ? 'En problemas' : 'Sin color'
+                                    }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><br>
+
+            <!-- Valores, Propósito y Territorio -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <!-- Valores Centrales -->
+                <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">Valores Centrales</h2>
+                    <ul class="list-disc list-inside text-slate-600">
+                        <li *ngFor="let valor of valores">{{ valor }}</li>
+                    </ul>
+                </div>
+
+                <!-- Propósito -->
+                <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">Propósito</h2>
+                    <p class="text-slate-600">{{ proposito }}</p>
+                </div>
+
+                <!-- Territorio -->
+                <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">Territorio</h2>
+                    <p class="text-slate-600">{{ territorio }}</p>
+                </div>
+            </div>
+
+
+            <!-- METAS A 3–5 AÑOS -->
+            <div class="mt-10">
+                <h3 class="text-[#003660] font-bold text-xl mb-4">Metas a 3–5 años</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border border-gray-400 rounded-lg text-sm text-gray-700">
+                        <thead class="bg-[#003660] text-white">
+                            <tr>
+                                <th class="p-3 text-left">Año</th>
+                                <th class="p-3 text-left">Ingresos</th>
+                                <th class="p-3 text-left">Utilidad</th>
+                                <th class="p-3 text-left">Efectivo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="bg-white">
+                                <td class="p-3">{{ metasPlazo.fecha }}</td>
+                                <td class="p-3">{{ metasPlazo.ingresos }}</td>
+                                <td class="p-3">{{ metasPlazo.utilidad }}</td>
+                                <td class="p-3">{{ metasPlazo.efectivo }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- METAS ANUALES -->
+            <div class="mt-10">
+                <h3 class="text-[#003660] font-bold text-xl mb-4">Metas Anuales</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border border-gray-400 rounded-lg text-sm text-gray-700">
+                        <thead class="bg-[#003660] text-white">
+                            <tr>
+                                <th class="p-3 text-left">Año Fiscal</th>
+                                <th class="p-3 text-left">Ingresos</th>
+                                <th class="p-3 text-left">Utilidad</th>
+                                <th class="p-3 text-left">Margen Bruto</th>
+                                <th class="p-3 text-left">Efectivo</th>
+                                <th class="p-3 text-left">Cuentas por Cobrar</th>
+                                <th class="p-3 text-left">Rotación Inventario</th>
+                                <th class="p-3 text-left">Ingreso/Empleado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="bg-white">
+                                <td class="p-3">{{ metasAnuales.anioFiscal }}</td>
+                                <td class="p-3">{{ metasAnuales.ingresos }}</td>
+                                <td class="p-3">{{ metasAnuales.utilidad }}</td>
+                                <td class="p-3">{{ metasAnuales.margenBruto }}</td>
+                                <td class="p-3">{{ metasAnuales.efectivo }}</td>
+                                <td class="p-3">{{ metasAnuales.cuentasPorCobrar }}</td>
+                                <td class="p-3">{{ metasAnuales.rotacionInventario }}</td>
+                                <td class="p-3">{{ metasAnuales.ingresoEmpleado }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- METAS TRIMESTRALES -->
+            <div class="mt-10">
+                <h3 class="text-[#003660] font-bold text-xl mb-4">Metas Trimestrales</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border border-gray-400 rounded-lg text-sm text-gray-700">
+                        <thead class="bg-[#003660] text-white">
+                            <tr>
+                                <th class="p-3 text-left">Trimestre</th>
+                                <th class="p-3 text-left">Ingresos</th>
+                                <th class="p-3 text-left">Utilidad</th>
+                                <th class="p-3 text-left">Margen Bruto</th>
+                                <th class="p-3 text-left">Efectivo</th>
+                                <th class="p-3 text-left">Cuentas por Cobrar</th>
+                                <th class="p-3 text-left">Rotación Inventario</th>
+                                <th class="p-3 text-left">Ingreso/Empleado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let meta of metasTrimestrales" class="bg-white border-t">
+                                <td class="p-3">{{ meta.trimestre }}</td>
+                                <td class="p-3">{{ meta.ingresos }}</td>
+                                <td class="p-3">{{ meta.utilidad }}</td>
+                                <td class="p-3">{{ meta.margenBruto }}</td>
+                                <td class="p-3">{{ meta.efectivo }}</td>
+                                <td class="p-3">{{ meta.cuentasPorCobrar }}</td>
+                                <td class="p-3">{{ meta.rotacionInventario }}</td>
+                                <td class="p-3">{{ meta.ingresoEmpleado }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <!-- ACCIONES CONSISTENTES -->
+            <div class="mt-10">
+                <h3 class="text-[#003660] font-bold text-xl mb-4">Acciones Consistentes</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border border-gray-400 rounded-lg text-sm text-gray-700">
+                        <thead class="bg-[#5FB1E7] text-black border-gray-400">
+                            <tr>
+                                <th class="p-3 text-left">#</th>
+                                <th class="p-3 text-left">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let accion of accionesConsistentes; let i = index" class="bg-white border-t">
+                                <td class="p-3">{{ i + 1 }}</td>
+                                <td class="p-3">
+                                    <input type="text" [(ngModel)]="accionesConsistentes[i]"
+                                        class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-slate-700"
+                                        placeholder="Acción {{ i + 1 }}" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PRIORIDADES -->
+            <div class="mt-10">
+                <h3 class="text-[#003660] font-bold text-xl mb-4">Visión de Prioridades</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border border-gray-400 rounded-lg text-sm text-gray-700">
+                        <thead class="bg-[#003660] text-white">
+                            <tr>
+                                <th class="p-3 text-left">#</th>
+                                <th class="p-3 text-left">Prioridad 3–5 años</th>
+                                <th class="p-3 text-left">Prioridad Anual</th>
+                                <th class="p-3 text-left">Prioridad Trimestral</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let prioridad of prioridadesPlazo; let i = index" class="bg-white border-t">
+                                <td class="p-3">{{ i + 1 }}</td>
+                                <td class="p-3">{{ prioridadesPlazo[i] }}</td>
+                                <td class="p-3">{{ prioridadesAnuales[i] }}</td>
+                                <td class="p-3">{{ prioridadesTrimestrales[i] }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- VISIÓN: GANAR EL JUEGO -->
+            <div class="mt-10">
+                <h3 class="text-[#003660] font-bold text-xl mb-4">Visión: Ganar el Juego</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Grupo 1 -->
+                    <div>
+                        <h4 class="text-base font-semibold text-slate-700 mb-2">Personas / Balance General / Otros</h4>
+                        <div class="flex flex-col gap-4">
+                            <div *ngFor="let item of ganarJuego1"
+                                class="bg-white p-4 rounded-xl border border-gray-400 shadow-sm flex items-center gap-4">
+                                <span class="inline-block h-4 w-4 rounded-full" [ngClass]="{
+                        'bg-green-500': item.color === 'verde',
+                        'bg-yellow-400': item.color === 'amarillo',
+                        'bg-red-500': item.color === 'rojo'
+                    }"></span>
+                                <span class="text-sm text-slate-700">{{ item.descripcion }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grupo 2 -->
+                    <div>
+                        <h4 class="text-base font-semibold text-slate-700 mb-2">Personas / Balance General / Otros</h4>
+                        <div class="flex flex-col gap-4">
+                            <div *ngFor="let item of ganarJuego2"
+                                class="bg-white p-4 rounded-xl border border-gray-400 shadow-sm flex items-center gap-4">
+                                <span class="inline-block h-4 w-4 rounded-full" [ngClass]="{
+                        'bg-green-500': item.color === 'verde',
+                        'bg-yellow-400': item.color === 'amarillo',
+                        'bg-red-500': item.color === 'rojo'
+                    }"></span>
+                                <span class="text-sm text-slate-700">{{ item.descripcion }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 mt-10">
+                <!-- Competencias Clave -->
+                <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
+                    <h4 class="text-lg font-bold text-slate-800 mb-2">Competencias Clave</h4>
+                    <p class="text-slate-600 text-sm leading-relaxed">{{ competenciasClave }}</p>
+                </div>
+
+                <!-- Utilidad / X -->
+                <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
+                    <h4 class="text-lg font-bold text-slate-800 mb-2">Utilidad / X</h4>
+                    <p class="text-slate-600 text-sm leading-relaxed">{{ utilidadX }}</p>
+                </div>
+
+                <!-- Promesas de Marca -->
+                <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
+                    <h4 class="text-lg font-bold text-slate-800 mb-2">Promesas de Marca</h4>
+                    <p class="text-slate-600 text-sm leading-relaxed">{{ promesasMarca }}</p>
+                </div>
+
+                <!-- Flywheel -->
+                <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
+                    <h4 class="text-lg font-bold text-slate-800 mb-2">Flywheel</h4>
+                    <p class="text-slate-600 text-sm leading-relaxed">{{ flywheel }}</p>
+                </div>
+
+                <!-- Factor X -->
+                <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
+                    <h4 class="text-lg font-bold text-slate-800 mb-2">Factor X</h4>
+                    <p class="text-slate-600 text-sm leading-relaxed">{{ factorX }}</p>
+                </div>
+
+                <!-- 7 Estratos - Estrategia en una Frase -->
+                <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
+                    <h4 class="text-lg font-bold text-slate-800 mb-2">7 Estratos - Estrategia en una Frase</h4>
+                    <p class="text-slate-600 text-sm leading-relaxed">{{ estrategiaFrase }}</p>
+                </div>
+
+                <!-- 7 Estratos - Palabras Propias -->
+                <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
+                    <h4 class="text-lg font-bold text-slate-800 mb-2">7 Estratos - Palabras Propias</h4>
+                    <p class="text-slate-600 text-sm leading-relaxed">{{ palabrasPropias }}</p>
+                </div>
+
+                <!-- BHAG -->
+                <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
+                    <h4 class="text-lg font-bold text-slate-800 mb-2">BHAG</h4>
+                    <p class="text-slate-600 text-sm leading-relaxed">{{ bhag }}</p>
+                </div>
+
+                <!-- Jugadores A (editable) -->
+                <div class="rounded-xl bg-[#5FB1E7] p-6 shadow border border-gray-400">
+                    <h4 class="text-lg font-bold text-slate-800 mb-2">Jugadores A</h4>
+                    <input type="text" [(ngModel)]="jugadoresA"
+                        class="w-full px-3 py-2 border border-gray-300 rounded text-slate-700 text-sm bg-white"
+                        placeholder="Ej: 40%" />
+                </div>
+            </div>
+
+            <!-- FDT – Fortalezas, Debilidades y Tendencias (solo lectura) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                <!-- Fortalezas -->
+                <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
+                    <h4 class="text-lg font-bold text-slate-800 mb-4">FDT Fortalezas</h4>
+                    <ul class="list-disc list-inside text-slate-600 text-sm space-y-1">
+                        <li *ngFor="let fortaleza of fdtFortalezas">{{ fortaleza }}</li>
+                    </ul>
+                </div>
+
+                <!-- Debilidades -->
+                <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
+                    <h4 class="text-lg font-bold text-slate-800 mb-4">FDT Debilidades</h4>
+                    <ul class="list-disc list-inside text-slate-600 text-sm space-y-1">
+                        <li *ngFor="let debilidad of fdtDebilidades">{{ debilidad }}</li>
+                    </ul>
+                </div>
+
+                <!-- Tendencias -->
+                <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
+                    <h4 class="text-lg font-bold text-slate-800 mb-4">FDT Tendencias</h4>
+                    <ul class="list-disc list-inside text-slate-600 text-sm space-y-1">
+                        <li *ngFor="let tendencia of fdtTendencias">{{ tendencia }}</li>
+                    </ul>
+                </div>
+            </div>
+
+
+            <!-- Ganar el Juego – Trimestral -->
+            <div class="mt-10">
+                <h3 class="text-[#003660] font-bold text-xl mb-4">Ganar el Juego (Trimestral)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Fecha límite -->
+                    <div class="rounded-xl bg-[#5FB1E7] p-6 shadow border border-gray-300">
+                        <h4 class="text-lg font-bold text-slate-800 mb-2">Fecha límite</h4>
+                        <input type="date" [(ngModel)]="juego.fechaLimite"
+                            class="w-full px-3 py-2 bg-white border border-gray-300 rounded text-slate-700 text-sm" />
+                    </div>
+
+                    <!-- Equipo -->
+                    <div class="rounded-xl bg-[#5FB1E7] p-6 shadow border border-gray-300">
+                        <h4 class="text-lg font-bold text-slate-800 mb-2">Equipo</h4>
+                        <input type="text" [(ngModel)]="juego.equipo"
+                            class="w-full px-3 py-2 bg-white border border-gray-300 rounded text-slate-700 text-sm"
+                            placeholder="Ej: Ventas regionales" />
+                    </div>
+
+                    <!-- Reglas del juego -->
+                    <div class="md:col-span-2 rounded-xl bg-[#5FB1E7] p-6 shadow border border-gray-300">
+                        <h4 class="text-lg font-bold text-slate-800 mb-2">Reglas del juego</h4>
+                        <textarea [(ngModel)]="juego.reglas"
+                            class="w-full px-3 py-2 bg-white border border-gray-300 rounded text-slate-700 text-sm"
+                            rows="3" placeholder="Describe las reglas del juego..."></textarea>
+                    </div>
+
+                    <!-- Tablero de marcador -->
+                    <div class="md:col-span-2 rounded-xl bg-[#5FB1E7] p-6 shadow border border-gray-300">
+                        <h4 class="text-lg font-bold text-slate-800 mb-2">Tablero de marcador</h4>
+                        <textarea [(ngModel)]="juego.tablero"
+                            class="w-full px-3 py-2 bg-white border border-gray-300 rounded text-slate-700 text-sm"
+                            rows="4" placeholder="Describe el tablero de metas o progreso..."></textarea>
+                    </div>
+
+                    <!-- Cómo celebraremos -->
+                    <div class="md:col-span-2 rounded-xl bg-[#5FB1E7] p-6 shadow border border-gray-300">
+                        <h4 class="text-lg font-bold text-slate-800 mb-2">Cómo celebraremos</h4>
+                        <textarea [(ngModel)]="juego.celebracion"
+                            class="w-full px-3 py-2 bg-white border border-gray-300 rounded text-slate-700 text-sm"
+                            rows="3" placeholder="Explica cómo celebrarán al lograr el objetivo..."></textarea>
+                    </div>
+
+                    <!-- Premio -->
+                    <div class="md:col-span-2 rounded-xl bg-[#5FB1E7] p-6 shadow border border-gray-300">
+                        <h4 class="text-lg font-bold text-slate-800 mb-2">Premio</h4>
+                        <textarea [(ngModel)]="juego.premio"
+                            class="w-full px-3 py-2 bg-white border border-gray-300 rounded text-slate-700 text-sm"
+                            rows="2" placeholder="Ej: Día libre, bono, almuerzo especial..."></textarea>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>

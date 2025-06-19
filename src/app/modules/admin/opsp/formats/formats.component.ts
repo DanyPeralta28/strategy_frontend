@@ -21,7 +21,7 @@ export class FormatsComponent {
     { nombre: 'Balance de KPIs', descripcion: 'Indicadores clave de rendimiento', link: 'balancekpis' },
     { nombre: 'Utilidad por X', descripcion: 'Relación de ganancias por unidad clave', link: 'utilidadx' },
     { nombre: 'Metas', descripcion: 'Objetivos específicos y medibles', link: 'goals' },
-    { nombre: 'Flywheel', descripcion: 'Modelo de impulso organizacional', link: '' },
+    { nombre: 'Flywheel', descripcion: 'Modelo de impulso organizacional', link: 'flywheel' },
     { nombre: 'Valores Centrales', descripcion: 'Principios que guían la cultura', link: 'corevalues' },
     { nombre: 'Propósito', descripcion: 'Razón de ser de la organización', link: 'purpose' },
     { nombre: 'Competencias clave', descripcion: 'Habilidades clave del equipo', link: 'keycompetencies' },

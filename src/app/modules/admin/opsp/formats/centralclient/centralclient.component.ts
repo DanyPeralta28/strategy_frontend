@@ -26,13 +26,12 @@ export class CentralclientComponent {
     { pregunta: '¿Qué es lo que más necesitan de nosotros para tener éxito?', respuesta: '' },
   ];
 
-  nombreResumen: string = '';
   descripcionResumen: string = '';
 
   save(): void {
     const respuestasCompletas = this.preguntas.filter(p => p.respuesta.trim() !== '');
 
-    if (respuestasCompletas.length === 0 && this.nombreResumen.trim() === '' && this.descripcionResumen.trim() === '') {
+    if (respuestasCompletas.length === 0 && this.descripcionResumen.trim() === '') {
       Swal.fire({
         icon: 'warning',
         title: 'Sin datos',
@@ -45,7 +44,6 @@ export class CentralclientComponent {
     const datos = {
       preguntas: this.preguntas,
       resumen: {
-        nombre: this.nombreResumen,
         descripcion: this.descripcionResumen
       }
     };

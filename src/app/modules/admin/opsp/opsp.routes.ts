@@ -16,6 +16,7 @@ import { CultureComponent } from 'app/modules/admin/opsp/formats/culture/culture
 import { CentralclientComponent } from 'app/modules/admin/opsp/formats/centralclient/centralclient.component';
 import { BrandpromisesComponent } from 'app/modules/admin/opsp/formats/brandpromises/brandpromises.component';
 import { BhagComponent } from 'app/modules/admin/opsp/formats/bhag/bhag.component';
+import { FlywheelComponent } from 'app/modules/admin/opsp/formats/flywheel/flywheel.component';
 
 export default [
     {
@@ -86,5 +87,9 @@ export default [
     {
         path: 'formats/bhag',
         component: BhagComponent
-    }
+    },
+        {
+        path: 'formats/flywheel',
+        component: FlywheelComponent
+    },
 ] as Routes;
