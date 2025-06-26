@@ -14,69 +14,165 @@
       <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
         <h4 class="text-[#003660] font-semibold text-lg mb-2">Valores Centrales</h4>
         <p class="text-sm text-gray-400 mb-3">Describe los valores clave que guían a tu organización</p>
-        <textarea formControlName="valores" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="5"></textarea>
+        <textarea formControlName="valores"
+          class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="5"></textarea>
       </div>
       <!-- Propósito -->
       <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
         <h4 class="text-[#003660] font-semibold text-lg mb-2">Propósito</h4>
         <p class="text-sm text-gray-400 mb-3">¿Cuál es la razón de existir de tu organización?</p>
-        <textarea formControlName="proposito" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="5"></textarea>
+        <textarea formControlName="proposito"
+          class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="5"></textarea>
       </div>
       <!-- Promesas -->
       <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
         <h4 class="text-[#003660] font-semibold text-lg mb-2">Promesas de Marca</h4>
         <p class="text-sm text-gray-400 mb-3">¿Qué compromiso haces con tus clientes y colaboradores?</p>
-        <textarea formControlName="promesas" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="5"></textarea>
+        <textarea formControlName="promesas"
+          class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="5"></textarea>
       </div>
     </div>
   </div>
 
-  <!-- BHAG -->
+  <!-- BHAG® -->
   <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
-    <h4 class="text-[#003660] font-semibold text-lg mb-2">BHAG</h4>
+    <h4 class="text-[#003660] font-semibold text-lg mb-2">BHAG®</h4>
     <p class="text-sm text-gray-400 mb-3">Meta audaz a largo plazo que transforma tu organización</p>
-    <textarea formControlName="bhag" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="3"></textarea>
+    <textarea formControlName="bhag"
+      class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="3"></textarea>
   </div>
 
-  <!-- Prioridades Estratégicas -->
-  <div formGroupName="prioridades" class="space-y-6">
+  <!-- PRIORIDADES ESTRATÉGICAS -->
+  <div class="space-y-6 mt-10">
     <h3 class="text-lg font-bold text-[#003660] border-b pb-2">Prioridades Estratégicas</h3>
+
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
-        <h4 class="text-[#003660] font-semibold text-lg mb-2">3-5 AÑOS</h4>
-        <textarea formControlName="largo" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="4"></textarea>
+      <!-- 3-5 AÑOS -->
+      <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
+        <div class="flex items-center justify-between mb-2">
+          <h4 class="text-[#003660] font-semibold text-lg">3-5 AÑOS</h4>
+          <button type="button" class="text-sm bg-[#003660] text-white px-3 py-1 rounded hover:bg-[#004b8d]"
+            (click)="addItem(prioridadesLargo)">
+            + Agregar
+          </button>
+        </div>
+        <div *ngIf="prioridadesLargo.length === 0" class="text-sm italic text-gray-400">
+          No hay prioridades aún.
+        </div>
+
+        <div *ngFor="let ctrl of prioridadesLargo.controls; let i = index" class="flex items-center gap-2 mb-2">
+          <textarea [formControl]="ctrl" rows="1" #autosizeArea (input)="autoResize(autosizeArea)" class="flex-1 px-3 py-2 border border-gray-300 rounded text-sm text-gray-700
+         resize-none overflow-hidden focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+          <button type="button" class="text-red-600 hover:text-red-800" (click)="removeItem(prioridadesLargo, i)">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
-      <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
-        <h4 class="text-[#003660] font-semibold text-lg mb-2">1 AÑO</h4>
-        <textarea formControlName="medio" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="4"></textarea>
+
+      <!-- 1 AÑO -->
+      <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
+        <div class="flex items-center justify-between mb-2">
+          <h4 class="text-[#003660] font-semibold text-lg">1 AÑO</h4>
+          <button type="button" class="text-sm bg-[#003660] text-white px-3 py-1 rounded hover:bg-[#004b8d]"
+            (click)="addItem(prioridadesMedio)">
+            + Agregar
+          </button>
+        </div>
+        <div *ngIf="prioridadesMedio.length === 0" class="text-sm italic text-gray-400">
+          No hay prioridades aún.
+        </div>
+        <div *ngFor="let ctrl of prioridadesMedio.controls; let i = index" class="flex items-center gap-2 mb-2">
+          <textarea [formControl]="ctrl" rows="1" #autosizeArea (input)="autoResize(autosizeArea)" class="flex-1 px-3 py-2 border border-gray-300 rounded text-sm text-gray-700
+         resize-none overflow-hidden focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+          <button type="button" class="text-red-600 hover:text-red-800" (click)="removeItem(prioridadesMedio, i)">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
-      <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
-        <h4 class="text-[#003660] font-semibold text-lg mb-2">TRIMESTRE</h4>
-        <textarea formControlName="corto" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]" rows="4"></textarea>
+
+      <!-- TRIMESTRE -->
+      <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
+        <div class="flex items-center justify-between mb-2">
+          <h4 class="text-[#003660] font-semibold text-lg">TRIMESTRE</h4>
+          <button type="button" class="text-sm bg-[#003660] text-white px-3 py-1 rounded hover:bg-[#004b8d]"
+            (click)="addItem(prioridadesCorto)">
+            + Agregar
+          </button>
+        </div>
+        <div *ngIf="prioridadesCorto.length === 0" class="text-sm italic text-gray-400">
+          No hay prioridades aún.
+        </div>
+        <div *ngFor="let ctrl of prioridadesCorto.controls; let i = index" class="flex items-center gap-2 mb-2">
+          <textarea [formControl]="ctrl" rows="1" #autosizeArea (input)="autoResize(autosizeArea)" class="flex-1 px-3 py-2 border border-gray-300 rounded text-sm text-gray-700
+         resize-none overflow-hidden focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+          <button type="button" class="text-red-600 hover:text-red-800" (click)="removeItem(prioridadesCorto, i)">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- KPIs -->
-  <div class="space-y-6">
-    <h3 class="text-xl font-bold text-[#003660] border-b pb-2">Sus KPIs</h3>
+  <div class="space-y-6 mt-10">
+    <div class="flex items-center justify-between mb-2">
+      <h3 class="text-xl font-bold text-[#003660]">Sus KPIs</h3>
+
+      <button type="button" (click)="addKpi()"
+        class="flex items-center gap-2 bg-[#003660] hover:bg-[#004b8d] text-white font-semibold px-4 py-2 rounded-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>Agregar KPI</span>
+      </button>
+    </div>
+
+    <!-- Tabla -->
     <div class="overflow-auto bg-white border border-gray-200 rounded-xl shadow-md">
       <table class="min-w-full text-sm text-gray-800">
         <thead class="bg-gray-100 text-[#003660] font-semibold">
           <tr>
-            <th class="p-3 text-left">#</th>
+            <th class="p-3 text-left w-12">#</th>
             <th class="p-3 text-left">KPI</th>
             <th class="p-3 text-left">Meta</th>
+            <th class="p-3 w-10"></th>
           </tr>
         </thead>
+
         <tbody formArrayName="kpis">
-          <tr *ngFor="let kpi of kpis.controls; let i = index" [formGroupName]="i" class="border-t hover:bg-gray-50 transition">
+          <tr *ngIf="kpis.length === 0">
+            <td colspan="4" class="text-center italic text-gray-400 py-4">
+              No hay KPIs aún. Usa el botón “Agregar KPI” para comenzar.
+            </td>
+          </tr>
+
+          <tr *ngFor="let kpi of kpis.controls; let i = index" [formGroupName]="i"
+            class="border-t hover:bg-gray-50 transition">
             <td class="p-3 font-medium">{{ i + 1 }}</td>
             <td class="p-3">
-              <input formControlName="kpi" type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]" />
+              <input formControlName="kpi" type="text"
+                class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]" />
             </td>
             <td class="p-3">
-              <input formControlName="meta" type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]" />
+              <input formControlName="meta" type="text"
+                class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]" />
+            </td>
+            <td class="p-3 text-center">
+              <button type="button" (click)="removeKpi(i)" class="text-red-600 hover:text-red-800">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </td>
           </tr>
         </tbody>
@@ -85,7 +181,7 @@
   </div>
 
   <!-- Ganar el Juego -->
-  <div class="space-y-6 pt-10">
+  <div class="space-y-6 pt-0">
     <h3 class="text-xl font-bold text-[#003660] border-b pb-2">Ganar el Juego</h3>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div class="bg-white border border-gray-200 rounded-xl shadow-md">
@@ -93,22 +189,35 @@
         <table class="w-full text-sm" formArrayName="ganarJuego1">
           <tbody>
             <tr *ngFor="let item of ganarJuego1.controls; let i = index" [formGroupName]="i">
-              <td class="p-3 w-10 text-xl">{{ estados[i].icono }}</td>
+              <td class="p-3 w-10 text-xl">
+                <!-- Círculo de color -->
+                <span class="inline-block w-4 h-4 rounded-full border border-gray-300"
+                  [style.backgroundColor]="estados[i]?.color"></span>
+              </td>
               <td class="p-3">
-                <input formControlName="descripcion" type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]" [placeholder]="estados[i].placeholder" />
+                <input formControlName="descripcion" type="text"
+                  class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]"
+                  [placeholder]="estados[i]?.placeholder" />
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+
       <div class="bg-white border border-gray-200 rounded-xl shadow-md">
         <div class="text-center py-2 font-semibold border-b text-[#003660]">Ganar el Juego</div>
         <table class="w-full text-sm" formArrayName="ganarJuego2">
           <tbody>
             <tr *ngFor="let item of ganarJuego2.controls; let i = index" [formGroupName]="i">
-              <td class="p-3 w-10 text-xl">{{ estados[i].icono }}</td>
+              <td class="p-3 w-10 text-xl">
+                <!-- Círculo de color -->
+                <span class="inline-block w-4 h-4 rounded-full border border-gray-300"
+                  [style.backgroundColor]="estados[i]?.color"></span>
+              </td>
               <td class="p-3">
-                <input formControlName="descripcion" type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]" [placeholder]="estados[i].placeholder" />
+                <input formControlName="descripcion" type="text"
+                  class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]"
+                  [placeholder]="estados[i]?.placeholder" />
               </td>
             </tr>
           </tbody>
@@ -118,27 +227,94 @@
   </div>
 
   <!-- Prioridades Trimestrales -->
-  <div class="space-y-6 pt-10">
-    <h3 class="text-xl font-bold text-[#003660] border-b pb-2">Sus Prioridades Trimestrales</h3>
+  <div class="space-y-6 pt-0">
+    <div class="flex items-center justify-between mb-2">
+      <h3 class="text-xl font-bold text-[#003660]">Sus Prioridades Trimestrales</h3>
+      <button type="button" (click)="addPrioridad()"
+        class="flex items-center gap-2 bg-[#003660] hover:bg-[#004b8d] text-white font-semibold px-4 py-2 rounded-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>Agregar Prioridad</span>
+      </button>
+    </div>
+
     <div class="overflow-auto bg-white border border-gray-200 rounded-xl shadow-md">
       <table class="min-w-full text-sm text-gray-800">
         <thead class="bg-gray-100 text-[#003660] font-semibold">
           <tr>
-            <th class="p-3 text-left">#</th>
+            <th class="p-3 text-left w-12">#</th>
             <th class="p-3 text-left">Prioridad</th>
             <th class="p-3 text-left">Plazo</th>
+            <th class="p-3 text-left">¿OKR?</th>
+            <th class="p-3 w-10"></th>
           </tr>
         </thead>
+
         <tbody formArrayName="prioridadesTrimestrales">
-          <tr *ngFor="let prioridad of prioridadesTrimestrales.controls; let i = index" [formGroupName]="i" class="border-t hover:bg-gray-50 transition">
-            <td class="p-3 font-medium">{{ i + 1 }}</td>
-            <td class="p-3">
-              <input formControlName="prioridad" type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]" />
-            </td>
-            <td class="p-3">
-              <input formControlName="plazo" type="text" class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]" />
+          <!-- mensaje vacío -->
+          <tr *ngIf="prioridadesTrimestrales.length === 0">
+            <td colspan="5" class="text-center italic text-gray-400 py-4">
+              No hay prioridades aún.
             </td>
           </tr>
+
+          <!-- PRIORIDAD + subprioridades en el MISMO ngFor -->
+          <ng-container *ngFor="let prioridad of prioridadesTrimestrales.controls; let i = index" [formGroupName]="i">
+            <!-- Fila principal -->
+            <tr class="border-t hover:bg-gray-50 transition">
+              <td class="p-3 font-medium">{{ i + 1 }}</td>
+
+              <td class="p-3">
+                <input formControlName="prioridad" type="text" class="w-full border border-gray-300 rounded-md p-2
+                      focus:ring-2 focus:ring-[#56B4DA]" />
+              </td>
+
+              <td class="p-3">
+                <input formControlName="plazo" type="text" class="w-full border border-gray-300 rounded-md p-2
+                      focus:ring-2 focus:ring-[#56B4DA]" />
+              </td>
+
+              <td class="p-3 text-center">
+                <input type="checkbox" formControlName="esOKR" />
+              </td>
+
+              <td class="p-3 text-center">
+                <button type="button" (click)="removePrioridad(i)" class="text-red-600 hover:text-red-800">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </td>
+            </tr>
+
+            <!-- Fila de subprioridades (solo si es OKR) -->
+            <tr *ngIf="prioridad.get('esOKR')?.value">
+              <td colspan="5" class="px-6 pb-4">
+                <div class="pl-4 border-l-4 border-[#003660] bg-gray-50 rounded-lg p-4 space-y-3">
+                  <div class="flex items-center justify-between mb-2">
+                    <h4 class="font-semibold text-[#003660]">Subprioridades</h4>
+
+                    <button type="button" (click)="addSubprioridad(i)" class="text-sm text-[#003660] hover:underline">
+                      + Agregar subprioridad
+                    </button>
+                  </div>
+
+                  <div *ngFor="let sub of getSubprioridades(i).controls; let j = index" class="flex items-center gap-2">
+                    <input [formControl]="sub" type="text"
+                      class="flex-1 border border-gray-300 rounded-md p-2 text-sm text-gray-700" />
+                    <button type="button" (click)="removeSubprioridad(i, j)" class="text-red-600 hover:text-red-800">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
         </tbody>
       </table>
     </div>
@@ -146,7 +322,8 @@
 
   <!-- Botón Guardar -->
   <div class="text-right pt-6">
-    <button (click)="save()" class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow transition-all">
+    <button (click)="save()"
+      class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow transition-all">
       {{ visionForm.dirty ? 'Actualizar' : 'Guardar' }}
     </button>
   </div>

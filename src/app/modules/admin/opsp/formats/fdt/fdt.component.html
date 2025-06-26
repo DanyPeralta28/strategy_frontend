@@ -1,42 +1,114 @@
 <div class="max-w-7xl mx-auto p-6 sm:p-10 space-y-10" [formGroup]="fdtForm">
-
-  <!-- Título -->
+  <!-- Encabezado -->
   <div class="text-center mb-10">
-    <h2 class="text-3xl font-extrabold text-[#003660]">FDT – Fortalezas, Debilidades y Tendencias</h2>
-    <p class="mt-1 text-sm text-gray-500">Reflexiona sobre el entorno y las capacidades internas de tu organización</p>
+    <h2 class="text-3xl font-extrabold text-[#003660]">
+      FDT – Fortalezas, Debilidades y Tendencias
+    </h2>
+    <p class="mt-1 text-sm text-gray-500">
+      Reflexiona sobre el entorno y las capacidades internas de tu organización
+    </p>
   </div>
 
-  <!-- Tendencias -->
-  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
-    <h4 class="text-[#003660] font-semibold text-lg mb-2">Tendencias</h4>
-    <p class="text-sm text-gray-400 mb-3">
-      ¿Cuáles son los cambios más significativos en tecnología, distribución, innovación de producto, mercados,
-      consumidor y tendencias sociales en todo el mundo que pueden impactar en su empresa?
-    </p>
-    <textarea formControlName="tendencias" rows="5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+  <!-- ===== Tendencias ===== -->
+  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
+    <div class="flex items-center justify-between mb-2">
+      <div>
+        <h4 class="text-[#003660] font-semibold text-lg">Tendencias</h4>
+        <p class="text-sm text-gray-400">
+          ¿Cuáles son los cambios más significativos en tecnología, distribución, innovación de producto, mercados, consumidor y tendencias sociales en todo el mundo que pueden impactar en su empresa?
+        </p>
+      </div>
+      <button type="button" class="text-sm bg-[#003660] text-white px-3 py-1 rounded hover:bg-[#004b8d]"
+        (click)="addItem(tendencias)">
+        + Agregar
+      </button>
+    </div>
+
+    <!-- Lista -->
+    <div *ngIf="tendencias.length === 0" class="text-sm italic text-gray-400">
+      No hay tendencias aún.
+    </div>
+
+    <div *ngFor="let ctrl of tendencias.controls; let i = index" class="flex items-center gap-2 mb-2"
+      [formControl]="ctrl">
+      <input type="text" class="flex-1 border border-gray-300 rounded-md p-2 text-sm text-gray-700" />
+      <button type="button" class="text-red-600 hover:text-red-800" (click)="removeItem(tendencias, i)">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+      </button>
+    </div>
   </div>
 
-  <!-- Fortalezas -->
-  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
-    <h4 class="text-[#003660] font-semibold text-lg mb-2">Fortalezas / Competencias Clave</h4>
-    <p class="text-sm text-gray-400 mb-3">
-      ¿Cuáles son las fortalezas propias de la organización que han sido la clave del éxito?
-    </p>
-    <textarea formControlName="fortalezas" rows="5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+  <!-- ===== Fortalezas ===== -->
+  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
+    <div class="flex items-center justify-between mb-2">
+      <div>
+        <h4 class="text-[#003660] font-semibold text-lg">
+          Fortalezas / Competencias Clave
+        </h4>
+        <p class="text-sm text-gray-400">
+          ¿Cuáles son las fortalezas propias de la organización que han sido la clave del éxito?
+        </p>
+      </div>
+      <button type="button" class="text-sm bg-[#003660] text-white px-3 py-1 rounded hover:bg-[#004b8d]"
+        (click)="addItem(fortalezas)">
+        + Agregar
+      </button>
+    </div>
+
+    <div *ngIf="fortalezas.length === 0" class="text-sm italic text-gray-400">
+      No hay fortalezas aún.
+    </div>
+
+    <div *ngFor="let ctrl of fortalezas.controls; let i = index" class="flex items-center gap-2 mb-2"
+      [formControl]="ctrl">
+      <input type="text" class="flex-1 border border-gray-300 rounded-md p-2 text-sm text-gray-700" />
+      <button type="button" class="text-red-600 hover:text-red-800" (click)="removeItem(fortalezas, i)">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+      </button>
+    </div>
   </div>
 
-  <!-- Debilidades -->
-  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
-    <h4 class="text-[#003660] font-semibold text-lg mb-2">Debilidades</h4>
-    <p class="text-sm text-gray-400 mb-3">
-      ¿Cuáles son las debilidades propias de la organización que cuestan mucho cambiar?
-    </p>
-    <textarea formControlName="debilidades" rows="5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+  <!-- ===== Debilidades ===== -->
+  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
+    <div class="flex items-center justify-between mb-2">
+      <div>
+        <h4 class="text-[#003660] font-semibold text-lg">Debilidades</h4>
+        <p class="text-sm text-gray-400">
+          ¿Cuáles son las debilidades propias de la organización que cuestan mucho cambiar?
+        </p>
+      </div>
+      <button type="button" class="text-sm bg-[#003660] text-white px-3 py-1 rounded hover:bg-[#004b8d]"
+        (click)="addItem(debilidades)">
+        + Agregar
+      </button>
+    </div>
+
+    <div *ngIf="debilidades.length === 0" class="text-sm italic text-gray-400">
+      No hay debilidades aún.
+    </div>
+
+    <div *ngFor="let ctrl of debilidades.controls; let i = index" class="flex items-center gap-2 mb-2"
+      [formControl]="ctrl">
+      <input type="text" class="flex-1 border border-gray-300 rounded-md p-2 text-sm text-gray-700" />
+      <button type="button" class="text-red-600 hover:text-red-800" (click)="removeItem(debilidades, i)">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+      </button>
+    </div>
   </div>
 
   <!-- Botón Guardar -->
   <div class="text-right pt-6">
-    <button (click)="save()" class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow transition-all">
+    <button (click)="save()"
+      class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow transition-all">
       {{ fdtForm.dirty ? 'Actualizar' : 'Guardar' }}
     </button>
   </div>

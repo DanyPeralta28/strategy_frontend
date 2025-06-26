@@ -1,81 +1,101 @@
 <div class="max-w-7xl mx-auto px-6 py-10 space-y-16">
-
   <!-- Encabezado -->
   <div class="text-center">
     <h2 class="text-3xl font-extrabold text-[#003660]">Metas</h2>
     <p class="mt-2 text-sm text-gray-500">Objetivos específicos y medibles</p>
   </div>
 
-  <!-- Metas Anuales -->
-  <div class="space-y-8">
-    <h3 class="text-xl font-bold text-[#003660] border-b pb-2">Metas Anuales</h3>
-
-    <div class="grid md:grid-cols-2 gap-8">
-      <!-- Card Anual: 3-5 Años -->
+  <!-- Secciones 3–5 años / 1 año -->
+  <div class="grid md:grid-cols-2 gap-8">
+    <ng-container *ngFor="let section of ['threeFiveYears', 'year']">
       <div class="bg-white border border-gray-200 rounded-2xl shadow-md p-6">
-        <h4 class="text-lg font-semibold text-[#003660] text-center mb-6">3–5 Años</h4>
+        <h4 class="text-lg font-semibold text-[#003660] text-center mb-6">
+          {{ section === 'threeFiveYears' ? '3–5 Años' : '1 Año' }}
+        </h4>
+
         <div class="grid gap-4">
-          <ng-container *ngFor="let campo of campos">
-            <div>
-              <label class="block text-sm text-gray-700 mb-1">{{ campo }}</label>
-              <input [(ngModel)]="metas.largo[campo]" type="text"
+          <ng-container *ngFor="let field of goalData[section].values; let i = index">
+            <div class="relative">
+              <!-- Etiqueta editable -->
+              <div class="mb-1">
+                <ng-container *ngIf="!field.editing; else labelEdit">
+                  <div class="flex items-center gap-1">
+                    <span class="text-xs text-gray-500 leading-4">{{ field.title || '--' }}</span>
+                    <button mat-icon-button (click)="toggleEdit(section, i)" matTooltip="Editar nombre"
+                      class="p-0 h-4 w-4 min-w-0 flex items-center justify-center text-gray-400 hover:text-[#003660]">
+                      <mat-icon fontIcon="edit" class="text-[14px] leading-none"></mat-icon>
+                    </button>
+                  </div>
+                </ng-container>
+                <ng-template #labelEdit>
+                  <input [(ngModel)]="field.title" (blur)="toggleEdit(section, i)"
+                    class="border-b border-[#56B4DA] focus:outline-none w-full text-xs"
+                    placeholder="Nombre del campo" />
+                </ng-template>
+              </div>
+
+              <!-- Valor -->
+              <input [(ngModel)]="field.value" type="text"
                 class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
             </div>
           </ng-container>
-        </div>
-      </div>
 
-      <!-- Card Anual: 1 Año -->
-      <div class="bg-white border border-gray-200 rounded-2xl shadow-md p-6">
-        <h4 class="text-lg font-semibold text-[#003660] text-center mb-6">1 Año</h4>
-        <div class="grid gap-4">
-          <ng-container *ngFor="let campo of campos">
-            <div>
-              <label class="block text-sm text-gray-700 mb-1">{{ campo }}</label>
-              <input [(ngModel)]="metas.medio[campo]" type="text"
-                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
-            </div>
-          </ng-container>
+          <button (click)="addField(section)" class="text-sm text-[#003660] font-medium mt-2 hover:underline">
+            + Agregar campo
+          </button>
         </div>
       </div>
-    </div>
+    </ng-container>
   </div>
 
-  <!-- Metas Trimestrales -->
-  <div class="space-y-8">
-    <h3 class="text-xl font-bold text-[#003660] border-b pb-2">Metas Trimestrales</h3>
+  <!-- Secciones Trimestrales -->
+  <h3 class="text-xl font-bold text-[#003660] border-b pb-2 mt-14">Metas Trimestrales</h3>
+  <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <ng-container *ngFor="let section of quarterKeys; let idx = index">
+      <div class="bg-white border border-gray-200 rounded-2xl shadow-md p-6">
+        <h4 class="text-center text-lg font-semibold text-[#003660] mb-4">
+          Trimestre {{ idx + 1 }}
+        </h4>
 
-    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-      <ng-container *ngFor="let trimestre of ['T1', 'T2', 'T3', 'T4']; let i = index">
-        <div class="bg-white border border-gray-200 rounded-2xl shadow-md p-6">
-          <h4 class="text-center text-lg font-semibold text-[#003660] mb-4">Trimestre {{ i + 1 }}</h4>
-
-          <div class="mb-4">
-            <label class="block text-sm text-gray-700 mb-1">Mes Inicio - Mes Fin</label>
-            <input [(ngModel)]="metas.trimestres[trimestre].rango" type="text"
-              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
-          </div>
-
-          <div class="grid gap-4">
-            <ng-container *ngFor="let campo of campos">
-              <div>
-                <label class="block text-sm text-gray-700 mb-1">{{ campo }}</label>
-                <input [(ngModel)]="metas.trimestres[trimestre][campo]" type="text"
-                  class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+        <div class="grid gap-4">
+          <ng-container *ngFor="let field of goalData[section].values; let j = index">
+            <div class="relative">
+              <!-- Etiqueta editable -->
+              <div class="mb-1">
+                <ng-container *ngIf="!field.editing; else labelEditQ">
+                  <div class="flex items-center gap-1">
+                    <span class="text-xs text-gray-500 leading-4">{{ field.title || '--' }}</span>
+                    <button mat-icon-button (click)="toggleEdit(section, j)" matTooltip="Editar nombre"
+                      class="p-0 h-4 w-4 min-w-0 flex items-center justify-center text-gray-400 hover:text-[#003660]">
+                      <mat-icon fontIcon="edit" class="text-[14px] leading-none"></mat-icon>
+                    </button>
+                  </div>
+                </ng-container>
+                <ng-template #labelEditQ>
+                  <input [(ngModel)]="field.title" (blur)="toggleEdit(section, j)"
+                    class="border-b border-[#56B4DA] focus:outline-none w-full text-xs"
+                    placeholder="Nombre del campo" />
+                </ng-template>
               </div>
-            </ng-container>
-          </div>
+
+              <!-- Valor -->
+              <input [(ngModel)]="field.value" type="text"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+            </div>
+          </ng-container>
+
+          <button (click)="addField(section)" class="text-sm text-[#003660] font-medium mt-2 hover:underline">
+            + Agregar campo
+          </button>
         </div>
-      </ng-container>
-    </div>
+      </div>
+    </ng-container>
   </div>
 
   <!-- Botón Guardar -->
-  <div class="text-right pt-6">
-    <button (click)="guardar()"
-      class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
+  <div class="text-right pt-10">
+    <button (click)="save()" class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-3 px-8 rounded-xl shadow">
       Guardar
     </button>
   </div>
-
 </div>

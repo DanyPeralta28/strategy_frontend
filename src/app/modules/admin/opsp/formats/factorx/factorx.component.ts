@@ -28,15 +28,35 @@ export class FactorxComponent {
   ];
 
   bottlenecks = [
-    { descripcion: '', lider: '', fecha: '' },
-    { descripcion: '', lider: '', fecha: '' },
     { descripcion: '', lider: '', fecha: '' }
   ];
 
-  feria = { descripcion: '', lider: '', fecha: '' };
+  ferias = [
+    { descripcion: '', lider: '', fecha: '' }
+  ];
 
   toggleInefficiency(box: any): void {
     box.has_inefficiency = !box.has_inefficiency;
+  }
+
+  addBottleneck(): void {
+    this.bottlenecks.push({ descripcion: '', lider: '', fecha: '' });
+  }
+
+  removeBottleneck(index: number): void {
+    if (this.bottlenecks.length > 1) {
+      this.bottlenecks.splice(index, 1);
+    }
+  }
+
+  addFeria(): void {
+    this.ferias.push({ descripcion: '', lider: '', fecha: '' });
+  }
+
+  removeFeria(index: number): void {
+    if (this.ferias.length > 1) {
+      this.ferias.splice(index, 1);
+    }
   }
 
   save(): void {
@@ -49,7 +69,7 @@ export class FactorxComponent {
           tiene_ineficiencia: step.has_inefficiency
         })),
       cuellosDeBotella: this.bottlenecks,
-      feriaComercial: this.feria
+      feriaComercial: this.ferias
     };
 
     console.log('DATA COMPLETA:', payload);

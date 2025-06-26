@@ -41,6 +41,12 @@ export class BalancekpisComponent {
     });
   }
 
+  eliminarKPI(key: string, index: number): void {
+    if (this.kpisBalance[key].length > 1) {
+      this.kpisBalance[key].splice(index, 1);
+    }
+  }
+
   guardarKPIs(): void {
     const resultadoFiltrado: any = {};
 
@@ -57,7 +63,7 @@ export class BalancekpisComponent {
       kpis: resultadoFiltrado
     };
 
-    console.log('Balance de KPIs:', payload);
+    console.log('KPIs de Balance:', payload);
 
     Swal.fire({
       icon: 'success',

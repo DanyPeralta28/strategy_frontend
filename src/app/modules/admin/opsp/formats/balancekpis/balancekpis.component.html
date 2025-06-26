@@ -1,7 +1,7 @@
 <div class="max-w-7xl mx-auto p-6 sm:p-10 space-y-10">
     <!-- Título -->
     <div class="text-center">
-        <h2 class="text-3xl font-extrabold text-[#003660]">Balance de KPIs</h2>
+        <h2 class="text-3xl font-extrabold text-[#003660]">KPIs de Balance</h2>
         <p class="mt-1 text-sm text-gray-500">Indicadores clave de rendimiento</p>
     </div>
 
@@ -17,27 +17,36 @@
             <h3 class="text-lg font-semibold text-[#003660]">{{ categoria.label }}</h3>
 
             <div class="space-y-3">
-                <div *ngFor="let kpi of kpisBalance[categoria.key]; let i = index"
-                    class="grid grid-cols-1 md:grid-cols-4 gap-4 items-start">
-                    <div class="md:col-span-2">
-                        <label class="text-sm font-medium text-gray-700">KPI</label>
-                        <input [(ngModel)]="kpi.kpi" type="text"
-                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]" />
+                <div *ngFor="let kpi of kpisBalance[categoria.key]; let i = index" class="relative">
+                    <!-- Botón eliminar -->
+                    <div class="text-right -mt-2 mb-2 pt-6" *ngIf="kpisBalance[categoria.key].length > 1">
+                        <button (click)="eliminarKPI(categoria.key, i)"
+                            class="text-red-600 text-sm font-medium hover:underline">
+                            🗑 Eliminar
+                        </button>
                     </div>
-                    <div>
-                        <label class="text-sm font-medium text-gray-700">Resultado</label>
-                        <input [(ngModel)]="kpi.resultado" type="text"
-                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]" />
-                    </div>
-                    <div>
-                        <label class="text-sm font-medium text-gray-700">Color</label>
-                        <select [(ngModel)]="kpi.color"
-                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]">
-                            <option value="">Seleccione</option>
-                            <option value="verde-oscuro">🟢 Excelente</option>
-                            <option value="verde-claro">🟢 Bien</option>
-                            <option value="rojo">🔴 En problemas</option>
-                        </select>
+
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-start mb-3">
+                        <div class="md:col-span-2">
+                            <label class="text-sm font-medium text-gray-700">KPI</label>
+                            <input [(ngModel)]="kpi.kpi" type="text"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]" />
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Resultado</label>
+                            <input [(ngModel)]="kpi.resultado" type="text"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]" />
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Color</label>
+                            <select [(ngModel)]="kpi.color"
+                                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]">
+                                <option value="">Seleccione</option>
+                                <option value="verde-oscuro">🟢 Excelente</option>
+                                <option value="verde-claro">🟢 Bien</option>
+                                <option value="rojo">🔴 En problemas</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>

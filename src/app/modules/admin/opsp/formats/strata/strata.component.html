@@ -1,21 +1,27 @@
 <div class="max-w-7xl mx-auto p-6 sm:p-10 space-y-10" [formGroup]="sevenForm">
-
   <!-- Título -->
   <div class="text-center">
     <h2 class="text-3xl font-extrabold text-[#003660]">7 Estratos</h2>
-    <p class="mt-1 text-sm text-gray-500">Define con claridad tu diferenciación estratégica</p>
+    <p class="mt-1 text-sm text-gray-500">
+      Define con claridad tu diferenciación estratégica
+    </p>
   </div>
 
   <!-- Palabras Propias -->
-  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
+  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
     <h4 class="text-[#003660] font-semibold text-lg mb-2">Palabras Propias</h4>
-    <p class="text-sm text-gray-400 mb-3">Describe términos únicos que representan tu identidad</p>
-    <textarea formControlName="palabrasPropias" rows="4" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+    <p class="text-sm text-gray-400 mb-3">
+      Describe términos únicos que representan tu identidad
+    </p>
+    <textarea formControlName="uniqueWords" rows="4"
+      class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
   </div>
 
   <!-- Territorio y Promesa de Marca -->
   <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
-    <h4 class="text-[#003660] font-semibold text-lg mb-4">Territorio y Promesa de Marca</h4>
+    <h4 class="text-[#003660] font-semibold text-lg mb-4">
+      Territorio y Promesa de Marca
+    </h4>
     <div class="overflow-auto rounded-lg">
       <table class="min-w-full text-sm text-gray-800">
         <thead class="bg-gray-100 font-semibold text-[#003660]">
@@ -23,22 +29,26 @@
             <th class="p-3 text-left">Cliente Central</th>
             <th class="p-3 text-left">Qué</th>
             <th class="p-3 text-left">Dónde</th>
-            <th class="p-3 text-left">Promesas con KPIs</th>
+            <th class="p-3 text-left">Promesa de marca</th>
           </tr>
         </thead>
-        <tbody formGroupName="territorio">
+        <tbody formGroupName="brandTerritory">
           <tr class="border-t hover:bg-gray-50 transition">
             <td class="p-2">
-              <textarea formControlName="cliente" rows="3" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+              <textarea formControlName="customer" rows="3"
+                class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
             </td>
             <td class="p-2">
-              <textarea formControlName="que" rows="3" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+              <textarea formControlName="what" rows="3"
+                class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
             </td>
             <td class="p-2">
-              <textarea formControlName="donde" rows="3" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+              <textarea formControlName="where" rows="3"
+                class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
             </td>
             <td class="p-2">
-              <textarea formControlName="promesas" rows="3" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+              <textarea formControlName="promises" rows="3"
+                class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
             </td>
           </tr>
         </tbody>
@@ -47,52 +57,108 @@
   </div>
 
   <!-- Garantía -->
-  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
-    <h4 class="text-[#003660] font-semibold text-lg mb-2">Garantía asociada a la Promesa de Marca</h4>
-    <p class="text-sm text-gray-400 mb-3">(Mecanismo Catalizador que respalda tu propuesta)</p>
-    <textarea formControlName="garantia" rows="3" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
+    <h4 class="text-[#003660] font-semibold text-lg mb-2">
+      Garantía asociada a la Promesa de Marca
+    </h4>
+    <p class="text-sm text-gray-400 mb-3">
+      (Mecanismo catalizador que respalda tu propuesta)
+    </p>
+    <textarea formControlName="brandGuarantee" rows="3"
+      class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
   </div>
 
   <!-- Estrategia en una frase -->
-  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
-    <h4 class="text-[#003660] font-semibold text-lg mb-2">La estrategia en una frase</h4>
-    <p class="text-sm text-gray-400 mb-3">Clave para generar ingresos y enfoque estratégico</p>
-    <textarea formControlName="estrategia" rows="3" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
+    <h4 class="text-[#003660] font-semibold text-lg mb-2">
+      La estrategia en una frase
+    </h4>
+    <p class="text-sm text-gray-400 mb-3">
+      Clave para generar ingresos y enfoque estratégico
+    </p>
+    <textarea formControlName="strategy" rows="3"
+      class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
   </div>
 
-  <!-- Actividades Diferenciadoras -->
-  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
-    <h4 class="text-[#003660] font-semibold text-lg mb-2">Actividades Diferenciadoras</h4>
-    <p class="text-sm text-gray-400 mb-3">Procesos únicos que tu competencia no puede replicar fácilmente</p>
-    <textarea formControlName="actividades" rows="3" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+  <!-- Actividades Diferenciadoras (lista dinámica) -->
+  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
+    <div class="flex items-center justify-between mb-2">
+      <div>
+        <h4 class="text-[#003660] font-semibold text-lg">
+          Actividades Diferenciadoras
+        </h4>
+        <p class="text-sm text-gray-400">
+          Procesos únicos que tu competencia no puede replicar fácilmente
+        </p>
+      </div>
+      <button type="button" (click)="addDifferentiator()"
+        class="text-sm bg-[#003660] text-white px-3 py-1 rounded hover:bg-[#004b8d]">
+        + Agregar
+      </button>
+    </div>
+
+    <div *ngIf="differentiators.length === 0" class="text-sm italic text-gray-400">
+      No hay actividades aún.
+    </div>
+
+    <div formArrayName="differentiators" class="space-y-4">
+      <div *ngFor="let ctrl of differentiators.controls; let i = index" [formGroupName]="i"
+        class="flex items-center gap-2">
+        <input type="text" formControlName="value"
+          class="flex-1 border border-gray-300 rounded-md p-2 text-sm text-gray-700"
+          placeholder="Describe una actividad…" />
+        <button type="button" (click)="removeDifferentiator(i)" class="text-red-600 hover:text-red-800">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Factor X -->
-  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md min-h-[160px]">
-    <h4 class="text-[#003660] font-semibold text-lg mb-2">Factor X (10x - 100x Ventaja Fundamental)</h4>
-    <p class="text-sm text-gray-400 mb-3">Ventaja clave que multiplica tu impacto</p>
-    <textarea formControlName="factorX" rows="3" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
+    <h4 class="text-[#003660] font-semibold text-lg mb-2">
+      Factor X (10× – 100× Ventaja Fundamental)
+    </h4>
+    <p class="text-sm text-gray-400 mb-3">
+      Ventaja clave que multiplica tu impacto
+    </p>
+    <textarea formControlName="factorX" rows="3"
+      class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
   </div>
 
-  <!-- Utilidad por X y BHAG -->
+  <!-- Utilidad por X & BHAG -->
   <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
-        <h4 class="text-[#003660] font-semibold text-lg mb-2">Utilidad por X (Motor Económico)</h4>
-        <p class="text-sm text-gray-400 mb-3">Relación clave entre ingresos y unidad crítica</p>
-        <textarea formControlName="utilidadX" rows="3" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+        <h4 class="text-[#003660] font-semibold text-lg mb-2">
+          Utilidad por X (Motor Económico)
+        </h4>
+        <p class="text-sm text-gray-400 mb-3">
+          Relación clave entre ingresos y unidad crítica
+        </p>
+        <textarea formControlName="profitPerX" rows="3"
+          class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
       </div>
       <div>
-        <h4 class="text-[#003660] font-semibold text-lg mb-2">BHAG (Meta a 10-25 años)</h4>
-        <p class="text-sm text-gray-400 mb-3">Objetivo audaz de largo plazo</p>
-        <textarea formControlName="bhag" rows="3" class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+        <h4 class="text-[#003660] font-semibold text-lg mb-2">
+          BHAG® (Meta a 10 – 25 años)
+        </h4>
+        <p class="text-sm text-gray-400 mb-3">
+          Objetivo audaz de largo plazo
+        </p>
+        <textarea formControlName="bhag" rows="3"
+          class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#56B4DA]"></textarea>
       </div>
     </div>
   </div>
 
   <!-- Botón Guardar -->
   <div class="text-right pt-4">
-    <button (click)="save()" class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow transition-all">
+    <button (click)="save()"
+      class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow transition-all">
       {{ sevenForm.dirty ? 'Actualizar' : 'Guardar' }}
     </button>
   </div>

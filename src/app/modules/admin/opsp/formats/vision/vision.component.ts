@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
@@ -12,42 +12,75 @@ import Swal from 'sweetalert2';
   styleUrl: './vision.component.scss'
 })
 export class VisionComponent {
+  @ViewChildren('autosizeArea') textareas!: QueryList<ElementRef<HTMLTextAreaElement>>;
+
   visionForm!: FormGroup;
 
   estados = [
-    { icono: '🟢', placeholder: 'Excelente (verde oscuro)' },
-    { icono: '🟢', placeholder: 'Bien (verde claro)' },
-    { icono: '🟡', placeholder: 'Entre verde y rojo' },
-    { icono: '🔴', placeholder: 'En problemas (rojo)' }
+    { color: '#006600', placeholder: 'Excelente (verde oscuro)' },
+    { color: '#66CC66', placeholder: 'Bien (verde claro)' },
+    { color: '#FFCC00', placeholder: 'Entre verde y rojo' },
+    { color: '#CC0000', placeholder: 'En problemas (rojo)' }
   ];
 
   constructor(private fb: FormBuilder) { }
 
   ngOnInit(): void {
     this.visionForm = this.fb.group({
-      valores: ['', Validators.required],
-      proposito: ['', Validators.required],
-      promesas: ['', Validators.required],
-      bhag: ['', Validators.required],
-      prioridades: this.fb.group({
-        largo: ['', Validators.required],
-        medio: ['', Validators.required],
-        corto: ['', Validators.required]
-      }),
-      kpis: this.fb.array(this.createKpiRows(3)),
+      valores: [''],
+      proposito: [''],
+      promesas: [''],
+      bhag: [''],
+      prioridadesLargo: this.fb.array([]),
+      prioridadesMedio: this.fb.array([]),
+      prioridadesCorto: this.fb.array([]),
+      kpis: this.fb.array([]),
       ganarJuego1: this.fb.array(this.createGanarJuegoRows()),
       ganarJuego2: this.fb.array(this.createGanarJuegoRows()),
-      prioridadesTrimestrales: this.fb.array(this.createPrioridadRows(5))
+      prioridadesTrimestrales: this.fb.array([])
     });
 
     this.loadFromStorage();
   }
 
+  // prioridades estrategicas
+  get prioridadesLargo(): FormArray {
+    return this.visionForm.get('prioridadesLargo') as FormArray;
+  }
+
+  get prioridadesMedio(): FormArray {
+    return this.visionForm.get('prioridadesMedio') as FormArray;
+  }
+
+  get prioridadesCorto(): FormArray {
+    return this.visionForm.get('prioridadesCorto') as FormArray;
+  }
+
+  autoResize(textarea: HTMLTextAreaElement): void {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+  }
+
+  ngAfterViewInit(): void {
+    this.textareas.forEach(textarea => {
+      this.autoResize(textarea.nativeElement);
+    });
+  }
+
+  // Métodos
+  addItem(array: FormArray): void {
+    array.push(this.fb.control(''));
+  }
+
+  removeItem(array: FormArray, index: number): void {
+    array.removeAt(index);
+  }
+
   createKpiRows(count: number): FormGroup[] {
     return Array.from({ length: count }, () =>
       this.fb.group({
-        kpi: ['', Validators.required],
-        meta: ['', Validators.required]
+        kpi: [''],
+        meta: ['']
       })
     );
   }
@@ -55,8 +88,8 @@ export class VisionComponent {
   createPrioridadRows(count: number): FormGroup[] {
     return Array.from({ length: count }, () =>
       this.fb.group({
-        prioridad: ['', Validators.required],
-        plazo: ['', Validators.required]
+        prioridad: [''],
+        plazo: ['']
       })
     );
   }
@@ -64,13 +97,29 @@ export class VisionComponent {
   createGanarJuegoRows(): FormGroup[] {
     return this.estados.map(() =>
       this.fb.group({
-        descripcion: ['', Validators.required]
+        descripcion: ['']
       })
     );
   }
 
+  // KPIS
   get kpis(): FormArray {
     return this.visionForm.get('kpis') as FormArray;
+  }
+
+  createKpiGroup(): FormGroup {
+    return this.fb.group({
+      kpi: [''],
+      meta: ['']
+    });
+  }
+
+  addKpi(): void {
+    this.kpis.push(this.createKpiGroup());
+  }
+
+  removeKpi(index: number): void {
+    this.kpis.removeAt(index);
   }
 
   get ganarJuego1(): FormArray {
@@ -81,8 +130,38 @@ export class VisionComponent {
     return this.visionForm.get('ganarJuego2') as FormArray;
   }
 
+  // prioridades trimestrales
   get prioridadesTrimestrales(): FormArray {
     return this.visionForm.get('prioridadesTrimestrales') as FormArray;
+  }
+
+  createPrioridadForm(): FormGroup {
+    return this.fb.group({
+      prioridad: [''],
+      plazo: [''],
+      esOKR: [false],
+      subprioridades: this.fb.array([])
+    });
+  }
+
+  addPrioridad(): void {
+    this.prioridadesTrimestrales.push(this.createPrioridadForm());
+  }
+
+  removePrioridad(index: number): void {
+    this.prioridadesTrimestrales.removeAt(index);
+  }
+
+  getSubprioridades(index: number): FormArray {
+    return (this.prioridadesTrimestrales.at(index) as FormGroup).get('subprioridades') as FormArray;
+  }
+
+  addSubprioridad(index: number): void {
+    this.getSubprioridades(index).push(this.fb.control(''));
+  }
+
+  removeSubprioridad(prioridadIndex: number, subIndex: number): void {
+    this.getSubprioridades(prioridadIndex).removeAt(subIndex);
   }
 
   save(): void {

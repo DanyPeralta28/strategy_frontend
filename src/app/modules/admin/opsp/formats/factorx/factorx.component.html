@@ -68,24 +68,23 @@
 
         <ng-container *ngFor="let cuello of bottlenecks; let i = index">
             <div class="space-y-3 mb-6">
-                <h5 class="text-sm font-semibold text-[#003660] mb-1">Cuello de botella {{ i + 1 }}</h5>
+                <div class="flex justify-between items-center mb-1">
+                    <h5 class="text-sm font-semibold text-[#003660]">Cuello de botella {{ i + 1 }}</h5>
+                    <button *ngIf="bottlenecks.length > 1" type="button" (click)="removeBottleneck(i)"
+                        class="text-red-600 text-sm hover:underline">🗑 Eliminar</button>
+                </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-start">
-                    <!-- Descripción: ocupa más espacio -->
                     <div class="md:col-span-3">
                         <textarea [(ngModel)]="cuello.descripcion" rows="3"
                             class="w-full p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-[#56B4DA]"
                             placeholder="Describa el cuello de botella..."></textarea>
                     </div>
-
-                    <!-- Líder -->
                     <div class="md:col-span-1">
                         <h5 class="text-sm font-semibold text-[#003660] mb-1">Líder</h5>
                         <input [(ngModel)]="cuello.lider" type="text"
                             class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]" />
                     </div>
-
-                    <!-- Fecha -->
                     <div class="md:col-span-1">
                         <h5 class="text-sm font-semibold text-[#003660] mb-1">Fecha</h5>
                         <input [(ngModel)]="cuello.fecha" type="date"
@@ -94,40 +93,69 @@
                 </div>
             </div>
         </ng-container>
-    </div>
 
-
-    <!-- Acción: feria comercial -->
-    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md max-w-5xl mx-auto">
-        <h4 class="text-[#003660] font-semibold text-lg mb-1">ACCIÓN</h4>
-        <p class="text-sm font-medium text-[#003660] mb-3">Designar un líder para asistir a una feria comercial este año
-        </p>
-
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-start">
-            <!-- Descripción Feria Comercial -->
-            <div class="md:col-span-3">
-                <label class="block text-sm font-semibold text-[#003660] mb-1">Feria Comercial</label>
-                <textarea [(ngModel)]="feria.descripcion" rows="3"
-                    class="w-full p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-[#56B4DA]"
-                    placeholder="Nombre o detalles de la feria..."></textarea>
-            </div>
-
-            <!-- Líder -->
-            <div class="md:col-span-1">
-                <label class="block text-sm font-semibold text-[#003660] mb-1">Líder</label>
-                <input [(ngModel)]="feria.lider" type="text"
-                    class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]" />
-            </div>
-
-            <!-- Fecha -->
-            <div class="md:col-span-1">
-                <label class="block text-sm font-semibold text-[#003660] mb-1">Fecha</label>
-                <input [(ngModel)]="feria.fecha" type="date"
-                    class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]" />
-            </div>
+        <!-- Botón Agregar -->
+        <div class="text-right">
+            <button type="button" (click)="addBottleneck()"
+                class="text-sm text-[#003660] font-semibold hover:underline">+ Agregar cuello de botella</button>
         </div>
     </div>
 
+    <!-- ACCIÓN: Asistir a feria comercial -->
+    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md max-w-5xl mx-auto">
+        <h4 class="text-[#003660] font-semibold text-lg mb-1">ACCIÓN</h4>
+        <p class="text-sm font-medium text-[#003660] mb-4">
+            Designar un líder para asistir a una feria comercial este año
+        </p>
+
+        <!-- Lista dinámica -->
+        <ng-container *ngFor="let feria of ferias; let i = index">
+            <div class="space-y-3 mb-6">
+                <div class="flex justify-between items-center mb-1">
+                    <h5 class="text-sm font-semibold text-[#003660]">
+                        Feria {{ i + 1 }}
+                    </h5>
+                    <button *ngIf="ferias.length > 1" type="button" (click)="removeFeria(i)"
+                        class="text-red-600 text-sm hover:underline">
+                        🗑 Eliminar
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-start">
+                    <!-- Descripción -->
+                    <div class="md:col-span-3">
+                        <label class="block text-sm font-semibold text-[#003660] mb-1">
+                            Feria Comercial
+                        </label>
+                        <textarea [(ngModel)]="feria.descripcion" rows="3"
+                            class="w-full p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-[#56B4DA]"
+                            placeholder="Nombre o detalles de la feria..."></textarea>
+                    </div>
+
+                    <!-- Líder -->
+                    <div class="md:col-span-1">
+                        <label class="block text-sm font-semibold text-[#003660] mb-1">Líder</label>
+                        <input [(ngModel)]="feria.lider" type="text"
+                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]" />
+                    </div>
+
+                    <!-- Fecha -->
+                    <div class="md:col-span-1">
+                        <label class="block text-sm font-semibold text-[#003660] mb-1">Fecha</label>
+                        <input [(ngModel)]="feria.fecha" type="date"
+                            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]" />
+                    </div>
+                </div>
+            </div>
+        </ng-container>
+
+        <!-- Botón agregar -->
+        <div class="text-right mb-4">
+            <button type="button" (click)="addFeria()" class="text-sm text-[#003660] font-semibold hover:underline">
+                + Agregar feria
+            </button>
+        </div>
+    </div>
 
     <!-- Botón Guardar -->
     <div class="text-right max-w-5xl mx-auto pt-6">

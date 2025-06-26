@@ -136,13 +136,7 @@ export class OpspComponent {
 
     territorio = 'Guatemala';
 
-    accionesConsistentes: string[] = [
-        'Capacitación semanal del equipo',
-        'Reunión mensual de seguimiento de KPIs',
-        'Retroalimentación continua con clientes',
-        'Aplicar valores en procesos clave',
-        'Comunicar logros trimestrales'
-    ];
+    accionesConsistentes: string[] = [];
 
     prioridadesPlazo: string[] = [
         'Expandir operaciones a Centroamérica',
@@ -170,18 +164,22 @@ export class OpspComponent {
 
     // Sección: Visión - Ganar el Juego
     ganarJuego1 = [
-        { color: 'verde', descripcion: '' },
+        { color: 'verdeOscuro', descripcion: 'gana oscuro' },
+        { color: 'verde', descripcion: 'gana verde' },
+        { color: 'amarillo', descripcion: 'Entre verde y rojo' },
+        { color: 'rojo', descripcion: 'gana rojo' }
+    ];
+
+    ganarJuego2 = [
+        { color: 'verdeOscuro', descripcion: '' },
         { color: 'verde', descripcion: '' },
         { color: 'amarillo', descripcion: 'Entre verde y rojo' },
         { color: 'rojo', descripcion: '' }
     ];
 
-    ganarJuego2 = [
-        { color: 'verde', descripcion: '' },
-        { color: 'verde', descripcion: '' },
-        { color: 'amarillo', descripcion: 'Entre verde y rojo' },
-        { color: 'rojo', descripcion: '' }
-    ];
+    metaTrimestreVigente = this.metasTrimestrales[0];
+    trimestreVigente: string = this.metaTrimestreVigente?.trimestre || '';
+    prioridadesTrimestreVigente = this.prioridadesTrimestrales;
 
     // Sección: Diferenciadores
     competenciasClave = 'Desarrollo ágil, servicio al cliente excepcional, enfoque en resultados.';
@@ -226,5 +224,29 @@ export class OpspComponent {
 
 
     constructor() {
+    }
+
+    // acciones consistentes
+    addAccion(): void {
+        this.accionesConsistentes.push('');
+    }
+
+    removeAccion(index: number): void {
+        this.accionesConsistentes.splice(index, 1);
+    }
+
+    trackByIndex(index: number): number {
+        return index;   // evita que Angular recree la fila y pierdas el foco
+    }
+
+    // ganar el juego
+    getPlaceholder(color: string): string {
+        switch (color) {
+            case 'verdeOscuro': return 'Excelente (verde oscuro)';
+            case 'verde': return 'Bien (verde claro)';
+            case 'amarillo': return 'Entre verde y rojo';
+            case 'rojo': return 'En problemas (rojo)';
+            default: return '';
+        }
     }
 }

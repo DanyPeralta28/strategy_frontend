@@ -61,7 +61,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <!-- Valores Centrales -->
                 <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
-                    <h2 class="text-xl font-bold text-slate-800 mb-2">Valores Centrales</h2>
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">Valores Creencias</h2>
                     <ul class="list-disc list-inside text-slate-600">
                         <li *ngFor="let valor of valores">{{ valor }}</li>
                     </ul>
@@ -80,117 +80,60 @@
                 </div>
             </div>
 
-
-            <!-- METAS A 3–5 AÑOS -->
-            <div class="mt-10">
-                <h3 class="text-[#003660] font-bold text-xl mb-4">Metas a 3–5 años</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full border border-gray-400 rounded-lg text-sm text-gray-700">
-                        <thead class="bg-[#003660] text-white">
-                            <tr>
-                                <th class="p-3 text-left">Año</th>
-                                <th class="p-3 text-left">Ingresos</th>
-                                <th class="p-3 text-left">Utilidad</th>
-                                <th class="p-3 text-left">Efectivo</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="bg-white">
-                                <td class="p-3">{{ metasPlazo.fecha }}</td>
-                                <td class="p-3">{{ metasPlazo.ingresos }}</td>
-                                <td class="p-3">{{ metasPlazo.utilidad }}</td>
-                                <td class="p-3">{{ metasPlazo.efectivo }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- METAS ANUALES -->
-            <div class="mt-10">
-                <h3 class="text-[#003660] font-bold text-xl mb-4">Metas Anuales</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full border border-gray-400 rounded-lg text-sm text-gray-700">
-                        <thead class="bg-[#003660] text-white">
-                            <tr>
-                                <th class="p-3 text-left">Año Fiscal</th>
-                                <th class="p-3 text-left">Ingresos</th>
-                                <th class="p-3 text-left">Utilidad</th>
-                                <th class="p-3 text-left">Margen Bruto</th>
-                                <th class="p-3 text-left">Efectivo</th>
-                                <th class="p-3 text-left">Cuentas por Cobrar</th>
-                                <th class="p-3 text-left">Rotación Inventario</th>
-                                <th class="p-3 text-left">Ingreso/Empleado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="bg-white">
-                                <td class="p-3">{{ metasAnuales.anioFiscal }}</td>
-                                <td class="p-3">{{ metasAnuales.ingresos }}</td>
-                                <td class="p-3">{{ metasAnuales.utilidad }}</td>
-                                <td class="p-3">{{ metasAnuales.margenBruto }}</td>
-                                <td class="p-3">{{ metasAnuales.efectivo }}</td>
-                                <td class="p-3">{{ metasAnuales.cuentasPorCobrar }}</td>
-                                <td class="p-3">{{ metasAnuales.rotacionInventario }}</td>
-                                <td class="p-3">{{ metasAnuales.ingresoEmpleado }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- METAS TRIMESTRALES -->
-            <div class="mt-10">
-                <h3 class="text-[#003660] font-bold text-xl mb-4">Metas Trimestrales</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full border border-gray-400 rounded-lg text-sm text-gray-700">
-                        <thead class="bg-[#003660] text-white">
-                            <tr>
-                                <th class="p-3 text-left">Trimestre</th>
-                                <th class="p-3 text-left">Ingresos</th>
-                                <th class="p-3 text-left">Utilidad</th>
-                                <th class="p-3 text-left">Margen Bruto</th>
-                                <th class="p-3 text-left">Efectivo</th>
-                                <th class="p-3 text-left">Cuentas por Cobrar</th>
-                                <th class="p-3 text-left">Rotación Inventario</th>
-                                <th class="p-3 text-left">Ingreso/Empleado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let meta of metasTrimestrales" class="bg-white border-t">
-                                <td class="p-3">{{ meta.trimestre }}</td>
-                                <td class="p-3">{{ meta.ingresos }}</td>
-                                <td class="p-3">{{ meta.utilidad }}</td>
-                                <td class="p-3">{{ meta.margenBruto }}</td>
-                                <td class="p-3">{{ meta.efectivo }}</td>
-                                <td class="p-3">{{ meta.cuentasPorCobrar }}</td>
-                                <td class="p-3">{{ meta.rotacionInventario }}</td>
-                                <td class="p-3">{{ meta.ingresoEmpleado }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-
             <!-- ACCIONES CONSISTENTES -->
             <div class="mt-10">
-                <h3 class="text-[#003660] font-bold text-xl mb-4">Acciones Consistentes</h3>
+                <!-- Título + botón en la MISMA fila -->
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-[#003660] font-bold text-xl">Acciones Consistentes</h3>
+
+                    <button type="button" (click)="addAccion()"
+                        class="flex items-center gap-2 bg-[#003660] hover:bg-[#004b8d] text-white font-semibold px-4 py-2 rounded-md">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span>Agregar acción</span>
+                    </button>
+                </div>
+
                 <div class="overflow-x-auto">
                     <table class="min-w-full border border-gray-400 rounded-lg text-sm text-gray-700">
-                        <thead class="bg-[#5FB1E7] text-black border-gray-400">
+                        <thead class="bg-[#003660] text-white border-gray-400">
                             <tr>
-                                <th class="p-3 text-left">#</th>
+                                <th class="p-3 text-left w-12">#</th>
                                 <th class="p-3 text-left">Acción</th>
+                                <th class="p-3 w-10"></th>
                             </tr>
                         </thead>
+
                         <tbody>
-                            <tr *ngFor="let accion of accionesConsistentes; let i = index" class="bg-white border-t">
+                            <tr *ngFor="let accion of accionesConsistentes; let i = index; trackBy: trackByIndex"
+                                class="bg-white border-t">
                                 <td class="p-3">{{ i + 1 }}</td>
+
                                 <td class="p-3">
-                                    <input type="text" [(ngModel)]="accionesConsistentes[i]"
-                                        class="w-full px-2 py-1 border border-gray-300 rounded text-sm text-slate-700"
+                                    <input type="text" [(ngModel)]="accionesConsistentes[i]" name="accion{{ i }}"
+                                        [ngModelOptions]="{ standalone: true }" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm
+                     text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#003660]"
                                         placeholder="Acción {{ i + 1 }}" />
+                                </td>
+
+                                <td class="p-3 text-center">
+                                    <button type="button" (click)="removeAccion(i)"
+                                        class="text-red-600 hover:text-red-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <!-- Mensaje vacío -->
+                            <tr *ngIf="accionesConsistentes.length === 0" class="border-t">
+                                <td colspan="3" class="p-4 text-center text-gray-500 italic">
+                                    No hay acciones aún. Haz clic en “Agregar acción” para empezar.
                                 </td>
                             </tr>
                         </tbody>
@@ -198,69 +141,183 @@
                 </div>
             </div>
 
+            <!-- METAS -->
+            <div class="mt-10 space-y-6">
+                <!-- Título de la sección -->
+                <h3 class="text-[#003660] font-bold text-xl mb-6">Metas</h3>
+
+                <!-- Grid de 3 columnas -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                    <!-- Metas 3–5 años -->
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6 space-y-3 w-full">
+                        <h4 class="font-bold text-[#003660] text-lg mb-2">3–5 AÑOS</h4>
+                        <div class="flex justify-between items-center text-sm border-b pb-2">
+                            <span class="font-bold">Ingresos</span>
+                            <span class="text-right">{{ metasPlazo.ingresos }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b pb-2">
+                            <span class="font-bold">Utilidad</span>
+                            <span class="text-right">{{ metasPlazo.utilidad }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="font-bold">Efectivo</span>
+                            <span class="text-right">{{ metasPlazo.efectivo }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Metas Anuales -->
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6 space-y-3 w-full">
+                        <h4 class="font-bold text-[#003660] text-lg mb-2">Anual</h4>
+                        <div class="flex justify-between items-center text-sm border-b pb-2">
+                            <span class="font-bold">Ingresos</span>
+                            <span class="text-right">{{ metasAnuales.ingresos }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b pb-2">
+                            <span class="font-bold">Utilidad</span>
+                            <span class="text-right">{{ metasAnuales.utilidad }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b pb-2">
+                            <span class="font-bold">Margen Bruto</span>
+                            <span class="text-right">{{ metasAnuales.margenBruto }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b pb-2">
+                            <span class="font-bold">Efectivo</span>
+                            <span class="text-right">{{ metasAnuales.efectivo }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b pb-2">
+                            <span class="font-bold">CxC</span>
+                            <span class="text-right">{{ metasAnuales.cuentasPorCobrar }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b pb-2">
+                            <span class="font-bold">Rot. Inventario</span>
+                            <span class="text-right">{{ metasAnuales.rotacionInventario }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="font-bold">Ingreso / Emp.</span>
+                            <span class="text-right">{{ metasAnuales.ingresoEmpleado }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Metas Trimestre Vigente -->
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6 space-y-3 w-full">
+                        <h4 class="font-bold text-[#003660] text-lg mb-2">Trimestre {{ metaTrimestreVigente.trimestre }}
+                        </h4>
+                        <div class="flex justify-between items-center text-sm border-b pb-2">
+                            <span class="font-bold">Ingresos</span>
+                            <span class="text-right">{{ metaTrimestreVigente.ingresos }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b pb-2">
+                            <span class="font-bold">Utilidad</span>
+                            <span class="text-right">{{ metaTrimestreVigente.utilidad }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b pb-2">
+                            <span class="font-bold">Margen Bruto</span>
+                            <span class="text-right">{{ metaTrimestreVigente.margenBruto }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b pb-2">
+                            <span class="font-bold">Efectivo</span>
+                            <span class="text-right">{{ metaTrimestreVigente.efectivo }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b pb-2">
+                            <span class="font-bold">CxC</span>
+                            <span class="text-right">{{ metaTrimestreVigente.cuentasPorCobrar }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-b pb-2">
+                            <span class="font-bold">Rot. Inventario</span>
+                            <span class="text-right">{{ metaTrimestreVigente.rotacionInventario }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="font-bold">Ingreso / Emp.</span>
+                            <span class="text-right">{{ metaTrimestreVigente.ingresoEmpleado }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- PRIORIDADES -->
-            <div class="mt-10">
-                <h3 class="text-[#003660] font-bold text-xl mb-4">Visión de Prioridades</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full border border-gray-400 rounded-lg text-sm text-gray-700">
-                        <thead class="bg-[#003660] text-white">
-                            <tr>
-                                <th class="p-3 text-left">#</th>
-                                <th class="p-3 text-left">Prioridad 3–5 años</th>
-                                <th class="p-3 text-left">Prioridad Anual</th>
-                                <th class="p-3 text-left">Prioridad Trimestral</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let prioridad of prioridadesPlazo; let i = index" class="bg-white border-t">
-                                <td class="p-3">{{ i + 1 }}</td>
-                                <td class="p-3">{{ prioridadesPlazo[i] }}</td>
-                                <td class="p-3">{{ prioridadesAnuales[i] }}</td>
-                                <td class="p-3">{{ prioridadesTrimestrales[i] }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="mt-10 space-y-6">
+                <!-- Título de la sección -->
+                <h3 class="text-[#003660] font-bold text-xl my-8">Prioridades</h3>
+
+                <!-- Grid de 3 columnas -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                    <!-- Prioridades 3–5 años -->
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6 w-full">
+                        <h4 class="font-bold text-[#003660] text-lg mb-4">3–5 AÑOS</h4>
+                        <ul class="space-y-2 list-decimal list-inside text-sm text-slate-700">
+                            <li *ngFor="let prioridad of prioridadesPlazo">{{ prioridad }}</li>
+                        </ul>
+                    </div>
+
+                    <!-- Prioridades Anuales -->
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6 w-full">
+                        <h4 class="font-bold text-[#003660] text-lg mb-4">Anual</h4>
+                        <ul class="space-y-2 list-decimal list-inside text-sm text-slate-700">
+                            <li *ngFor="let prioridad of prioridadesAnuales">{{ prioridad }}</li>
+                        </ul>
+                    </div>
+
+                    <!-- Prioridades Trimestre Vigente -->
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6 w-full">
+                        <h4 class="font-bold text-[#003660] text-lg mb-4">
+                            Trimestre {{ metaTrimestreVigente.trimestre }}
+                        </h4>
+                        <ul class="space-y-2 list-decimal list-inside text-sm text-slate-700">
+                            <li *ngFor="let prioridad of prioridadesTrimestreVigente">{{ prioridad }}</li>
+                        </ul>
+                    </div>
+
                 </div>
             </div>
 
-            <!-- VISIÓN: GANAR EL JUEGO -->
-            <div class="mt-10">
-                <h3 class="text-[#003660] font-bold text-xl mb-4">Visión: Ganar el Juego</h3>
+            <!-- GANAR EL JUEGO -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Grupo 1 -->
-                    <div>
-                        <h4 class="text-base font-semibold text-slate-700 mb-2">Personas / Balance General / Otros</h4>
-                        <div class="flex flex-col gap-4">
-                            <div *ngFor="let item of ganarJuego1"
-                                class="bg-white p-4 rounded-xl border border-gray-400 shadow-sm flex items-center gap-4">
-                                <span class="inline-block h-4 w-4 rounded-full" [ngClass]="{
-                        'bg-green-500': item.color === 'verde',
-                        'bg-yellow-400': item.color === 'amarillo',
-                        'bg-red-500': item.color === 'rojo'
-                    }"></span>
-                                <span class="text-sm text-slate-700">{{ item.descripcion }}</span>
-                            </div>
-                        </div>
+                <!-- Card ANUAL -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-md">
+                    <div class="text-center py-2 font-semibold border-b text-[#003660]">
+                        Ganar el Juego · Anual
                     </div>
 
-                    <!-- Grupo 2 -->
-                    <div>
-                        <h4 class="text-base font-semibold text-slate-700 mb-2">Personas / Balance General / Otros</h4>
-                        <div class="flex flex-col gap-4">
-                            <div *ngFor="let item of ganarJuego2"
-                                class="bg-white p-4 rounded-xl border border-gray-400 shadow-sm flex items-center gap-4">
-                                <span class="inline-block h-4 w-4 rounded-full" [ngClass]="{
-                        'bg-green-500': item.color === 'verde',
-                        'bg-yellow-400': item.color === 'amarillo',
-                        'bg-red-500': item.color === 'rojo'
-                    }"></span>
-                                <span class="text-sm text-slate-700">{{ item.descripcion }}</span>
-                            </div>
+                    <div class="p-4 space-y-4">
+                        <div *ngFor="let item of ganarJuego1; let i = index" class="flex items-center gap-4">
+                            <span class="inline-block w-4 h-4 rounded-full border border-gray-300" [ngClass]="{
+                                'bg-[#006600]': item.color === 'verdeOscuro',
+                                'bg-[#07ce07]': item.color === 'verde',
+                                'bg-yellow-400': item.color === 'amarillo',
+                                'bg-red-500': item.color === 'rojo'
+                            }"></span>
+                            <input type="text" [(ngModel)]="item.descripcion"
+                                class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]"
+                                [placeholder]="getPlaceholder(item.color)" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card TRIMESTRAL -->
+                <div class="bg-white border border-gray-200 rounded-xl shadow-md">
+                    <div class="text-center py-2 font-semibold border-b text-[#003660]">
+                        Ganar el Juego · Trimestre {{ trimestreVigente }}
+                    </div>
+
+                    <div class="p-4 space-y-4">
+                        <div *ngFor="let item of ganarJuego2; let i = index" class="flex items-center gap-4">
+                            <span class="inline-block w-4 h-4 rounded-full border border-gray-300" [ngClass]="{
+                                'bg-[#006600]': item.color === 'verdeOscuro',
+                                'bg-[#07ce07]': item.color === 'verde',
+                                'bg-yellow-400': item.color === 'amarillo',
+                                'bg-red-500': item.color === 'rojo'
+                            }"></span>
+                            <input type="text" [(ngModel)]="item.descripcion"
+                                class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]"
+                                [placeholder]="getPlaceholder(item.color)" />
                         </div>
                     </div>
                 </div>
             </div>
+
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 mt-10">
                 <!-- Competencias Clave -->
@@ -295,24 +352,24 @@
 
                 <!-- 7 Estratos - Estrategia en una Frase -->
                 <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
-                    <h4 class="text-lg font-bold text-slate-800 mb-2">7 Estratos - Estrategia en una Frase</h4>
+                    <h4 class="text-lg font-bold text-slate-800 mb-2">Estrategia en una Frase</h4>
                     <p class="text-slate-600 text-sm leading-relaxed">{{ estrategiaFrase }}</p>
                 </div>
 
                 <!-- 7 Estratos - Palabras Propias -->
                 <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
-                    <h4 class="text-lg font-bold text-slate-800 mb-2">7 Estratos - Palabras Propias</h4>
+                    <h4 class="text-lg font-bold text-slate-800 mb-2">Palabras Propias</h4>
                     <p class="text-slate-600 text-sm leading-relaxed">{{ palabrasPropias }}</p>
                 </div>
 
-                <!-- BHAG -->
+                <!-- BHAG® -->
                 <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
-                    <h4 class="text-lg font-bold text-slate-800 mb-2">BHAG</h4>
+                    <h4 class="text-lg font-bold text-slate-800 mb-2">BHAG®</h4>
                     <p class="text-slate-600 text-sm leading-relaxed">{{ bhag }}</p>
                 </div>
 
                 <!-- Jugadores A (editable) -->
-                <div class="rounded-xl bg-[#5FB1E7] p-6 shadow border border-gray-400">
+                <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
                     <h4 class="text-lg font-bold text-slate-800 mb-2">Jugadores A</h4>
                     <input type="text" [(ngModel)]="jugadoresA"
                         class="w-full px-3 py-2 border border-gray-300 rounded text-slate-700 text-sm bg-white"
@@ -324,7 +381,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                 <!-- Fortalezas -->
                 <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
-                    <h4 class="text-lg font-bold text-slate-800 mb-4">FDT Fortalezas</h4>
+                    <h4 class="text-lg font-bold text-slate-800 mb-4">Fortalezas</h4>
                     <ul class="list-disc list-inside text-slate-600 text-sm space-y-1">
                         <li *ngFor="let fortaleza of fdtFortalezas">{{ fortaleza }}</li>
                     </ul>
@@ -332,7 +389,7 @@
 
                 <!-- Debilidades -->
                 <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
-                    <h4 class="text-lg font-bold text-slate-800 mb-4">FDT Debilidades</h4>
+                    <h4 class="text-lg font-bold text-slate-800 mb-4">Debilidades</h4>
                     <ul class="list-disc list-inside text-slate-600 text-sm space-y-1">
                         <li *ngFor="let debilidad of fdtDebilidades">{{ debilidad }}</li>
                     </ul>
@@ -340,7 +397,7 @@
 
                 <!-- Tendencias -->
                 <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
-                    <h4 class="text-lg font-bold text-slate-800 mb-4">FDT Tendencias</h4>
+                    <h4 class="text-lg font-bold text-slate-800 mb-4">Tendencias</h4>
                     <ul class="list-disc list-inside text-slate-600 text-sm space-y-1">
                         <li *ngFor="let tendencia of fdtTendencias">{{ tendencia }}</li>
                     </ul>
@@ -354,14 +411,14 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                     <!-- Fecha límite -->
-                    <div class="rounded-xl bg-[#5FB1E7] p-6 shadow border border-gray-300">
+                    <div class="rounded-xl bg-white p-6 shadow border border-gray-300">
                         <h4 class="text-lg font-bold text-slate-800 mb-2">Fecha límite</h4>
                         <input type="date" [(ngModel)]="juego.fechaLimite"
                             class="w-full px-3 py-2 bg-white border border-gray-300 rounded text-slate-700 text-sm" />
                     </div>
 
                     <!-- Equipo -->
-                    <div class="rounded-xl bg-[#5FB1E7] p-6 shadow border border-gray-300">
+                    <div class="rounded-xl bg-white p-6 shadow border border-gray-300">
                         <h4 class="text-lg font-bold text-slate-800 mb-2">Equipo</h4>
                         <input type="text" [(ngModel)]="juego.equipo"
                             class="w-full px-3 py-2 bg-white border border-gray-300 rounded text-slate-700 text-sm"
@@ -369,7 +426,7 @@
                     </div>
 
                     <!-- Reglas del juego -->
-                    <div class="md:col-span-2 rounded-xl bg-[#5FB1E7] p-6 shadow border border-gray-300">
+                    <div class="md:col-span-2 rounded-xl bg-white p-6 shadow border border-gray-300">
                         <h4 class="text-lg font-bold text-slate-800 mb-2">Reglas del juego</h4>
                         <textarea [(ngModel)]="juego.reglas"
                             class="w-full px-3 py-2 bg-white border border-gray-300 rounded text-slate-700 text-sm"
@@ -377,7 +434,7 @@
                     </div>
 
                     <!-- Tablero de marcador -->
-                    <div class="md:col-span-2 rounded-xl bg-[#5FB1E7] p-6 shadow border border-gray-300">
+                    <div class="md:col-span-2 rounded-xl bg-white p-6 shadow border border-gray-300">
                         <h4 class="text-lg font-bold text-slate-800 mb-2">Tablero de marcador</h4>
                         <textarea [(ngModel)]="juego.tablero"
                             class="w-full px-3 py-2 bg-white border border-gray-300 rounded text-slate-700 text-sm"
@@ -385,7 +442,7 @@
                     </div>
 
                     <!-- Cómo celebraremos -->
-                    <div class="md:col-span-2 rounded-xl bg-[#5FB1E7] p-6 shadow border border-gray-300">
+                    <div class="md:col-span-2 rounded-xl bg-white p-6 shadow border border-gray-300">
                         <h4 class="text-lg font-bold text-slate-800 mb-2">Cómo celebraremos</h4>
                         <textarea [(ngModel)]="juego.celebracion"
                             class="w-full px-3 py-2 bg-white border border-gray-300 rounded text-slate-700 text-sm"
@@ -393,7 +450,7 @@
                     </div>
 
                     <!-- Premio -->
-                    <div class="md:col-span-2 rounded-xl bg-[#5FB1E7] p-6 shadow border border-gray-300">
+                    <div class="md:col-span-2 rounded-xl bg-white p-6 shadow border border-gray-300">
                         <h4 class="text-lg font-bold text-slate-800 mb-2">Premio</h4>
                         <textarea [(ngModel)]="juego.premio"
                             class="w-full px-3 py-2 bg-white border border-gray-300 rounded text-slate-700 text-sm"

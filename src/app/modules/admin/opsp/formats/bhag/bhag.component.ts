@@ -22,13 +22,13 @@ export class BhagComponent {
       Swal.fire({
         icon: 'warning',
         title: 'Campos incompletos',
-        text: 'Por favor completa el BHAG y su descripción.',
+        text: 'Por favor completa el BHAG® y su descripción.',
         confirmButtonColor: '#003660'
       });
       return;
     }
 
-    console.log('BHAG guardado:', this.form);
+    console.log('BHAG® guardado:', this.form);
 
     Swal.fire({
       icon: 'success',

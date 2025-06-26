@@ -12,11 +12,11 @@ import Swal from 'sweetalert2';
 })
 export class CorevaluesComponent {
   valores = [
-    { nombre: '', corta: '', larga: '' }
+    { nombre: '', explicacion: '' }
   ];
 
   agregarValor(): void {
-    this.valores.push({ nombre: '', corta: '', larga: '' });
+    this.valores.push({ nombre: '', explicacion: '' });
   }
 
   eliminarValor(index: number): void {
@@ -25,7 +25,7 @@ export class CorevaluesComponent {
 
   guardarValores(): void {
     const valoresFiltrados = this.valores.filter(v =>
-      v.nombre.trim() !== '' || v.corta.trim() !== '' || v.larga.trim() !== ''
+      v.nombre.trim() !== '' || v.explicacion.trim() !== ''
     );
 
     console.log('Valores guardados:', valoresFiltrados);
