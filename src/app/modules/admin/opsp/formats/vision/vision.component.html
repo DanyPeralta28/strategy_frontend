@@ -74,51 +74,73 @@
 
       <!-- 1 AÑO -->
       <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
-        <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center justify-between mb-4">
           <h4 class="text-[#003660] font-semibold text-lg">1 AÑO</h4>
           <button type="button" class="text-sm bg-[#003660] text-white px-3 py-1 rounded hover:bg-[#004b8d]"
             (click)="addItem(prioridadesMedio)">
             + Agregar
           </button>
         </div>
-        <div *ngIf="prioridadesMedio.length === 0" class="text-sm italic text-gray-400">
-          No hay prioridades aún.
-        </div>
-        <div *ngFor="let ctrl of prioridadesMedio.controls; let i = index" class="flex items-center gap-2 mb-2">
-          <textarea [formControl]="ctrl" rows="1" #autosizeArea (input)="autoResize(autosizeArea)" class="flex-1 px-3 py-2 border border-gray-300 rounded text-sm text-gray-700
-         resize-none overflow-hidden focus:ring-2 focus:ring-[#56B4DA]"></textarea>
-          <button type="button" class="text-red-600 hover:text-red-800" (click)="removeItem(prioridadesMedio, i)">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+
+        <div *ngIf="prioridadesMedio.length === 0" class="text-sm italic text-gray-400">No hay prioridades aún.</div>
+
+        <div *ngFor="let grupo of prioridadesMedio.controls; let i = index; trackBy: trackByIndex" [formGroup]="grupo"
+          class="relative bg-gray-50 border p-4 rounded-lg mb-4">
+
+          <!-- Botón eliminar -->
+          <button type="button" class="absolute top-2 right-2 text-red-600 hover:text-red-800"
+            (click)="removeItem(prioridadesMedio, i)">
+            ✕
           </button>
+
+          <!-- Prioridad -->
+          <label class="block text-sm font-semibold text-[#003660] mb-1">
+            Prioridad&nbsp;{{ i + 1 }}
+          </label>
+          <textarea formControlName="descripcion" rows="2" #ta (input)="autoResize(ta)" class="w-full px-3 py-2 border border-gray-300 rounded text-sm
+                     resize-none overflow-hidden focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+
+          <!-- Quién -->
+          <label class="block text-sm font-medium text-[#003660] mt-3 mb-1">Quién</label>
+          <input formControlName="quien" type="text" class="w-full px-3 py-2 border border-gray-300 rounded text-sm
+                  focus:ring-2 focus:ring-[#56B4DA]">
         </div>
       </div>
 
+
       <!-- TRIMESTRE -->
       <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md">
-        <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center justify-between mb-4">
           <h4 class="text-[#003660] font-semibold text-lg">TRIMESTRE</h4>
           <button type="button" class="text-sm bg-[#003660] text-white px-3 py-1 rounded hover:bg-[#004b8d]"
             (click)="addItem(prioridadesCorto)">
             + Agregar
           </button>
         </div>
-        <div *ngIf="prioridadesCorto.length === 0" class="text-sm italic text-gray-400">
-          No hay prioridades aún.
-        </div>
-        <div *ngFor="let ctrl of prioridadesCorto.controls; let i = index" class="flex items-center gap-2 mb-2">
-          <textarea [formControl]="ctrl" rows="1" #autosizeArea (input)="autoResize(autosizeArea)" class="flex-1 px-3 py-2 border border-gray-300 rounded text-sm text-gray-700
-         resize-none overflow-hidden focus:ring-2 focus:ring-[#56B4DA]"></textarea>
-          <button type="button" class="text-red-600 hover:text-red-800" (click)="removeItem(prioridadesCorto, i)">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-              stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+
+        <div *ngIf="prioridadesCorto.length === 0" class="text-sm italic text-gray-400">No hay prioridades aún.</div>
+
+        <div *ngFor="let grupo of prioridadesCorto.controls; let i = index; trackBy: trackByIndex" [formGroup]="grupo"
+          class="relative bg-gray-50 border p-4 rounded-lg mb-4">
+
+          <button type="button" class="absolute top-2 right-2 text-red-600 hover:text-red-800"
+            (click)="removeItem(prioridadesCorto, i)">
+            ✕
           </button>
+
+          <label class="block text-sm font-semibold text-[#003660] mb-1">
+            Prioridad&nbsp;{{ i + 1 }}
+          </label>
+          <textarea formControlName="descripcion" rows="2" #taC (input)="autoResize(taC)" class="w-full px-3 py-2 border border-gray-300 rounded text-sm
+                     resize-none overflow-hidden focus:ring-2 focus:ring-[#56B4DA]"></textarea>
+
+          <label class="block text-sm font-medium text-[#003660] mt-3 mb-1">Quién</label>
+          <input formControlName="quien" type="text" class="w-full px-3 py-2 border border-gray-300 rounded text-sm
+                  focus:ring-2 focus:ring-[#56B4DA]">
         </div>
       </div>
+
+
     </div>
   </div>
 

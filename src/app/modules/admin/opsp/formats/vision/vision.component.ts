@@ -72,6 +72,19 @@ export class VisionComponent {
     array.push(this.fb.control(''));
   }
 
+  addItemWithOwner(array: FormArray) {
+    array.push(
+      this.fb.group({
+        descripcion: [''],
+        quien: ['']
+      })
+    );
+  }
+
+  trackByIndex(_index: number): number {
+    return _index;
+  }
+
   removeItem(array: FormArray, index: number): void {
     array.removeAt(index);
   }

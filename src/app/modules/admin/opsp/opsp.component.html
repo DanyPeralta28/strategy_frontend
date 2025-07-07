@@ -237,25 +237,32 @@
 
             <!-- PRIORIDADES -->
             <div class="mt-10 space-y-6">
-                <!-- Título de la sección -->
                 <h3 class="text-[#003660] font-bold text-xl my-8">Prioridades</h3>
-
-                <!-- Grid de 3 columnas -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
                     <!-- Prioridades 3–5 años -->
                     <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6 w-full">
                         <h4 class="font-bold text-[#003660] text-lg mb-4">3–5 AÑOS</h4>
                         <ul class="space-y-2 list-decimal list-inside text-sm text-slate-700">
-                            <li *ngFor="let prioridad of prioridadesPlazo">{{ prioridad }}</li>
+                            <li *ngFor="let prioridad of prioridadesPlazo">
+                                {{ prioridad }}
+                            </li>
                         </ul>
                     </div>
 
                     <!-- Prioridades Anuales -->
                     <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6 w-full">
                         <h4 class="font-bold text-[#003660] text-lg mb-4">Anual</h4>
-                        <ul class="space-y-2 list-decimal list-inside text-sm text-slate-700">
-                            <li *ngFor="let prioridad of prioridadesAnuales">{{ prioridad }}</li>
+                        <ul class="space-y-4 text-sm text-slate-700">
+                            <li *ngFor="let prioridad of prioridadesAnuales; let i = index">
+                                <div class="space-y-1">
+                                    <p class="font-semibold">
+                                        {{ i + 1 }}. {{ prioridad.descripcion }}
+                                    </p>
+                                    <p class="text-xs text-slate-500 flex items-center gap-1">
+                                        👤 <span>Responsable: {{ prioridad.quien || 'No asignado' }}</span>
+                                    </p>
+                                </div>
+                            </li>
                         </ul>
                     </div>
 
@@ -264,13 +271,22 @@
                         <h4 class="font-bold text-[#003660] text-lg mb-4">
                             Trimestre {{ metaTrimestreVigente.trimestre }}
                         </h4>
-                        <ul class="space-y-2 list-decimal list-inside text-sm text-slate-700">
-                            <li *ngFor="let prioridad of prioridadesTrimestreVigente">{{ prioridad }}</li>
+                        <ul class="space-y-4 text-sm text-slate-700">
+                            <li *ngFor="let prioridad of prioridadesTrimestreVigente; let i = index">
+                                <div class="space-y-1">
+                                    <p class="font-semibold">
+                                        {{ i + 1 }}. {{ prioridad.descripcion }}
+                                    </p>
+                                    <p class="text-xs text-slate-500 flex items-center gap-1">
+                                        👤 <span>Responsable: {{ prioridad.quien || 'No asignado' }}</span>
+                                    </p>
+                                </div>
+                            </li>
                         </ul>
                     </div>
-
                 </div>
             </div>
+
 
             <!-- GANAR EL JUEGO -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">

@@ -146,20 +146,15 @@ export class OpspComponent {
         'Alcanzar reconocimiento nacional'
     ];
 
-    prioridadesAnuales: string[] = [
-        'Implementar ERP',
-        'Capacitar 100% del equipo en nuevas herramientas',
-        'Reducir rotación en un 15%',
-        'Alcanzar meta de ventas de $3M',
-        'Mejorar NPS en 10 puntos'
+    prioridadesAnuales = [
+        { descripcion: 'Implementar ERP', quien: 'Juan Pérez' },
+        { descripcion: 'Capacitar al equipo', quien: 'Ana García' },
     ];
 
-    prioridadesTrimestrales: string[] = [
-        'Lanzamiento nuevo sitio web',
-        'Campaña publicitaria digital',
-        'Auditoría interna de procesos',
-        'Evaluación de satisfacción de clientes',
-        'Integración de CRM con ERP'
+    prioridadesTrimestrales = [
+        { descripcion: 'Campaña publicitaria', quien: 'Marcos Díaz' },
+        { descripcion: 'Campaña publicitaria', quien: 'Marcos Díaz' },
+        { descripcion: 'Campaña publicitaria', quien: 'Marcos Díaz' },
     ];
 
     // Sección: Visión - Ganar el Juego
