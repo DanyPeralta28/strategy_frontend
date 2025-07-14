@@ -1,1 +1,368 @@
-<p>followup works!</p>
+<div class="bg-white rounded-xl shadow-md p-6 mt-6 w-full">
+
+    <!-- Encabezado -->
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+        <h2 class="text-xl font-bold text-[#003660]">
+            Ejecución · Plan individual de 13 semanas
+        </h2>
+
+        <div class="flex items-center gap-3">
+            <ng-container *ngIf="startDate; else seleccionarFecha">
+                <span class="text-sm text-slate-600">
+                    Semana&nbsp;1 termina:&nbsp;
+                    <span class="font-semibold text-[#003660]">{{ startDate | date:'longDate' }}</span>
+                </span>
+            </ng-container>
+
+            <ng-template #seleccionarFecha>
+                <span class="text-sm text-slate-600">Fecha no seleccionada</span>
+            </ng-template>
+
+            <button (click)="openModal()" class="flex items-center gap-1 bg-[#003660] text-white px-3 py-1.5 rounded
+             hover:bg-[#005f8c] text-xs transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                {{ startDate ? 'Cambiar fecha' : 'Seleccionar fecha inicio' }}
+            </button>
+
+            <button
+                class="text-sm border border-[#003660] text-[#003660] rounded px-3 py-1 hover:bg-[#003660] hover:text-white transition"
+                (click)="toggleVistaAlcance()">
+                {{ vistaAlcance === 'individual' ? 'Vista Grupal' : 'Vista Individual' }}
+            </button>
+
+            <button (click)="openConfigModal()" mat-icon-button class="text-[#003660]">
+                <mat-icon>settings</mat-icon>
+            </button>
+        </div>
+    </div>
+
+    <ng-container *ngIf="vistaAlcance === 'individual'">
+        <!-- Grid KPIs y Prioridades + Ganar el Juego -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Columna KPIs -->
+            <div class="space-y-6">
+                <!-- Mis KPIs -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-300">
+                    <div
+                        class="bg-gray-100 py-2 px-4 font-semibold text-[#003660] text-center border-b border-gray-300">
+                        Mis KPIs
+                    </div>
+                    <table class="w-full text-sm text-left text-gray-700 border-collapse">
+                        <thead>
+                            <tr class="bg-white text-gray-500 text-left text-xs border border-gray-300">
+                                <th class="px-4 py-2 border border-gray-300">Descripción</th>
+                                <th class="px-4 py-2 border border-gray-300">Categoría</th>
+                                <th class="px-4 py-2 border border-gray-300">Meta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <ng-container *ngFor="let kpi of kpis">
+                                <tr class="border border-gray-300">
+                                    <td class="px-4 py-2 border border-gray-300" rowspan="3">{{ kpi.descripcion }}</td>
+                                    <td class="px-4 py-2 border border-gray-300"><span
+                                            class="inline-block bg-green-600 text-white px-2 py-1 rounded text-xs">SV</span>
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-300">{{ kpi.sv }}</td>
+                                </tr>
+                                <tr class="border border-gray-300">
+                                    <td class="px-4 py-2 border border-gray-300"><span
+                                            class="inline-block bg-green-200 text-gray-800 px-2 py-1 rounded text-xs">V</span>
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-300">{{ kpi.v }}</td>
+                                </tr>
+                                <tr class="border border-gray-300">
+                                    <td class="px-4 py-2 border border-gray-300"><span
+                                            class="inline-block bg-red-500 text-white px-2 py-1 rounded text-xs">R</span>
+                                    </td>
+                                    <td class="px-4 py-2 border border-gray-300">{{ kpi.r }}</td>
+                                </tr>
+                            </ng-container>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Ganar el Juego KPIs -->
+                <div class="bg-white border border-gray-300 rounded-xl shadow-md p-4 space-y-4" [formGroup]="form">
+                    <div class="text-center py-2 font-semibold border-b text-[#003660]">Ganar el Juego KPIs</div>
+
+                    <table class="w-full text-sm" formArrayName="ganarJuegoKpis">
+                        <tbody>
+                            <tr *ngFor="let item of ganarJuegoKpis.controls; let i = index" [formGroupName]="i">
+                                <td class="p-3 w-10">
+                                    <span class="inline-block w-4 h-4 rounded-full border border-gray-300"
+                                        [style.backgroundColor]="(estados[i] && estados[i].color) || '#ccc'"></span>
+                                </td>
+                                <td class="p-3 w-full">
+                                    <input formControlName="descripcion" type="text"
+                                        class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]"
+                                        [placeholder]="estados[i]?.placeholder" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Resultado y color -->
+                    <div class="flex gap-4 items-center">
+                        <input formControlName="resultadoKpis" placeholder="Resultado"
+                            class="flex-1 border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]" />
+                        <select formControlName="colorKpis"
+                            class="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]">
+                            <option value="" disabled>Color</option>
+                            <option value="#047857">SV</option>
+                            <option value="#bbf7d0">V</option>
+                            <option value="#f87171">R</option>
+                            <option value="#e2e8f0">NA</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Columna Prioridades -->
+            <div class="space-y-6">
+                <!-- Mis Prioridades -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-300">
+                    <div
+                        class="bg-gray-100 py-2 px-4 font-semibold text-[#003660] text-center border-b border-gray-300">
+                        Mis Prioridades Trimestrales
+                    </div>
+                    <table class="w-full text-sm border-collapse text-gray-700">
+                        <thead>
+                            <tr class="bg-white text-gray-500 text-left text-xs border border-gray-300">
+                                <th class="px-4 py-2 border border-gray-300">#</th>
+                                <th class="px-4 py-2 border border-gray-300">Prioridad</th>
+                                <th class="px-4 py-2 border border-gray-300">Cuándo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let prioridad of prioridades; let i = index" class="border border-gray-300">
+                                <td class="px-4 py-2 border border-gray-300">{{ i + 1 }}</td>
+                                <td class="px-4 py-2 border border-gray-300">{{ prioridad.nombre }}</td>
+                                <td class="px-4 py-2 border border-gray-300">{{ prioridad.cuando }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Ganar el Juego Prioridades -->
+                <div class="bg-white border border-gray-300 rounded-xl shadow-md p-4 space-y-4" [formGroup]="form">
+                    <div class="text-center py-2 font-semibold border-b text-[#003660]">Ganar el Juego Prioridades</div>
+
+                    <table class="w-full text-sm" formArrayName="ganarJuegoPrioridades">
+                        <tbody>
+                            <tr *ngFor="let item of ganarJuegoPrioridades.controls; let i = index" [formGroupName]="i">
+                                <td class="p-3 w-10">
+                                    <span class="inline-block w-4 h-4 rounded-full border border-gray-300"
+                                        [style.backgroundColor]="estados2[i]?.color || '#ccc'"></span>
+                                </td>
+                                <td class="p-3 w-full">
+                                    <input formControlName="descripcion" type="text"
+                                        class="w-full border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]"
+                                        [placeholder]="estados2[i]?.placeholder" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Resultado y color -->
+                    <div class="flex gap-4 items-center">
+                        <input formControlName="resultadoPrioridades" placeholder="Resultado"
+                            class="flex-1 border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]" />
+                        <select formControlName="colorPrioridades"
+                            class="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-[#56B4DA]">
+                            <option value="" disabled>Color</option>
+                            <option value="#047857">SV</option>
+                            <option value="#bbf7d0">V</option>
+                            <option value="#f87171">R</option>
+                            <option value="#e2e8f0">NA</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="vistaModo === 'cualitativa'">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden mt-6 w-full border border-gray-300">
+                <!-- Encabezado con título y botones al mismo nivel -->
+                <div class="bg-gray-100 px-4 py-2 border-b border-gray-300 flex justify-between items-center">
+                    <button (click)="anteriorPrioridad()" class="text-[#003660] hover:text-[#005f8c] text-sl">
+                        ❮ Anterior
+                    </button>
+
+                    <span class="font-semibold text-[#003660] text-center text-xl">
+                        Prioridad #{{ prioridadActualIndex + 1 }}: {{ prioridadActual?.nombre }}
+                    </span>
+
+                    <button (click)="siguientePrioridad()" class="text-[#003660] hover:text-[#005f8c] text-sl">
+                        Siguiente ❯
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-700 border border-gray-300 table-fixed">
+                        <thead class="bg-[#e5f4fd] text-[#003660] font-semibold">
+                            <tr>
+                                <th class="border px-1 py-1 text-center" style="width: 60px; height: 40px;">Semana</th>
+                                <th class="border px-2 py-1 text-center" style="width: 60px; height: 40px;">Fecha</th>
+                                <th class="border px-2 py-1 text-center" style="height: 40px;">El resultado esperado por
+                                    semana
+                                </th>
+                                <th class="border px-2 py-1 text-center" style="width: 90px; height: 40px;">Super verde
+                                </th>
+                                <th class="border px-2 py-1 text-center" style="width: 80px; height: 40px;">Verde</th>
+                                <th class="border px-2 py-1 text-center" style="width: 80px; height: 40px;">Rojo</th>
+                                <th class="border px-2 py-1 text-center" style="width: 80px; height: 40px;">Resultado
+                                </th>
+                                <th class="border px-2 py-1 text-center" style="width: 80px; height: 40px;">Color</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let semana of semanasCualitativaActual; let i = index">
+                                <td class="border px-1 py-1 text-center" style="width: 60px;">{{ i + 1 }}</td>
+                                <td class="border px-2 py-1 text-center" style="width: 60px;">{{ semana.fecha |
+                                    date:'dd-MMM' }}
+                                </td>
+                                <td class="border px-2 py-1 text-center">
+                                    <input [(ngModel)]="semana.resultadoEsperado" class="w-full p-1 border rounded" />
+                                </td>
+                                <td class="border px-2 py-1 text-center" style="width: 90px;">
+                                    <input [(ngModel)]="semana.superVerde" class="w-full p-1 border rounded" />
+                                </td>
+                                <td class="border px-2 py-1 text-center" style="width: 80px;">
+                                    <input [(ngModel)]="semana.verde" class="w-full p-1 border rounded" />
+                                </td>
+                                <td class="border px-2 py-1 text-center" style="width: 80px;">
+                                    <input [(ngModel)]="semana.rojo" class="w-full p-1 border rounded" />
+                                </td>
+                                <td class="border px-2 py-1 text-center" style="width: 80px;">
+                                    <input [(ngModel)]="semana.resultado" class="w-full p-1 border rounded" />
+                                </td>
+                                <td class="border px-2 py-1 text-center" style="width: 80px;">
+                                    <select [(ngModel)]="semana.color"
+                                        class="w-full p-1 border rounded font-semibold text-center"
+                                        [ngStyle]="{ backgroundColor: semana.color, color: getTextoColor(semana.color) }">
+                                        <option *ngFor="let item of coloresDisponibles" [ngValue]="item.color"
+                                            [ngStyle]="{ backgroundColor: item.color, color: item.textColor }">
+                                            {{ item.nombre }}
+                                        </option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="vistaModo === 'cuantitativa'">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden mt-6 w-full border border-gray-300">
+                <!-- Encabezado con título y botones al mismo nivel -->
+                <div class="bg-gray-100 px-4 py-2 border-b border-gray-300 flex justify-between items-center">
+                    <button (click)="anteriorPrioridad()" class="text-[#003660] hover:text-[#005f8c] text-sl">
+                        ❮ Anterior
+                    </button>
+
+                    <span class="font-semibold text-[#003660] text-center text-xl">
+                        Prioridad #{{ prioridadActualIndex + 1 }}: {{ prioridadActual?.nombre }}
+                    </span>
+
+                    <button (click)="siguientePrioridad()" class="text-[#003660] hover:text-[#005f8c] text-sl">
+                        Siguiente ❯
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-700 border border-gray-300 table-fixed">
+                        <thead class="bg-[#e5f4fd] text-[#003660] font-semibold">
+                            <tr>
+                                <th class="border px-1 py-1 text-center" style="width: 60px; height: 40px;">Semana</th>
+                                <th class="border px-2 py-1 text-center" style="width: 80px; height: 40px;">Fecha</th>
+                                <th class="border px-2 py-1 text-center" style="height: 40px;">El resultado esperado por
+                                    semana</th>
+                                <th class="border px-2 py-1 text-center" style="width: 100px; height: 40px;">Logrado
+                                </th>
+                                <th class="border px-2 py-1 text-center" style="width: 100px; height: 40px;">No Logrado
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let semana of semanasCuantitativaActual; let i = index">
+                                <td class="border px-1 py-1 text-center">{{ i + 1 }}</td>
+                                <td class="border px-2 py-1 text-center">{{ semana.fecha | date:'dd-MMM' }}</td>
+                                <td class="border px-2 py-1 text-center">
+                                    <input [(ngModel)]="semana.resultadoEsperado" class="w-full p-1 border rounded" />
+                                </td>
+                                <td class="border px-2 py-1 text-center cursor-pointer"
+                                    [ngStyle]="{ backgroundColor: semana.logrado ? '#006600' : 'white' }"
+                                    (click)="semana.logrado = !semana.logrado">
+                                </td>
+                                <td class="border px-2 py-1 text-center cursor-pointer"
+                                    [ngStyle]="{ backgroundColor: semana.noLogrado ? '#CC0000' : 'white' }"
+                                    (click)="semana.noLogrado = !semana.noLogrado">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="flex justify-end mt-6">
+            <button (click)="save()"
+                class="bg-[#003660] hover:bg-[#005f8c] text-white font-semibold px-6 py-2 rounded shadow-md transition">
+                Guardar
+            </button>
+        </div>
+
+        <!-- MODAL DE FECHA -->
+        <div *ngIf="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div class="bg-white w-full max-w-sm p-6 rounded-xl shadow-lg">
+                <h3 class="text-lg font-semibold text-[#003660] mb-4">
+                    Selecciona la fecha en que finaliza la Semana&nbsp;1
+                </h3>
+
+                <input type="date" [(ngModel)]="startDate" class="w-full px-3 py-2 border border-gray-300 rounded
+            focus:ring-2 focus:ring-[#56B4DA] mb-6">
+
+                <div class="flex justify-end gap-3">
+                    <button (click)="closeModal()"
+                        class="px-4 py-1.5 border rounded hover:bg-slate-100">Cancelar</button>
+                    <button (click)="saveDate()"
+                        class="px-4 py-1.5 bg-[#003660] text-white rounded hover:bg-[#005f8c]">Guardar</button>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="showConfigModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div class="bg-white w-full max-w-sm p-6 rounded-xl shadow-lg">
+                <h3 class="text-lg font-semibold text-[#003660] mb-4">
+                    Selecciona el tipo de vista
+                </h3>
+
+                <label class="block mb-2">
+                    <input type="radio" name="vista" value="cuantitativa" [(ngModel)]="vistaModo" />
+                    Cuantitativa
+                </label>
+
+                <label class="block mb-6">
+                    <input type="radio" name="vista" value="cualitativa" [(ngModel)]="vistaModo" />
+                    Cualitativa
+                </label>
+
+                <div class="flex justify-end gap-3">
+                    <button (click)="closeConfigModal()"
+                        class="px-4 py-1.5 border rounded hover:bg-slate-100">Cancelar</button>
+                    <button (click)="saveConfig()"
+                        class="px-4 py-1.5 bg-[#003660] text-white rounded hover:bg-[#005f8c]">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="vistaAlcance === 'grupal'">
+    </ng-container>
