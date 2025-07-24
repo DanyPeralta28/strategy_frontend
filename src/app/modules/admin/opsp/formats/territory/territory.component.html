@@ -1,11 +1,11 @@
 <div class="w-full max-w-7xl mx-auto p-6 sm:p-10 space-y-10">
-    <!-- Encabezado -->
+    <!-- Título -->
     <div class="text-center">
         <h2 class="text-3xl font-extrabold text-[#003660]">Territorios</h2>
         <p class="mt-1 text-sm text-gray-500">Gestión de lugares geográficos clave para la operación</p>
     </div>
 
-    <!-- Formulario de nuevo territorio -->
+    <!-- Formulario para agregar territorio -->
     <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 space-y-4">
         <h3 class="text-lg font-semibold text-[#003660]">Agregar nuevo territorio</h3>
         <input [(ngModel)]="newTerritory" type="text"
@@ -17,16 +17,74 @@
         </button>
     </div>
 
-    <!-- Listado -->
-    <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 space-y-4">
-        <h3 class="text-lg font-semibold text-[#003660]">Listado de territorios</h3>
-        <div class="space-y-4">
-            <div *ngFor="let t of territories; let i = index"
-                class="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
-                <input [(ngModel)]="t.name"
-                    class="flex-1 p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400" />
-                <button (click)="removeTerritory(i)" class="text-sm text-red-600 ml-4 hover:underline">Eliminar</button>
+    <!-- Territorios -->
+    <div *ngFor="let t of territories; let i = index"
+        class="bg-white border border-gray-300 rounded-xl shadow-md p-6 space-y-4 relative">
+
+        <!-- Encabezado del territorio -->
+        <div class="flex justify-between items-center mb-2">
+            <h4 class="text-lg font-bold text-[#003660]">Lugar Geográfico: {{ t.name }}</h4>
+            <button (click)="removeTerritory(i)" class="text-red-600 hover:underline text-sm">Eliminar</button>
+        </div>
+
+        <!-- Botón agregar segmento -->
+        <button (click)="addSegment(t)"
+            class="bg-blue-100 text-blue-800 px-3 py-1 rounded-lg text-sm font-medium hover:bg-blue-200">
+            + Agregar Segmento
+        </button>
+
+        <!-- Segmentos -->
+        <div *ngFor="let s of t.segments; let si = index"
+            class="border-l-4 border-blue-300 pl-4 ml-4 bg-blue-50/20 rounded-md p-4 space-y-3 shadow-sm">
+
+            <div class="flex items-center gap-4">
+                <input [(ngModel)]="s.name"
+                    class="p-2 border border-gray-300 rounded-md w-1/2 bg-white focus:ring-2 focus:ring-blue-300"
+                    placeholder="Segmento" />
+                <button (click)="removeSegment(t, si)" class="text-red-600 text-sm hover:underline">Eliminar
+                    segmento</button>
+            </div>
+
+            <button (click)="addProduct(s)"
+                class="bg-green-100 text-green-800 px-3 py-1 rounded-lg text-sm font-medium hover:bg-green-200">
+                + Agregar Producto
+            </button>
+
+            <!-- Productos -->
+            <div *ngFor="let p of s.products; let pi = index"
+                class="border-l-4 border-green-300 pl-4 ml-4 bg-green-50/20 rounded-md p-4 space-y-2 shadow-sm">
+
+                <div class="flex items-center gap-4">
+                    <input [(ngModel)]="p.name"
+                        class="p-2 border border-gray-300 rounded-md w-1/2 bg-white focus:ring-2 focus:ring-green-300"
+                        placeholder="Producto" />
+                    <button (click)="removeProduct(s, pi)" class="text-red-600 text-sm hover:underline">Eliminar
+                        producto</button>
+                </div>
+
+                <button (click)="addChannel(p)"
+                    class="bg-purple-100 text-purple-800 px-3 py-1 rounded-lg text-sm font-medium hover:bg-purple-200">
+                    + Agregar Canal de Venta
+                </button>
+
+                <!-- Canales -->
+                <div *ngFor="let c of p.channels; let ci = index"
+                    class="border-l-4 border-purple-300 pl-4 ml-4 bg-purple-50/20 rounded-md p-2 flex items-center gap-4 shadow-sm">
+                    <input [(ngModel)]="c.name"
+                        class="p-2 border border-gray-300 rounded-md w-2/3 bg-white focus:ring-2 focus:ring-purple-300"
+                        placeholder="Canal de venta" />
+                    <button (click)="removeChannel(p, ci)" class="text-red-600 text-sm hover:underline">Eliminar
+                        canal</button>
+                </div>
+
             </div>
         </div>
+    </div>
+
+    <!-- Botón para guardar todo -->
+    <div class="text-right">
+        <button (click)="saveAll()" class="mt-6 bg-[#003660] hover:bg-[#005f8c] text-white px-6 py-2 rounded-xl shadow">
+            Guardar todo
+        </button>
     </div>
 </div>

@@ -6,23 +6,47 @@
             <div class="flex flex-wrap items-center justify-between bg-[#003660] text-white p-4 rounded-t-lg">
                 <div class="font-semibold">ESTRATEGIA <span class="font-normal">Scaling</span><br><br></div>
 
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full sm:w-auto mt-4 sm:mt-0">
-                    <label class="text-sm font-semibold" for="entidad">Entidad</label>
-                    <select id="entidad" [(ngModel)]="selectedEntidad"
-                        class="bg-white text-black rounded px-2 py-1 w-64">
-                        <option *ngFor="let entidad of entidades" [value]="entidad">{{ entidad }}</option>
-                    </select>
+                <div class="flex flex-wrap items-center justify-between bg-[#003660] text-white p-4 rounded-t-lg gap-4">
+                    <!-- Filtro: Entidad -->
+                    <div class="flex flex-col gap-1 w-48">
+                        <label for="entidad" class="text-sm font-semibold">Entidad</label>
+                        <select id="entidad" [(ngModel)]="selectedEntidad"
+                            class="bg-white text-black rounded px-2 py-2 h-10 w-full border border-gray-300">
+                            <option *ngFor="let entidad of entidades" [value]="entidad">{{ entidad }}</option>
+                        </select>
+                    </div>
 
-                    <!-- <label class="text-sm font-semibold" for="equipo">Equipo</label>
-                    <select id="equipo" [(ngModel)]="selectedEquipo" class="bg-white text-black rounded px-2 py-1 w-48">
-                        <option *ngFor="let equipo of equipos" [value]="equipo">{{ equipo }}</option>
-                    </select> -->
+                    <!-- Filtro: Equipo -->
+                    <div class="flex flex-col gap-1 w-48">
+                        <label for="equipo" class="text-sm font-semibold">Equipo</label>
+                        <select id="equipo" [(ngModel)]="selectedEquipo"
+                            class="bg-white text-black rounded px-2 py-2 h-10 w-full border border-gray-300">
+                            <option *ngFor="let equipo of equipos" [value]="equipo">{{ equipo }}</option>
+                        </select>
+                    </div>
 
-                    <!-- <label class="text-sm font-semibold" for="usuario">Usuario</label>
-                    <select id="usuario" [(ngModel)]="selectedUsuario"
-                        class="bg-white text-black rounded px-2 py-1 w-48">
-                        <option *ngFor="let usuario of usuarios" [value]="usuario">{{ usuario }}</option>
-                    </select> -->
+                    <!-- Filtro: Usuarios -->
+                    <div class="flex flex-col gap-1 w-60 relative">
+                        <label class="text-sm font-semibold">Usuarios</label>
+
+                        <!-- Input visible -->
+                        <div class="bg-white text-black rounded px-2 py-2 h-10 w-full border border-gray-300 cursor-pointer flex items-center"
+                            (click)="showUserDropdown = !showUserDropdown">
+                            {{ selectedUserNames }}
+                        </div>
+
+                        <!-- Dropdown con checkboxes -->
+                        <div *ngIf="showUserDropdown"
+                            class="absolute top-full left-0 w-full bg-white rounded-lg shadow-lg border border-gray-300 mt-1 z-50 max-h-64 overflow-y-auto">
+                            <label *ngFor="let user of usuarios"
+                                class="flex items-center px-3 py-2 hover:bg-gray-100 text-sm text-[#003660] font-medium cursor-pointer">
+                                <input type="checkbox"
+                                    class="form-checkbox h-4 w-4 text-blue-600 border-gray-300 rounded mr-2"
+                                    [(ngModel)]="user.checked" />
+                                {{ user.name }}
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -474,6 +498,197 @@
                     </div>
 
                 </div>
+            </div>
+
+            <!-- Resultados por usuario seleccionado -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8" *ngFor="let user of selectedUsers">
+                <ng-container *ngIf="getSelectedUserData(user.id) as data">
+
+                    <!-- Columna KPIs -->
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-xl shadow-md border border-gray-300">
+                            <div
+                                class="bg-gray-100 py-2 px-4 font-semibold text-[#003660] text-center border-b border-gray-300">
+                                Mis KPIs - {{ user.name }}
+                            </div>
+                            <table class="w-full text-sm text-left text-gray-700 border-collapse">
+                                <thead>
+                                    <tr class="bg-white text-gray-500 border border-gray-300">
+                                        <th class="px-4 py-2 font-semibold border">Descripción</th>
+                                        <th class="px-4 py-2 font-semibold border">SV</th>
+                                        <th class="px-4 py-2 font-semibold border">V</th>
+                                        <th class="px-4 py-2 font-semibold border">R</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let kpi of data.kpis" class="border border-gray-300">
+                                        <td class="px-4 py-2 border">{{ kpi.description }}</td>
+                                        <td class="px-4 py-2 border">{{ kpi.sv }}</td>
+                                        <td class="px-4 py-2 border">{{ kpi.v }}</td>
+                                        <td class="px-4 py-2 border">{{ kpi.r }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Ganar el Juego KPIs -->
+                        <div class="bg-white border border-gray-300 rounded-xl shadow-md">
+                            <div
+                                class="bg-gray-100 py-2 px-4 font-semibold text-[#003660] text-center border-b border-gray-300">
+                                Ganar el Juego KPIs - {{ user.name }}
+                            </div>
+
+                            <table class="w-full text-sm text-left text-gray-700 border-collapse">
+                                <thead>
+                                    <tr class="bg-white text-gray-500 border border-gray-300">
+                                        <th class="px-4 py-2 font-semibold border">Indicador</th>
+                                        <th class="px-4 py-2 font-semibold border">Valor</th>
+                                        <th class="px-4 py-2 font-semibold border">Color</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border border-gray-300">
+                                        <td class="px-4 py-2 border font-semibold text-[#003660]">Número crítico</td>
+                                        <td class="px-4 py-2 border">{{ data.ganarJuego.kpis.critical }}</td>
+                                        <td class="px-4 py-2 border"></td>
+                                    </tr>
+                                    <tr class="border border-gray-300">
+                                        <td class="px-4 py-2 border">Super Verde</td>
+                                        <td class="px-4 py-2 border">{{ data.ganarJuego.kpis.sv }}</td>
+                                        <td class="px-4 py-2 border">
+                                            <span class="inline-block w-4 h-4 rounded-full"
+                                                style="background-color: #006600;"></span>
+                                        </td>
+                                    </tr>
+                                    <tr class="border border-gray-300">
+                                        <td class="px-4 py-2 border">Verde</td>
+                                        <td class="px-4 py-2 border">{{ data.ganarJuego.kpis.v }}</td>
+                                        <td class="px-4 py-2 border">
+                                            <span class="inline-block w-4 h-4 rounded-full"
+                                                style="background-color: #66CC66;"></span>
+                                        </td>
+                                    </tr>
+                                    <tr class="border border-gray-300">
+                                        <td class="px-4 py-2 border">Amarillo</td>
+                                        <td class="px-4 py-2 border">{{ data.ganarJuego.kpis.a }}</td>
+                                        <td class="px-4 py-2 border">
+                                            <span class="inline-block w-4 h-4 rounded-full"
+                                                style="background-color: #FFCC00;"></span>
+                                        </td>
+                                    </tr>
+                                    <tr class="border border-gray-300">
+                                        <td class="px-4 py-2 border">Rojo</td>
+                                        <td class="px-4 py-2 border">{{ data.ganarJuego.kpis.r }}</td>
+                                        <td class="px-4 py-2 border">
+                                            <span class="inline-block w-4 h-4 rounded-full"
+                                                style="background-color: #CC0000;"></span>
+                                        </td>
+                                    </tr>
+                                    <tr class="border border-gray-300 font-semibold">
+                                        <td class="px-4 py-2 border text-[#003660]">Resultado</td>
+                                        <td class="px-4 py-2 border">{{ data.ganarJuego.kpis.result }}</td>
+                                        <td class="px-4 py-2 border">
+                                            <span class="inline-block w-4 h-4 rounded-full border border-gray-400"
+                                                [style.backgroundColor]="data.ganarJuego.kpis.color"></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Columna Prioridades -->
+                    <div class="space-y-6">
+                        <div class="bg-white rounded-xl shadow-md border border-gray-300">
+                            <div
+                                class="bg-gray-100 py-2 px-4 font-semibold text-[#003660] text-center border-b border-gray-300">
+                                Mis Prioridades Trimestrales - {{ user.name }}
+                            </div>
+                            <table class="w-full text-sm text-left text-gray-700 border-collapse">
+                                <thead>
+                                    <tr class="bg-white text-gray-500 border border-gray-300">
+                                        <th class="px-4 py-2 font-semibold border">#</th>
+                                        <th class="px-4 py-2 font-semibold border">Prioridad</th>
+                                        <th class="px-4 py-2 font-semibold border">Cuándo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let p of data.priorities; let i = index" class="border border-gray-300">
+                                        <td class="px-4 py-2 border">{{ i + 1 }}</td>
+                                        <td class="px-4 py-2 border">{{ p.name }}</td>
+                                        <td class="px-4 py-2 border">{{ p.when }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Ganar el Juego Prioridades -->
+                        <div class="bg-white border border-gray-300 rounded-xl shadow-md">
+                            <div
+                                class="bg-gray-100 py-2 px-4 font-semibold text-[#003660] text-center border-b border-gray-300">
+                                Ganar el Juego Prioridades - {{ user.name }}
+                            </div>
+
+                            <table class="w-full text-sm text-left text-gray-700 border-collapse">
+                                <thead>
+                                    <tr class="bg-white text-gray-500 border border-gray-300">
+                                        <th class="px-4 py-2 font-semibold border">Indicador</th>
+                                        <th class="px-4 py-2 font-semibold border">Valor</th>
+                                        <th class="px-4 py-2 font-semibold border">Color</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border border-gray-300">
+                                        <td class="px-4 py-2 border font-semibold text-[#003660]">Número crítico</td>
+                                        <td class="px-4 py-2 border">{{ data.ganarJuego.priorities.critical }}</td>
+                                        <td class="px-4 py-2 border"></td>
+                                    </tr>
+                                    <tr class="border border-gray-300">
+                                        <td class="px-4 py-2 border">Super Verde</td>
+                                        <td class="px-4 py-2 border">{{ data.ganarJuego.priorities.sv }}</td>
+                                        <td class="px-4 py-2 border">
+                                            <span class="inline-block w-4 h-4 rounded-full"
+                                                style="background-color: #006600;"></span>
+                                        </td>
+                                    </tr>
+                                    <tr class="border border-gray-300">
+                                        <td class="px-4 py-2 border">Verde</td>
+                                        <td class="px-4 py-2 border">{{ data.ganarJuego.priorities.v }}</td>
+                                        <td class="px-4 py-2 border">
+                                            <span class="inline-block w-4 h-4 rounded-full"
+                                                style="background-color: #66CC66;"></span>
+                                        </td>
+                                    </tr>
+                                    <tr class="border border-gray-300">
+                                        <td class="px-4 py-2 border">Amarillo</td>
+                                        <td class="px-4 py-2 border">{{ data.ganarJuego.priorities.a }}</td>
+                                        <td class="px-4 py-2 border">
+                                            <span class="inline-block w-4 h-4 rounded-full"
+                                                style="background-color: #FFCC00;"></span>
+                                        </td>
+                                    </tr>
+                                    <tr class="border border-gray-300">
+                                        <td class="px-4 py-2 border">Rojo</td>
+                                        <td class="px-4 py-2 border">{{ data.ganarJuego.priorities.r }}</td>
+                                        <td class="px-4 py-2 border">
+                                            <span class="inline-block w-4 h-4 rounded-full"
+                                                style="background-color: #CC0000;"></span>
+                                        </td>
+                                    </tr>
+                                    <tr class="border border-gray-300 font-semibold">
+                                        <td class="px-4 py-2 border text-[#003660]">Resultado</td>
+                                        <td class="px-4 py-2 border">{{ data.ganarJuego.priorities.result }}</td>
+                                        <td class="px-4 py-2 border">
+                                            <span class="inline-block w-4 h-4 rounded-full border border-gray-400"
+                                                [style.backgroundColor]="data.ganarJuego.priorities.color"></span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </ng-container>
             </div>
 
         </div>

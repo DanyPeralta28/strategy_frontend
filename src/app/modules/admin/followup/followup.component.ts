@@ -28,13 +28,13 @@ export class FollowupComponent {
 
   saveDate(): void {
     if (this.startDate) {
-      console.log('Fecha inicio seleccionada:', this.startDate);
+      console.log('Selected start date:', this.startDate);
       this.closeModal();
     }
   }
 
   saveConfig() {
-    console.log('⚙️ Vista seleccionada:', this.vistaModo);
+    console.log('⚙️ Selected view:', this.vistaModo);
     this.closeConfigModal();
   }
 
@@ -42,88 +42,91 @@ export class FollowupComponent {
     this.vistaAlcance = this.vistaAlcance === 'individual' ? 'grupal' : 'individual';
   }
 
-  kpis = [
-    {
-      descripcion: 'Número de ventas semanales',
-      sv: '100%',
-      v: '80%',
-      r: '20%'
-    },
-    {
-      descripcion: 'Llamadas a clientes potenciales',
-      sv: '50 llamadas',
-      v: '30 llamadas',
-      r: '20 llamadas'
-    },
-    {
-      descripcion: 'Nivel de satisfacción del cliente',
-      sv: '90%',
-      v: '70%',
-      r: '50%'
-    }
+  kpisEditable = [
+    { description: '', sv: '', v: '', r: '' }
   ];
 
-  prioridades = [
-    { nombre: 'Conseguir 100 leads', cuando: 'Julio 2025' },
-    { nombre: 'Vender 10k', cuando: 'Agosto 2025' },
-    { nombre: 'Finalizar campaña', cuando: 'Agosto 2025' },
-    { nombre: 'Optimizar CRM', cuando: 'Septiembre 2025' },
-    { nombre: 'Actualizar perfil LinkedIn', cuando: 'Septiembre 2025' }
+  priorities = [
+    { name: 'Conseguir 100 leads', when: '2025-07-15' },
+    { name: 'Vender 10k', when: '2025-08-10' },
+    { name: 'Finalizar campaña', when: '2025-08-25' },
+    { name: 'Optimizar CRM', when: '2025-09-05' },
+    { name: 'Actualizar perfil LinkedIn', when: '2025-09-20' }
   ];
 
-  prioridadActualIndex = 0;
-  semanasCualitativas: any[][] = [];
-  semanasCuantitativas: any[][] = [];
+  currentPriorityIndex = 0;
+  qualitativeWeeks: any[][] = [];
+  quantitativeWeeks: any[][] = [];
 
   estados = [
-    { color: '#006600', placeholder: 'Número crítico' },      // Verde oscuro
-    { color: '#66CC66', placeholder: '' },                    // Verde claro
-    { color: '#FFCC00', placeholder: 'Entre verde y rojo' },  // Amarillo
+    { color: '#006600', placeholder: 'Número crítico' },
+    { color: '#66CC66', placeholder: '' },
+    { color: '#FFCC00', placeholder: 'Entre verde y rojo' },
     { color: '#CC0000', placeholder: '' }
   ];
 
   estados2 = [
-    { color: '#006600', placeholder: 'Número crítico' },      // Verde oscuro
-    { color: '#66CC66', placeholder: '' },                    // Verde claro
-    { color: '#FFCC00', placeholder: 'Entre verde y rojo' },  // Amarillo
+    { color: '#006600', placeholder: 'Número crítico' },
+    { color: '#66CC66', placeholder: '' },
+    { color: '#FFCC00', placeholder: 'Entre verde y rojo' },
     { color: '#CC0000', placeholder: '' }
   ];
 
   coloresDisponibles = [
-    { nombre: 'Super Verde', color: '#006600', textColor: 'white' },
-    { nombre: 'Verde', color: '#66CC66', textColor: 'black' },
-    { nombre: 'Amarillo', color: '#FFCC00', textColor: 'black' },
-    { nombre: 'Rojo', color: '#CC0000', textColor: 'white' }
+    { name: 'Super Verde', color: '#006600', textColor: 'white' },
+    { name: 'Verde', color: '#66CC66', textColor: 'black' },
+    { name: 'Amarillo', color: '#FFCC00', textColor: 'black' },
+    { name: 'Rojo', color: '#CC0000', textColor: 'white' }
   ];
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
       // KPIs
-      ganarJuegoKpis: this.fb.array([
-        this.fb.group({ descripcion: [''] }),
-        this.fb.group({ descripcion: [''] }),
-        this.fb.group({ descripcion: [''] }),
-        this.fb.group({ descripcion: [''] }),
-      ]),
+      criticalNumberKpis: [''],
+      superVerdeKpis: [''],
+      verdeKpis: [''],
+      amarilloKpis: [''],
+      rojoKpis: [''],
       resultadoKpis: [''],
       colorKpis: [''],
 
       // Prioridades
-      ganarJuegoPrioridades: this.fb.array([
-        this.fb.group({ descripcion: [''] }),
-        this.fb.group({ descripcion: [''] }),
-        this.fb.group({ descripcion: [''] }),
-        this.fb.group({ descripcion: [''] }),
-      ]),
+      criticalNumberPriorities: [''],
+      superVerdePriorities: [''],
+      verdePriorities: [''],
+      amarilloPriorities: [''],
+      rojoPriorities: [''],
       resultadoPrioridades: [''],
-      colorPrioridades: ['']
+      colorPrioridades: [''],
     });
+
+
+    // grupal
+    this.formGroupView = this.fb.group({
+      criticalNumber: [''],
+      superVerde: [''],
+      verde: [''],
+      amarillo: [''],
+      rojo: [''],
+      resultadoPrioridades: [''],
+      colorPrioridades: [''],
+    });
+
+    this.loadQuarterPriorityFields();
   }
 
   ngOnInit() {
-    for (let i = 0; i < this.prioridades.length; i++) {
-      this.generarSemanas(i); // ⬅️ le pasamos el índice
+    for (let i = 0; i < this.priorities.length; i++) {
+      this.generateWeeks(i);
     }
+  }
+
+  agregarKpi() {
+    this.kpisEditable.push({ description: '', sv: '', v: '', r: '' });
+  }
+
+  eliminarKpi(index: number) {
+    this.kpisEditable.splice(index, 1);
   }
 
   get ganarJuegoKpis() {
@@ -134,124 +137,443 @@ export class FollowupComponent {
     return this.form.get('ganarJuegoPrioridades') as FormArray;
   }
 
-  get prioridadActual() {
-    return this.prioridades[this.prioridadActualIndex];
+  get currentPriority() {
+    return this.priorities[this.currentPriorityIndex];
   }
 
-  get semanasCualitativaActual() {
-    return this.semanasCualitativas[this.prioridadActualIndex] ?? [];
+  get currentQualitativeWeeks() {
+    return this.qualitativeWeeks[this.currentPriorityIndex] ?? [];
   }
 
-  get semanasCuantitativaActual() {
-    return this.semanasCuantitativas[this.prioridadActualIndex] ?? [];
+  get currentQuantitativeWeeks() {
+    return this.quantitativeWeeks[this.currentPriorityIndex] ?? [];
   }
 
-  generarSemanas(index: number) {
-    const fechaInicio = new Date(this.startDate || new Date());
+  generateWeeks(index: number) {
+    const startDate = new Date(this.startDate || new Date());
 
-    const semanasCualitativa = Array.from({ length: 13 }, (_, i) => {
-      const fecha = new Date(fechaInicio);
-      fecha.setDate(fechaInicio.getDate() + i * 7);
+    const qualitative = Array.from({ length: 13 }, (_, i) => {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + i * 7);
       return {
-        semana: i + 1,
-        fecha,
-        resultadoEsperado: '',
-        superVerde: '',
-        verde: '',
-        rojo: '',
-        resultado: '',
+        week: i + 1,
+        date,
+        expectedResult: '',
+        superGreen: '',
+        green: '',
+        red: '',
+        result: '',
         color: ''
       };
     });
 
-    const semanasCuantitativa = Array.from({ length: 13 }, (_, i) => {
-      const fecha = new Date(fechaInicio);
-      fecha.setDate(fechaInicio.getDate() + i * 7);
+    const quantitative = Array.from({ length: 13 }, (_, i) => {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + i * 7);
       return {
-        semana: i + 1,
-        fecha,
-        resultadoEsperado: '',
-        logrado: false,
-        noLogrado: false
+        week: i + 1,
+        date,
+        expectedResult: '',
+        achieved: false,
+        notAchieved: false
       };
     });
 
-    this.semanasCualitativas[index] = semanasCualitativa;
-    this.semanasCuantitativas[index] = semanasCuantitativa;
+    this.qualitativeWeeks[index] = qualitative;
+    this.quantitativeWeeks[index] = quantitative;
   }
 
   anteriorPrioridad() {
-    if (this.prioridadActualIndex > 0) {
-      this.prioridadActualIndex--;
+    if (this.currentPriorityIndex > 0) {
+      this.currentPriorityIndex--;
     }
   }
 
   siguientePrioridad() {
-    if (this.prioridadActualIndex < this.prioridades.length - 1) {
-      this.prioridadActualIndex++;
+    if (this.currentPriorityIndex < this.priorities.length - 1) {
+      this.currentPriorityIndex++;
     }
   }
 
   getTextoColor(color: string): string {
-    const encontrado = this.coloresDisponibles.find(c => c.color === color);
-    return encontrado ? encontrado.textColor : 'black';
+    const found = this.coloresDisponibles.find(c => c.color === color);
+    return found ? found.textColor : 'black';
   }
 
   getNombreColor(color: string): string {
-    const encontrado = this.coloresDisponibles.find(c => c.color === color);
-    return encontrado ? encontrado.nombre : color;
+    const found = this.coloresDisponibles.find(c => c.color === color);
+    return found ? found.name : color;
   }
 
   save() {
-    const juegoKpis = this.form.value.ganarJuegoKpis.map((item: any, index: number) => ({
+    // KPIs
+    const gameKpis = {
+      criticalNumber: this.form.value.criticalNumberKpis,
+      superGreen: this.form.value.superVerdeKpis,
+      green: this.form.value.verdeKpis,
+      yellow: this.form.value.amarilloKpis,
+      red: this.form.value.rojoKpis,
+      result: this.form.value.resultadoKpis,
       color: this.form.value.colorKpis,
-      descripcion: item.descripcion
-    }));
+      colorName: this.getNombreColor(this.form.value.colorKpis),
+    };
 
-    const juegoPrioridades = this.form.value.ganarJuegoPrioridades.map((item: any, index: number) => ({
+    // Prioridades
+    const gamePriorities = {
+      criticalNumber: this.form.value.criticalNumberPriorities,
+      superGreen: this.form.value.superVerdePriorities,
+      green: this.form.value.verdePriorities,
+      yellow: this.form.value.amarilloPriorities,
+      red: this.form.value.rojoPriorities,
+      result: this.form.value.resultadoPrioridades,
       color: this.form.value.colorPrioridades,
-      descripcion: item.descripcion
-    }));
+      colorName: this.getNombreColor(this.form.value.colorPrioridades),
+    };
 
-    const resultadoKpis = this.form.value.resultadoKpis;
-    const colorKpis = this.form.value.colorKpis;
-    const resultadoPrioridades = this.form.value.resultadoPrioridades;
-    const colorPrioridades = this.form.value.colorPrioridades;
-
-    const cualitativa = this.semanasCualitativas.map((semanas, index) => ({
-      prioridad: this.prioridades[index].nombre,
-      semanas: semanas.map(s => ({
-        semana: s.semana,
-        fecha: s.fecha,
-        resultadoEsperado: s.resultadoEsperado,
-        superVerde: s.superVerde,
-        verde: s.verde,
-        rojo: s.rojo,
-        resultado: s.resultado,
-        color: this.getNombreColor(s.color)
+    // Vista Cualitativa (13 semanas)
+    const qualitativeView = this.qualitativeWeeks.map((weeks, index) => ({
+      priority: this.priorities[index].name,
+      weeks: weeks.map(w => ({
+        week: w.week,
+        date: w.date,
+        expectedResult: w.expectedResult,
+        superGreen: w.superGreen,
+        green: w.green,
+        red: w.red,
+        result: w.result,
+        colorName: this.getNombreColor(w.color)
       }))
     }));
 
-    const cuantitativa = this.semanasCuantitativas.map((semanas, index) => ({
-      prioridad: this.prioridades[index].nombre,
-      semanas: semanas.map(s => ({
-        semana: s.semana,
-        fecha: s.fecha,
-        resultadoEsperado: s.resultadoEsperado,
-        logrado: s.logrado,
-        noLogrado: s.noLogrado
+    // Vista Cuantitativa (13 semanas)
+    const quantitativeView = this.quantitativeWeeks.map((weeks, index) => ({
+      priority: this.priorities[index].name,
+      weeks: weeks.map(w => ({
+        week: w.week,
+        date: w.date,
+        expectedResult: w.expectedResult,
+        achieved: w.achieved,
+        notAchieved: w.notAchieved
       }))
     }));
 
-    console.log('🎯 Ganar el Juego - KPIs:', juegoKpis);
-    console.log('📊 Resultado KPIs:', resultadoKpis);
-    console.log('🎨 Color KPIs:', colorKpis);
+    // Consola para verificar
+    console.log('🎯 Game Plan - KPIs:', gameKpis);
+    console.log('🎯 Game Plan - Priorities:', gamePriorities);
+    console.log('📘 Qualitative View:', qualitativeView);
+    console.log('📗 Quantitative View:', quantitativeView);
+  }
 
-    console.log('🎯 Ganar el Juego - Prioridades:', juegoPrioridades);
-    console.log('📊 Resultado Prioridades:', resultadoPrioridades);
-    console.log('🎨 Color Prioridades:', colorPrioridades);
+  // GRUPAL
 
-    console.log('📘 Vista Cualitativa:', cualitativa);
-    console.log('📗 Vista Cuantitativa:', cuantitativa);
+  filterType: 'team' | 'entity' = 'team';
+  currentWeekIndex = 4;
+  // filterType = 'team';
+
+  groupPrioritiesDataQualt = [
+    {
+      user: 'Usuario 1',
+      priorities: [
+        {
+          name: '100 Leads nuevos',
+          week: 5,
+          expectedResult: '30 leads',
+          superGreen: 35,
+          green: 30,
+          red: 25,
+          result: 28,
+          color: '#66CC66',
+        },
+        {
+          name: 'Campaña Ads',
+          week: 5,
+          expectedResult: '40 leads',
+          superGreen: 35,
+          green: 30,
+          red: 25,
+          result: 32,
+          color: '#006600',
+        },
+        {
+          name: 'Email Marketing',
+          week: 5,
+          expectedResult: 'Enviar 3 campañas',
+          superGreen: 5,
+          green: 4,
+          red: 2,
+          result: 3,
+          color: '#FFCC00',
+        },
+        {
+          name: 'Reuniones con equipo',
+          week: 5,
+          expectedResult: '2 reuniones estratégicas',
+          superGreen: 3,
+          green: 2,
+          red: 1,
+          result: 2,
+          color: '#66CC66',
+        },
+        {
+          name: 'Presentación a cliente',
+          week: 5,
+          expectedResult: 'Presentación comercial',
+          superGreen: 1,
+          green: 1,
+          red: 0,
+          result: 1,
+          color: '#006600',
+        }
+      ]
+    },
+    {
+      user: 'Usuario 2',
+      priorities: [
+        {
+          name: 'Seguimiento CRM',
+          week: 5,
+          expectedResult: 'Llamar a 15 clientes',
+          superGreen: 20,
+          green: 15,
+          red: 10,
+          result: 12,
+          color: '#FFCC00',
+        },
+        {
+          name: 'Diseño de campaña',
+          week: 5,
+          expectedResult: '3 piezas gráficas',
+          superGreen: 3,
+          green: 2,
+          red: 1,
+          result: 2,
+          color: '#66CC66',
+        },
+        {
+          name: 'Email Marketing',
+          week: 5,
+          expectedResult: 'Enviar 3 campañas',
+          superGreen: 5,
+          green: 4,
+          red: 2,
+          result: 3,
+          color: '#FFCC00',
+        },
+        {
+          name: 'Reuniones con equipo',
+          week: 5,
+          expectedResult: '2 reuniones estratégicas',
+          superGreen: 3,
+          green: 2,
+          red: 1,
+          result: 2,
+          color: '#66CC66',
+        },
+        {
+          name: 'Presentación a cliente',
+          week: 5,
+          expectedResult: 'Presentación comercial',
+          superGreen: 1,
+          green: 1,
+          red: 0,
+          result: 1,
+          color: '#006600',
+        }
+      ]
+    }
+  ];
+
+  groupPrioritiesDataQuant = [
+    {
+      user: 'Usuario 1',
+      priorities: [
+        {
+          name: '100 Leads nuevos',
+          week: 5,
+          expectedResult: '30 leads en redes sociales',
+          achieved: true
+        },
+        {
+          name: 'Campaña Ads',
+          week: 5,
+          expectedResult: '40 leads',
+          achieved: true
+        },
+        {
+          name: 'Email Marketing',
+          week: 5,
+          expectedResult: 'Enviar 3 campañas',
+          achieved: false
+        },
+        {
+          name: 'Reuniones con equipo',
+          week: 5,
+          expectedResult: '2 reuniones estratégicas',
+          achieved: true
+        },
+        {
+          name: 'Presentación a cliente',
+          week: 5,
+          expectedResult: 'Presentación comercial',
+          achieved: true
+        }
+      ]
+    },
+    {
+      user: 'Usuario 2',
+      priorities: [
+        {
+          name: 'Seguimiento CRM',
+          week: 5,
+          expectedResult: 'Llamar a 15 clientes',
+          achieved: false
+        },
+        {
+          name: 'Diseño de campaña',
+          week: 5,
+          expectedResult: '3 piezas gráficas',
+          achieved: true
+        },
+        {
+          name: 'Email Marketing',
+          week: 5,
+          expectedResult: 'Enviar 3 campañas',
+          achieved: false
+        },
+        {
+          name: 'Reuniones con equipo',
+          week: 5,
+          expectedResult: '2 reuniones estratégicas',
+          achieved: true
+        },
+        {
+          name: 'Presentación a cliente',
+          week: 5,
+          expectedResult: 'Presentación comercial',
+          achieved: true
+        }
+      ]
+    }
+  ];
+
+  getPrioritiesForWeek(priorities: any[]) {
+    const week = this.currentWeekIndex + 1;
+    return priorities
+      .filter(p => p.week === week)
+      .map((p, index) => ({
+        index: index + 1,
+        ...p
+      }));
+  }
+
+  getWeekStartDate(): Date {
+    if (!this.startDate) return new Date();
+    const baseDate = new Date(this.startDate);
+    return new Date(baseDate.setDate(baseDate.getDate() + this.currentWeekIndex * 7));
+  }
+
+  getEndWeekDate(date: Date): Date {
+    return new Date(date.getTime() + 6 * 24 * 60 * 60 * 1000);
+  }
+
+  getWeekRange(index: number): string {
+    const start = this.getWeekStartDate();
+    const end = this.getEndWeekDate(start);
+    return `${start.getDate()} ${start.toLocaleString('default', { month: 'short' })} - ${end.getDate()} ${end.toLocaleString('default', { month: 'short' })}`;
+  }
+
+  previousWeek() {
+    if (this.currentWeekIndex > 0) this.currentWeekIndex--;
+  }
+
+  nextWeek() {
+    if (this.currentWeekIndex < 12) this.currentWeekIndex++;
+  }
+
+  formGroupView: FormGroup;
+
+  groupStates = [
+    { color: '#006600', placeholder: 'Super Verde' },
+    { color: '#66CC66', placeholder: 'Verde' },
+    { color: '#FFCC00', placeholder: 'Entre verde y rojo' },
+    { color: '#CC0000', placeholder: 'Rojo' },
+  ];
+
+  get gameQuarterPriorities(): FormArray {
+    return this.formGroupView.get('gameQuarterPriorities') as FormArray;
+  }
+
+  loadQuarterPriorityFields(): void {
+    if (!this.gameQuarterPriorities) return;
+
+    this.groupStates.forEach(() => {
+      this.gameQuarterPriorities.push(
+        this.fb.group({ description: [''] })
+      );
+    });
+  }
+
+  showWeeklyConfigModal = false;
+
+  weeklyMeetingDay: string = 'Friday'; // default
+  weeklyMeetingTime: string = '09:00'; // default
+
+  weekDays = [
+    { value: 'Sunday', label: 'Domingo' },
+    { value: 'Monday', label: 'Lunes' },
+    { value: 'Tuesday', label: 'Martes' },
+    { value: 'Wednesday', label: 'Miércoles' },
+    { value: 'Thursday', label: 'Jueves' },
+    { value: 'Friday', label: 'Viernes' },
+    { value: 'Saturday', label: 'Sábado' }
+  ];
+
+  getNextMeetingDate(): string {
+    const now = new Date();
+    const currentDay = now.getDay(); // 0 = Sunday ... 6 = Saturday
+    const targetDay = this.weekDays.findIndex(d => d.value === this.weeklyMeetingDay);
+    const daysUntilNext = (targetDay + 7 - currentDay) % 7 || 7;
+
+    const nextMeeting = new Date(now);
+    nextMeeting.setDate(now.getDate() + daysUntilNext);
+
+    const [hours, minutes] = this.weeklyMeetingTime.split(':').map(Number);
+    nextMeeting.setHours(hours, minutes, 0, 0);
+
+    return nextMeeting.toLocaleString('es-ES', { weekday: 'long', hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' });
+  }
+
+
+  // Abre el modal
+  openMeetingConfigModal() {
+    this.showWeeklyConfigModal = true;
+  }
+
+  // Cierra el modal
+  closeMeetingConfigModal() {
+    this.showWeeklyConfigModal = false;
+  }
+
+  closeWeeklyConfigModal() {
+    this.showWeeklyConfigModal = false;
+  }
+
+  saveWeeklyConfig() {
+    this.showWeeklyConfigModal = false;
+    // Aquí podrías guardar en base de datos o localStorage si lo deseas
+  }
+
+  saveGroupQuarterGame(): void {
+    const data = {
+      criticalNumber: this.formGroupView.get('criticalNumber')?.value,
+      superGreen: this.formGroupView.get('superVerde')?.value,
+      green: this.formGroupView.get('verde')?.value,
+      yellow: this.formGroupView.get('amarillo')?.value,
+      red: this.formGroupView.get('rojo')?.value,
+      resultPriority: this.formGroupView.get('resultadoPrioridades')?.value,
+      colorPriority: this.getNombreColor(this.formGroupView.get('colorPrioridades')?.value)
+    };
+
+    console.log('🔵 Ganar el Juego Prioridades (Grupal)', data);
   }
 }

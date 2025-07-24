@@ -15,7 +15,84 @@ import Swal from 'sweetalert2';
 export class OpspComponent {
     entidades: string[] = ['Empresa A', 'Empresa B', 'Empresa C'];
     equipos: string[] = ['Ventas', 'Finanzas', 'Operaciones'];
-    usuarios: string[] = ['Usuario 1', 'Usuario 2', 'Usuario 3'];
+    // usuarios: string[] = ['Usuario 1', 'Usuario 2', 'Usuario 3'];
+    // Filtro
+    usuarios = [
+        { id: 1, name: 'Carlos', checked: false },
+        { id: 2, name: 'Lucía', checked: false },
+        { id: 3, name: 'Andrés', checked: false },
+        { id: 4, name: 'María', checked: false }
+    ];
+
+    userData = [
+        {
+            userId: 1,
+            kpis: [
+                { description: 'Ventas Q2', sv: 100, v: 90, r: 80 }
+            ],
+            priorities: [
+                { name: 'Finalizar campaña', when: '2025-08-25' }
+            ],
+            ganarJuego: {
+                kpis: { critical: '500', sv: '600', v: '550', a: '500', r: '450', result: '540', color: '#66CC66' },
+                priorities: { critical: '3 proyectos', sv: '4', v: '3', a: '2', r: '1', result: '3', color: '#66CC66' }
+            }
+        },
+        {
+            userId: 2,
+            kpis: [
+                { description: 'Satisfacción Cliente', sv: 95, v: 90, r: 85 }
+            ],
+            priorities: [
+                { name: 'Optimizar CRM', when: '2025-09-05' }
+            ],
+            ganarJuego: {
+                kpis: { critical: '90%', sv: '95%', v: '90%', a: '85%', r: '80%', result: '89%', color: '#FFCC00' },
+                priorities: { critical: '3 tareas', sv: '5', v: '4', a: '3', r: '2', result: '3', color: '#66CC66' }
+            }
+        },
+        {
+            userId: 3,
+            kpis: [
+                { description: 'Ventas Q2', sv: 100, v: 90, r: 80 }
+            ],
+            priorities: [
+                { name: 'Finalizar campaña', when: '2025-08-25' }
+            ],
+            ganarJuego: {
+                kpis: { critical: '500', sv: '600', v: '550', a: '500', r: '450', result: '540', color: '#66CC66' },
+                priorities: { critical: '3 proyectos', sv: '4', v: '3', a: '2', r: '1', result: '3', color: '#66CC66' }
+            }
+        },
+        {
+            userId: 4,
+            kpis: [
+                { description: 'Satisfacción Cliente', sv: 95, v: 90, r: 85 }
+            ],
+            priorities: [
+                { name: 'Optimizar CRM', when: '2025-09-05' }
+            ],
+            ganarJuego: {
+                kpis: { critical: '90%', sv: '95%', v: '90%', a: '85%', r: '80%', result: '89%', color: '#FFCC00' },
+                priorities: { critical: '3 tareas', sv: '5', v: '4', a: '3', r: '2', result: '3', color: '#66CC66' }
+            }
+        }
+    ];
+
+    showUserDropdown = false;
+
+    get selectedUsers() {
+        return this.usuarios.filter(u => u.checked);
+    }
+
+    get selectedUserNames(): string {
+        const names = this.selectedUsers.map(u => u.name);
+        return names.length ? names.join(', ') : 'Seleccionar usuarios';
+    }
+
+    getSelectedUserData(userId: number) {
+        return this.userData.find(u => u.userId === userId);
+    }
 
     selectedEntidad: string = '';
     selectedEquipo: string = '';
