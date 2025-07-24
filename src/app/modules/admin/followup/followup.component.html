@@ -176,25 +176,46 @@
                         class="bg-gray-100 py-2 px-4 font-semibold text-[#003660] text-center border-b border-gray-300">
                         Mis Prioridades Trimestrales
                     </div>
+
                     <table class="w-full text-sm border-collapse text-gray-700">
                         <thead>
                             <tr class="bg-white text-gray-500 text-left text-xs border border-gray-300">
                                 <th class="px-4 py-2 border border-gray-300">#</th>
                                 <th class="px-4 py-2 border border-gray-300">Prioridad</th>
                                 <th class="px-4 py-2 border border-gray-300">Cuándo</th>
+                                <th class="px-4 py-2 border border-gray-300 w-8"></th>
                             </tr>
                         </thead>
+
                         <tbody>
                             <tr *ngFor="let priority of priorities; let i = index" class="border border-gray-300">
                                 <td class="px-4 py-2 border border-gray-300">{{ i + 1 }}</td>
-                                <td class="px-4 py-2 border border-gray-300">{{ priority.name }}</td>
                                 <td class="px-4 py-2 border border-gray-300">
-                                    <input type="date" [(ngModel)]="priority.when" class="w-full p-1 border rounded" />
+                                    <input type="text" [(ngModel)]="priority.name" class="w-full border rounded p-1"
+                                        [readonly]="!priority.isIndividual" />
+                                </td>
+                                <td class="px-4 py-2 border border-gray-300">
+                                    <input type="date" [(ngModel)]="priority.when" class="w-full border rounded p-1"
+                                        [readonly]="!priority.isIndividual" />
+                                </td>
+                                <td class="px-2 text-center border border-gray-300">
+                                    <button *ngIf="priority.isIndividual" (click)="removePriority(i)"
+                                        class="text-red-600 hover:text-red-800">
+                                        ✕
+                                    </button>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+
+                    <div class="flex justify-end p-4">
+                        <button type="button" (click)="addPriority()"
+                            class="bg-[#003660] hover:bg-[#004b8d] text-white font-semibold px-4 py-2 rounded-md">
+                            + Agregar Prioridad
+                        </button>
+                    </div>
                 </div>
+
 
                 <!-- Ganar el Juego Prioridades (Individual) -->
                 <div class="bg-white border border-gray-300 rounded-xl shadow-md p-4 space-y-4" [formGroup]="form">
@@ -255,7 +276,7 @@
 
             </div>
         </div>
-        
+
         <!-- VISTA CUALITATIVA -->
         <div *ngIf="vistaModo === 'cualitativa'">
             <div class="bg-white rounded-xl shadow-md overflow-hidden mt-6 w-full border border-gray-300">
@@ -332,7 +353,7 @@
                         ❯</button>
                 </div>
 
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto" *ngIf="startDate && currentQualitativeWeeks.length > 0; else sinFecha">
                     <table class="w-full text-sm text-left text-gray-700 border border-gray-300 table-fixed">
                         <thead class="bg-[#e5f4fd] text-[#003660] font-semibold">
                             <tr>

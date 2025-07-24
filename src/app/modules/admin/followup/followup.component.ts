@@ -26,10 +26,16 @@ export class FollowupComponent {
   openConfigModal() { this.showConfigModal = true; }
   closeConfigModal() { this.showConfigModal = false; }
 
-  saveDate(): void {
-    if (this.startDate) {
-      console.log('Selected start date:', this.startDate);
-      this.closeModal();
+  saveDate() {
+    if (!this.startDate) {
+      alert('Por favor selecciona una fecha válida');
+      return;
+    }
+    this.closeModal()
+
+    // Generar semanas para todas las prioridades (o solo para la actual)
+    for (let i = 0; i < this.priorities.length; i++) {
+      this.generateWeeks(i);
     }
   }
 
@@ -46,13 +52,7 @@ export class FollowupComponent {
     { description: '', sv: '', v: '', r: '' }
   ];
 
-  priorities = [
-    { name: 'Conseguir 100 leads', when: '2025-07-15' },
-    { name: 'Vender 10k', when: '2025-08-10' },
-    { name: 'Finalizar campaña', when: '2025-08-25' },
-    { name: 'Optimizar CRM', when: '2025-09-05' },
-    { name: 'Actualizar perfil LinkedIn', when: '2025-09-20' }
-  ];
+  priorities: any[] = [];
 
   currentPriorityIndex = 0;
   qualitativeWeeks: any[][] = [];
@@ -116,6 +116,7 @@ export class FollowupComponent {
   }
 
   ngOnInit() {
+    this.loadInitialPriorities();
     for (let i = 0; i < this.priorities.length; i++) {
       this.generateWeeks(i);
     }
@@ -127,6 +128,63 @@ export class FollowupComponent {
 
   eliminarKpi(index: number) {
     this.kpisEditable.splice(index, 1);
+  }
+
+  loadInitialPriorities(): void {
+    this.priorities = [
+      // Prioridades globales
+      {
+        name: 'Implementar nuevo CRM en el equipo de ventas',
+        when: '2025-08-01',
+        isIndividual: false,
+        quien: 'Administrador'
+      },
+      {
+        name: 'Optimizar tiempos de entrega en logística',
+        when: '2025-08-05',
+        isIndividual: false,
+        quien: 'Administrador'
+      },
+      {
+        name: 'Incrementar la satisfacción del cliente en un 20%',
+        when: '2025-08-10',
+        isIndividual: false,
+        quien: 'Administrador'
+      },
+
+      // Prioridades individuales
+      {
+        name: 'Finalizar capacitación de liderazgo',
+        when: '2025-08-15',
+        isIndividual: true,
+        quien: 'María García'
+      },
+      {
+        name: 'Reducir errores en reportes financieros',
+        when: '2025-08-20',
+        isIndividual: true,
+        quien: 'Carlos Méndez'
+      },
+      {
+        name: 'Desarrollar módulo de reportes internos',
+        when: '2025-08-25',
+        isIndividual: true,
+        quien: 'Daniel Peralta'
+      }
+    ];
+  }
+
+  addPriority(): void {
+    this.priorities.push({
+      name: '',
+      when: '',
+      isIndividual: true,
+      quien: 'Usuario Actual' // Puedes reemplazar esto con el nombre del usuario autenticado
+    });
+  }
+
+  removePriority(index: number): void {
+    this.priorities.splice(index, 1);
   }
 
   get ganarJuegoKpis() {
@@ -150,11 +208,16 @@ export class FollowupComponent {
   }
 
   generateWeeks(index: number) {
-    const startDate = new Date(this.startDate || new Date());
+    if (!this.startDate) return;
+
+    const [year, month, day] = this.startDate.split('-').map(Number);
+    const base = new Date(year, month - 1, day);
 
     const qualitative = Array.from({ length: 13 }, (_, i) => {
-      const date = new Date(startDate);
-      date.setDate(startDate.getDate() + i * 7);
+      const date = new Date(base);
+      date.setDate(base.getDate() + i * 7);
+      date.setHours(12, 0, 0, 0); // evita desfase por zona horaria
+
       return {
         week: i + 1,
         date,
@@ -168,8 +231,10 @@ export class FollowupComponent {
     });
 
     const quantitative = Array.from({ length: 13 }, (_, i) => {
-      const date = new Date(startDate);
-      date.setDate(startDate.getDate() + i * 7);
+      const date = new Date(base);
+      date.setDate(base.getDate() + i * 7);
+      date.setHours(12, 0, 0, 0); // también aquí para evitar desfase
+
       return {
         week: i + 1,
         date,
@@ -183,16 +248,23 @@ export class FollowupComponent {
     this.quantitativeWeeks[index] = quantitative;
   }
 
-  anteriorPrioridad() {
-    if (this.currentPriorityIndex > 0) {
-      this.currentPriorityIndex--;
+  setCurrentPriorityIndex(index: number) {
+    if (index >= 0 && index < this.priorities.length) {
+      this.currentPriorityIndex = index;
+
+      // Si no hay semanas generadas para esta prioridad, las generas (o simplemente aseguras que existan)
+      if (!this.qualitativeWeeks[index]) {
+        this.generateWeeks(index);
+      }
     }
   }
 
+  anteriorPrioridad() {
+    this.setCurrentPriorityIndex(this.currentPriorityIndex - 1);
+  }
+
   siguientePrioridad() {
-    if (this.currentPriorityIndex < this.priorities.length - 1) {
-      this.currentPriorityIndex++;
-    }
+    this.setCurrentPriorityIndex(this.currentPriorityIndex + 1);
   }
 
   getTextoColor(color: string): string {

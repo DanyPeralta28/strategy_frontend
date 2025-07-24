@@ -23,6 +23,12 @@ export class VisionComponent {
     { color: '#CC0000', placeholder: 'En problemas (rojo)' }
   ];
 
+  usuarios = [
+    { id: '1', nombre: 'Juan Pérez' },
+    { id: '2', nombre: 'María García' },
+    { id: '3', nombre: 'Carlos Rodríguez' }
+  ];
+
   constructor(private fb: FormBuilder) { }
 
   ngOnInit(): void {
@@ -153,7 +159,9 @@ export class VisionComponent {
       prioridad: [''],
       plazo: [''],
       esOKR: [false],
-      subprioridades: this.fb.array([])
+      subprioridades: this.fb.array([]),
+      esIndividual: [false],
+      quien: [''],
     });
   }
 
