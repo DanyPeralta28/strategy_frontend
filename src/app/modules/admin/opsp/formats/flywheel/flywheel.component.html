@@ -8,13 +8,11 @@
 
   <!-- SWITCH de vista -->
   <div class="flex justify-center items-center gap-4 my-6">
-    <!-- Label izquierdo -->
     <span class="text-sm font-medium" [class.text-[#003660]]="viewMode === 'editor'"
       [class.font-semibold]="viewMode === 'editor'">
       Editor
     </span>
 
-    <!-- Switch -->
     <label class="relative inline-flex items-center cursor-pointer select-none">
       <input type="checkbox" class="sr-only" [checked]="viewMode === 'circular'"
         (change)="viewMode = $event.target.checked ? 'circular' : 'editor'">
@@ -27,18 +25,16 @@
       </div>
     </label>
 
-    <!-- Label derecho -->
     <span class="text-sm font-medium" [class.text-[#003660]]="viewMode === 'circular'"
       [class.font-semibold]="viewMode === 'circular'">
       Ciclo Circular
     </span>
   </div>
 
+  <!-- EDITOR -->
   <div *ngIf="viewMode === 'editor'" class="space-y-6">
-    <!-- Lista con drag-and-drop -->
     <div cdkDropList (cdkDropListDropped)="reordenar($event)" class="space-y-10 relative">
-      <ng-container *ngFor="let item of flywheelItems; let i = index">
-
+      <ng-container *ngFor="let item of flywheelItems; let i = index; trackBy: trackByItem">
         <!-- Card -->
         <div cdkDrag class="bg-white border border-gray-200 shadow-md rounded-xl p-6 relative">
           <!-- Drag Handle Visual -->
@@ -47,7 +43,7 @@
           </div>
 
           <div class="flex justify-between items-center mb-3">
-            <h4 class="text-[#003660] font-semibold">Elemento {{ i + 1 }}</h4>
+            <h4 class="text-[#003660] font-semibold">Elemento {{ item.order_item }}</h4>
             <button (click)="eliminarItem(i)" class="text-red-500 hover:underline text-sm">Eliminar</button>
           </div>
 
@@ -97,9 +93,9 @@
 
   <!-- CIRCULAR VIEW -->
   <ng-container *ngIf="viewMode === 'circular'">
-    <div class="relative mx-auto" style="width: 600px; height: 600px;"> <!-- Aumentado -->
+    <div class="relative mx-auto" style="width: 600px; height: 600px;">
       <!-- Líneas + flechas -->
-      <svg viewBox="0 0 600 600" class="absolute inset-0"> <!-- Aumentado -->
+      <svg viewBox="0 0 600 600" class="absolute inset-0">
         <defs>
           <marker id="arrowCirc" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
             <polygon points="0 0, 6 3, 0 6" fill="#56B4DA" />
@@ -117,8 +113,8 @@
       <!-- BLOQUES -->
       <ng-container *ngFor="let item of flywheelItems; let i = index">
         <div class="absolute select-none" [ngStyle]="getBlockStyle(i)">
-          <div class="bg-[#003660] text-white rounded-lg p-3 w-44 h-28 flex flex-col items-center justify-center
-                    text-center gap-1">
+          <div
+            class="bg-[#003660] text-white rounded-lg p-3 w-44 h-28 flex flex-col items-center justify-center text-center gap-1">
             <span class="text-[11px] font-semibold truncate">
               {{ item.responsable || 'Agrega un responsable' }}
             </span>
@@ -133,6 +129,4 @@
       </ng-container>
     </div>
   </ng-container>
-
-
 </div>

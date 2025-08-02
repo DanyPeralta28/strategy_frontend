@@ -19,25 +19,38 @@
         </p>
       </div>
       <button type="button" class="text-sm bg-[#003660] text-white px-3 py-1 rounded hover:bg-[#004b8d]"
-        (click)="addItem(tendencias)">
+        (click)="addTrend()">
         + Agregar
       </button>
     </div>
 
-    <!-- Lista -->
-    <div *ngIf="tendencias.length === 0" class="text-sm italic text-gray-400">
+    <div *ngIf="tendencias.length === 0" class="text-sm italic text-gray-400 mb-4">
       No hay tendencias aún.
     </div>
 
-    <div *ngFor="let ctrl of tendencias.controls; let i = index" class="flex items-center gap-2 mb-2"
-      [formControl]="ctrl">
-      <input type="text" class="flex-1 border border-gray-300 rounded-md p-2 text-sm text-gray-700" />
-      <button type="button" class="text-red-600 hover:text-red-800" (click)="removeItem(tendencias, i)">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    <div formArrayName="tendencias" class="space-y-2">
+      <div *ngFor="let group of tendencias.controls; let i = index; trackBy: trackByIndex" [formGroupName]="i"
+        class="flex gap-2 items-start">
+        <div class="flex-1">
+          <label class="block text-xs font-medium text-gray-600 mb-1">Tendencia</label>
+          <input type="text" formControlName="trend" placeholder="Ej. Transformación digital"
+            class="w-full border border-gray-300 rounded-md p-2 text-sm" />
+        </div>
+        <div class="flex-1">
+          <label class="block text-xs font-medium text-gray-600 mb-1">Impacto</label>
+          <input type="text" formControlName="impact" placeholder="Ej. Alto"
+            class="w-full border border-gray-300 rounded-md p-2 text-sm" />
+        </div>
+        <div class="flex-shrink-0 self-end">
+          <button type="button" class="text-red-600 hover:text-red-800" (click)="removeTrend(i)">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12" />
             </svg>
-      </button>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -53,24 +66,38 @@
         </p>
       </div>
       <button type="button" class="text-sm bg-[#003660] text-white px-3 py-1 rounded hover:bg-[#004b8d]"
-        (click)="addItem(fortalezas)">
+        (click)="addStrength()">
         + Agregar
       </button>
     </div>
 
-    <div *ngIf="fortalezas.length === 0" class="text-sm italic text-gray-400">
+    <div *ngIf="fortalezas.length === 0" class="text-sm italic text-gray-400 mb-4">
       No hay fortalezas aún.
     </div>
 
-    <div *ngFor="let ctrl of fortalezas.controls; let i = index" class="flex items-center gap-2 mb-2"
-      [formControl]="ctrl">
-      <input type="text" class="flex-1 border border-gray-300 rounded-md p-2 text-sm text-gray-700" />
-      <button type="button" class="text-red-600 hover:text-red-800" (click)="removeItem(fortalezas, i)">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    <div formArrayName="fortalezas" class="space-y-2">
+      <div *ngFor="let group of fortalezas.controls; let i = index; trackBy: trackByIndex" [formGroupName]="i"
+        class="flex gap-2 items-start">
+        <div class="flex-1">
+          <label class="block text-xs font-medium text-gray-600 mb-1">Fortaleza</label>
+          <input type="text" formControlName="strength" placeholder="Ej. Reputación de marca"
+            class="w-full border border-gray-300 rounded-md p-2 text-sm" />
+        </div>
+        <div class="flex-1">
+          <label class="block text-xs font-medium text-gray-600 mb-1">Importancia</label>
+          <input type="text" formControlName="importance" placeholder="Ej. Alta"
+            class="w-full border border-gray-300 rounded-md p-2 text-sm" />
+        </div>
+        <div class="flex-shrink-0 self-end">
+          <button type="button" class="text-red-600 hover:text-red-800" (click)="removeStrength(i)">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12" />
             </svg>
-      </button>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -84,24 +111,38 @@
         </p>
       </div>
       <button type="button" class="text-sm bg-[#003660] text-white px-3 py-1 rounded hover:bg-[#004b8d]"
-        (click)="addItem(debilidades)">
+        (click)="addWeakness()">
         + Agregar
       </button>
     </div>
 
-    <div *ngIf="debilidades.length === 0" class="text-sm italic text-gray-400">
+    <div *ngIf="debilidades.length === 0" class="text-sm italic text-gray-400 mb-4">
       No hay debilidades aún.
     </div>
 
-    <div *ngFor="let ctrl of debilidades.controls; let i = index" class="flex items-center gap-2 mb-2"
-      [formControl]="ctrl">
-      <input type="text" class="flex-1 border border-gray-300 rounded-md p-2 text-sm text-gray-700" />
-      <button type="button" class="text-red-600 hover:text-red-800" (click)="removeItem(debilidades, i)">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none"
-                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+    <div formArrayName="debilidades" class="space-y-2">
+      <div *ngFor="let group of debilidades.controls; let i = index; trackBy: trackByIndex" [formGroupName]="i"
+        class="flex gap-2 items-start">
+        <div class="flex-1">
+          <label class="block text-xs font-medium text-gray-600 mb-1">Debilidad</label>
+          <input type="text" formControlName="weakness" placeholder="Ej. Sistemas legados"
+            class="w-full border border-gray-300 rounded-md p-2 text-sm" />
+        </div>
+        <div class="flex-1">
+          <label class="block text-xs font-medium text-gray-600 mb-1">Severidad</label>
+          <input type="text" formControlName="severity" placeholder="Ej. Media"
+            class="w-full border border-gray-300 rounded-md p-2 text-sm" />
+        </div>
+        <div class="flex-shrink-0 self-end">
+          <button type="button" class="text-red-600 hover:text-red-800" (click)="removeWeakness(i)">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12" />
             </svg>
-      </button>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -109,7 +150,7 @@
   <div class="text-right pt-6">
     <button (click)="save()"
       class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow transition-all">
-      {{ fdtForm.dirty ? 'Actualizar' : 'Guardar' }}
+      Guardar
     </button>
   </div>
 </div>
