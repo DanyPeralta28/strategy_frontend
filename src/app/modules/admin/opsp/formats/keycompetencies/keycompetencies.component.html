@@ -9,71 +9,57 @@
   <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 space-y-6">
     <div>
       <label class="block text-sm font-semibold text-[#003660] mb-2">Competencia Central</label>
-      <input
-        type="text"
-        [(ngModel)]="form.central"
+      <input type="text" [(ngModel)]="form.central"
         class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]"
-        placeholder="Escribe tu competencia central..."
-      />
+        placeholder="Escribe tu competencia central..." />
     </div>
 
     <div>
       <label class="block text-sm font-semibold text-[#003660] mb-2">Explicación</label>
-      <textarea
-        rows="4"
-        [(ngModel)]="form.centralExplanation"
+      <textarea rows="4" [(ngModel)]="form.centralExplanation"
         class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]"
-        placeholder="Explica por qué esta competencia es central para tu organización..."
-      ></textarea>
+        placeholder="Explica por qué esta competencia es central para tu organización..."></textarea>
     </div>
   </div>
 
   <!-- Competencias Clave Dinámicas -->
-<!-- Competencias Clave Dinámicas -->
-<div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 space-y-6">
-  <div class="flex justify-between items-center mb-4">
-    <h3 class="text-lg font-semibold text-[#003660]">Listado de Competencias Clave</h3>
-    <button (click)="addCompetencia()"
-      class="bg-[#003660] hover:bg-[#005f8c] text-white text-sm px-4 py-2 rounded-xl shadow">
-      + Agregar competencia
-    </button>
-  </div>
+  <div class="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 space-y-6">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-lg font-semibold text-[#003660]">Listado de Competencias Clave</h3>
+      <button (click)="addCompetencia()"
+        class="bg-[#003660] hover:bg-[#005f8c] text-white text-sm px-4 py-2 rounded-xl shadow">
+        + Agregar competencia
+      </button>
+    </div>
 
-  <!-- Grid de 2 columnas -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div *ngFor="let item of form.claveCompetencias; let i = index" class="space-y-4 bg-gray-50 border border-gray-200 rounded-xl p-4">
-      <div class="flex justify-between items-center">
-        <span class="text-sm font-semibold text-[#003660]">Competencia #{{ i + 1 }}</span>
-        <button (click)="removeCompetencia(i)" class="text-sm text-red-600 hover:underline">Eliminar</button>
-      </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div *ngFor="let item of form.claveCompetencias; let i = index"
+        class="space-y-4 bg-gray-50 border border-gray-200 rounded-xl p-4">
+        <div class="flex justify-between items-center">
+          <span class="text-sm font-semibold text-[#003660]">Competencia #{{ i + 1 }}</span>
+          <button (click)="removeCompetencia(i)" class="text-sm text-red-600 hover:underline">Eliminar</button>
+        </div>
 
-      <div>
-        <label class="block text-sm font-medium text-[#003660] mb-1">Competencia</label>
-        <input
-          type="text"
-          [(ngModel)]="item.nombre"
-          class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400"
-          placeholder="Escribe la competencia"
-        />
-      </div>
+        <div>
+          <label class="block text-sm font-medium text-[#003660] mb-1">Competencia</label>
+          <input type="text" [(ngModel)]="item.nombre"
+            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]"
+            placeholder="Escribe la competencia" />
+        </div>
 
-      <div>
-        <label class="block text-sm font-medium text-[#003660] mb-1">Explicación</label>
-        <textarea
-          rows="3"
-          [(ngModel)]="item.descripcion"
-          class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400"
-          placeholder="Describe esta competencia..."></textarea>
+        <div>
+          <label class="block text-sm font-medium text-[#003660] mb-1">Explicación</label>
+          <textarea rows="3" [(ngModel)]="item.descripcion"
+            class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]"
+            placeholder="Describe esta competencia..."></textarea>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
   <!-- Botón Guardar -->
   <div class="text-right">
-    <button
-      (click)="save()"
-      class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
+    <button (click)="save()" class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
       Guardar
     </button>
   </div>

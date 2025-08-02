@@ -22,7 +22,7 @@ export class BhagComponent {
   constructor(public opspService: OpspService) { }
 
   ngOnInit() {
-    this.id_company = "BANRURAL_GT2";
+    this.id_company = "BANRURAL_GT3";
     this.loadBhag();
   }
 

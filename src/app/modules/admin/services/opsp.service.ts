@@ -141,7 +141,7 @@ export class OpspService {
     return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatBrandPromises}`));
   }
 
-  getBrandPromisesByCompany(id: any): Promise<any> {
+  getBrandPromiseByCompany(id: any): Promise<any> {
     return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatBrandPromises}?id_company=${id}`));
   }
 
@@ -183,7 +183,7 @@ export class OpspService {
     return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatCentralClients}`));
   }
 
-  getCentralClientsByCompany(id: any): Promise<any> {
+  getCentralClientByCompany(id: any): Promise<any> {
     return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatCentralClients}?id_company=${id}`));
   }
 
@@ -351,7 +351,7 @@ export class OpspService {
     return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatCultures}`));
   }
 
-  getCulturesByCompany(id: any): Promise<any> {
+  getCultureByCompany(id: any): Promise<any> {
     return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatCultures}?id_company=${id}`));
   }
 

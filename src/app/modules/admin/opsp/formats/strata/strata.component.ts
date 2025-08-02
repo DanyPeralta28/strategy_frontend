@@ -21,15 +21,23 @@ export class StrataComponent implements OnInit {
   sevenForm!: FormGroup;
 
   // contexto / estado
-  id_company: string = 'BANRURAL_GT2';
+  id_company: string = 'BANRURAL_GT3';
   existingStrataId: number | null = null;
   existingBhagId: number | null = null;
   originalBhagDescription: string = '';
   existingProfitPerXId: number | null = null;
   originalProfitPerXDefinition: string = '';
+  centralClientSummary: string = '';
   status = 1;
   created_by = 'admin_user';
   user_name = 'jdoe';
+
+  brandPromiseId?: number;
+  existingBrandPromise: {
+    primary_promise?: string;
+    secondary_promise?: string;
+    tertiary_promise?: string;
+  } | null = null;
 
   constructor(private fb: FormBuilder, public opspService: OpspService) { }
 
@@ -51,8 +59,39 @@ export class StrataComponent implements OnInit {
     });
 
     this.loadStrata();
+    this.loadCentralClientSummary();
+    this.loadBrandPromise();
     this.loadBhag();
     this.loadProfitPerX();
+  }
+
+  private async loadCentralClientSummary(): Promise<void> {
+    try {
+      const resp = await this.opspService.getCentralClientByCompany(this.id_company);
+      if (resp?.data && resp.data.length > 0) {
+        this.centralClientSummary = resp.data[0].core_client_summary || '';
+      }
+    } catch (err) {
+      console.error('Error cargando resumen del Cliente Central:', err);
+    }
+  }
+
+  private async loadBrandPromise(): Promise<void> {
+    try {
+      const resp = await this.opspService.getBrandPromiseByCompany(this.id_company);
+      if (resp?.data && resp.data.length > 0) {
+        const bp = resp.data[0];
+        this.brandPromiseId = bp.id;
+        this.existingBrandPromise = {
+          primary_promise: bp.primary_promise,
+          secondary_promise: bp.secondary_promise,
+          tertiary_promise: bp.tertiary_promise
+        };
+        this.sevenForm.get('brandTerritory.promises')?.setValue(bp.primary_promise || '');
+      }
+    } catch (err) {
+      console.error('Error cargando Promesa Líder:', err);
+    }
   }
 
   /** ---------- getters ---------- */

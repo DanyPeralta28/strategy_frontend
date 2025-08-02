@@ -45,7 +45,7 @@ export class VisionComponent {
 
 
   ngOnInit(): void {
-    this.id_company = "BANRURAL_GT2";
+    this.id_company = "BANRURAL_GT3";
 
     this.visionForm = this.fb.group({
       valores: [''],
@@ -153,7 +153,7 @@ export class VisionComponent {
 
   private savePurposeIfNeeded(): Promise<any> {
     const currentPurpose = (this.visionForm.get('proposito')?.value || '').trim();
-    
+
     if (!currentPurpose) {
       return Promise.resolve(null); // nada que guardar
     }
@@ -210,11 +210,13 @@ export class VisionComponent {
         }
 
         this.visionForm.patchValue({
-          valores: data.core_values,
+          // valores: data.core_values,
           // proposito: data.proposito,
           promesas: data.brand_promises,
           bhag: this.bhag
         });
+        this.loadCoreValuesForVision();
+
         // 3-5 years
         this.strategic3to5.clear();
 
@@ -279,6 +281,22 @@ export class VisionComponent {
       .catch(err => {
         console.error("Error cargando BHAG:", err);
       });
+  }
+
+  private async loadCoreValuesForVision(): Promise<void> {
+    try {
+      const resp = await this.opspService.getCoreValuesByCompany(this.id_company);
+      const items = resp.data || [];
+      const csv = items
+        .map((v: any) => v.value_title?.trim())
+        .filter((t: string) => t)
+        .join(', ');
+      // Sobrescribe el campo de valores con los valores centrales formateados
+      this.visionForm.patchValue({ valores: csv });
+    } catch (err) {
+      console.error('Error cargando valores centrales para visión:', err);
+      // no fallar duro; deja lo que venga de data.core_values
+    }
   }
 
   // prioridades estrategicas

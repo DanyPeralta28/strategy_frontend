@@ -35,7 +35,7 @@ export class FlywheelComponent implements OnInit {
   originalSequence: string[] = [];
 
   // contexto / estado
-  id_company: string = 'BANRURAL_GT99'; // ajustar según contexto real
+  id_company: string = 'BANRURAL_GT98'; // ajustar según contexto real
   flywheelCode: number = 101; // default, puede venir desde backend
   created_by: string = 'admin_user';
 
@@ -50,33 +50,17 @@ export class FlywheelComponent implements OnInit {
   }
 
   /** Carga existente desde API */
-  private loadFlywheel(): void {
+  loadFlywheel(): void {
     this.opspService
       .getFlywheelByCompany(this.id_company)
       .then(resp => {
         if (!resp?.data || resp.data.length === 0) {
-          // inicializar vacíos con uid
+          // inicializar con un solo ítem vacío (antes eran tres)
           this.flywheelItems = [
             {
               uid: this.makeUid(),
               code: this.flywheelCode,
               order_item: 1,
-              descripcion: '',
-              kpi: '',
-              responsable: '',
-            },
-            {
-              uid: this.makeUid(),
-              code: this.flywheelCode,
-              order_item: 2,
-              descripcion: '',
-              kpi: '',
-              responsable: '',
-            },
-            {
-              uid: this.makeUid(),
-              code: this.flywheelCode,
-              order_item: 3,
               descripcion: '',
               kpi: '',
               responsable: '',
@@ -113,28 +97,12 @@ export class FlywheelComponent implements OnInit {
       })
       .catch(err => {
         console.error('Error cargando Flywheel:', err);
-        // fallback de inicialización
+        // fallback de inicialización con un solo ítem vacío
         this.flywheelItems = [
           {
             uid: this.makeUid(),
             code: this.flywheelCode,
             order_item: 1,
-            descripcion: '',
-            kpi: '',
-            responsable: '',
-          },
-          {
-            uid: this.makeUid(),
-            code: this.flywheelCode,
-            order_item: 2,
-            descripcion: '',
-            kpi: '',
-            responsable: '',
-          },
-          {
-            uid: this.makeUid(),
-            code: this.flywheelCode,
-            order_item: 3,
             descripcion: '',
             kpi: '',
             responsable: '',
@@ -145,7 +113,6 @@ export class FlywheelComponent implements OnInit {
         this.originalSequence = this.flywheelItems.map(i => i.uid);
       });
   }
-
 
   /** Añadir / eliminar / reordenar */
   agregarItem(): void {

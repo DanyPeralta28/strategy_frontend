@@ -1,5 +1,4 @@
 <div class="max-w-4xl mx-auto px-6 py-10 space-y-10">
-
   <!-- Encabezado -->
   <div class="text-center">
     <h2 class="text-3xl font-extrabold text-[#003660]">Valores Centrales</h2>
@@ -8,26 +7,34 @@
 
   <!-- Lista de Valores -->
   <div class="space-y-6">
-    <div *ngFor="let valor of valores; let i = index" class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-4">
-
+    <div *ngFor="let valor of coreValues; let i = index; trackBy: trackByValor"
+      class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-4">
       <div class="flex justify-between items-center">
         <h3 class="text-sm font-semibold text-[#003660]">Valor #{{ i + 1 }}</h3>
-        <button *ngIf="valores.length > 1" (click)="eliminarValor(i)"
+        <button *ngIf="coreValues.length > 1" (click)="eliminarValor(i)"
           class="text-red-600 hover:text-red-800 text-sm font-medium">
           Eliminar
         </button>
       </div>
 
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Valor (palabra o frase)</label>
-        <input [(ngModel)]="valor.nombre" type="text"
-          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
-      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Valor (palabra o frase)</label>
+          <input [(ngModel)]="valor.value_title" type="text"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+        </div>
 
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Explicación</label>
-        <textarea [(ngModel)]="valor.explicacion" rows="4"
-          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA] resize-none"></textarea>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Descripción corta</label>
+          <input [(ngModel)]="valor.short_description" type="text"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+        </div>
+
+        <div class="md:col-span-3">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Explicación detallada</label>
+          <textarea [(ngModel)]="valor.long_description" rows="3"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA] resize-none"></textarea>
+        </div>
       </div>
     </div>
 

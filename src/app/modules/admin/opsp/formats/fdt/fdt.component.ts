@@ -22,7 +22,7 @@ export class FdtComponent implements OnInit {
   fdtForm!: FormGroup;
 
   // contexto: reemplaza según tu flujo real (ruta / sesión)
-  id_company: string = 'BANRURAL_GT2';
+  id_company: string = 'BANRURAL_GT3';
   existingFdtId: number | null = null;
   status = 1;
   created_by = 'admin_user';

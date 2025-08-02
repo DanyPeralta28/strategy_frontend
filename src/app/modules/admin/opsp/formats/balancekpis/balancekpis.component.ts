@@ -31,7 +31,7 @@ export class BalancekpisComponent implements OnInit {
   };
 
   // contexto
-  id_company: string = 'BANRURAL_GT2'; // reemplaza según flujo real
+  id_company: string = 'BANRURAL_GT3'; // reemplaza según flujo real
   existingKpiBalanceId: number | null = null;
   created_by: string = 'admin_user';
 

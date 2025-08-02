@@ -13,7 +13,7 @@ import { PurposeComponent } from 'app/modules/admin/opsp/formats/purpose/purpose
 import { KeycompetenciesComponent } from 'app/modules/admin/opsp/formats/keycompetencies/keycompetencies.component';
 import { TerritoryComponent } from 'app/modules/admin/opsp/formats/territory/territory.component';
 import { CultureComponent } from 'app/modules/admin/opsp/formats/culture/culture.component';
-import { CentralclientComponent } from 'app/modules/admin/opsp/formats/centralclient/centralclient.component';
+import { CentralClientComponent } from 'app/modules/admin/opsp/formats/centralclient/centralclient.component';
 import { BrandpromisesComponent } from 'app/modules/admin/opsp/formats/brandpromises/brandpromises.component';
 import { BhagComponent } from 'app/modules/admin/opsp/formats/bhag/bhag.component';
 import { FlywheelComponent } from 'app/modules/admin/opsp/formats/flywheel/flywheel.component';
@@ -78,7 +78,7 @@ export default [
     },
     {
         path: 'formats/centralclient',
-        component: CentralclientComponent
+        component: CentralClientComponent
     },
     {
         path: 'formats/brandpromises',
