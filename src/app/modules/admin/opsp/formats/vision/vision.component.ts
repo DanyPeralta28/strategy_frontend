@@ -45,7 +45,7 @@ export class VisionComponent {
 
 
   ngOnInit(): void {
-    this.id_company = "BANRURAL_GT3";
+    this.id_company = "BANRURAL_GT2";
 
     this.visionForm = this.fb.group({
       valores: [''],

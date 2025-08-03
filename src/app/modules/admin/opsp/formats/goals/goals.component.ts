@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import Swal from 'sweetalert2';
+import { OpspService } from '../../../services/opsp.service'; // ajusta la ruta si hace falta
 
 interface GoalField {
   title: string;
@@ -12,7 +13,6 @@ interface GoalField {
 interface GoalSection {
   key: string;
   title: string;
-  range?: string;
   values: GoalField[];
 }
 
@@ -22,12 +22,16 @@ interface GoalSection {
   templateUrl: './goals.component.html',
   styleUrl: './goals.component.scss'
 })
-export class GoalsComponent {
+export class GoalsComponent implements OnInit {
+  // compañía fija por ahora; podrías sacarla de contexto / ruta según tu flujo
+  id_company = 'BANRURAL_GT2';
+  recordId: number | null = null; // si ya existe, se llena
+
   goalData: Record<string, GoalSection> = {
     threeFiveYears: {
       key: 'threeFiveYears',
       title: '3–5 Años',
-      values: [{ title: 'Año tributario', value: '2025' }]
+      values: []
     },
     year: {
       key: 'year',
@@ -58,6 +62,12 @@ export class GoalsComponent {
 
   quarterKeys = ['trimesterOne', 'trimesterTwo', 'trimesterThree', 'trimesterFour'];
 
+  constructor(private opspService: OpspService) {}
+
+  ngOnInit(): void {
+    this.loadGoals();
+  }
+
   /** Alterna modo edición de la etiqueta */
   toggleEdit(sectionKey: string, index: number): void {
     const item = this.goalData[sectionKey].values[index];
@@ -73,14 +83,98 @@ export class GoalsComponent {
     });
   }
 
-  /** Guardar (solo demo) */
-  save(): void {
-    console.log('Goal data:', this.goalData);
-    Swal.fire({
-      icon: 'success',
-      title: '¡Guardado!',
-      text: 'Las metas se guardaron correctamente.',
-      confirmButtonColor: '#003660'
-    });
+  private mapBackendToUI(data: any): void {
+    // Helper para transformar arrays del backend al goalData
+    const mapSection = (backendArr: any[] | undefined, targetKey: string) => {
+      if (Array.isArray(backendArr)) {
+        this.goalData[targetKey].values = backendArr.map(item => ({
+          title: item.titulo || '',
+          value: item.value || '',
+          editing: false
+        }));
+      }
+    };
+
+    mapSection(data.three_to_five_years, 'threeFiveYears');
+    mapSection(data.one_year, 'year');
+    mapSection(data.trimester_one, 'trimesterOne');
+    mapSection(data.trimester_two, 'trimesterTwo');
+    mapSection(data.trimester_three, 'trimesterThree');
+    mapSection(data.trimester_four, 'trimesterFour');
+  }
+
+  private buildPayload(): any {
+    const sections = [
+      'threeFiveYears',
+      'year',
+      'trimesterOne',
+      'trimesterTwo',
+      'trimesterThree',
+      'trimesterFour'
+    ].map(key => ({
+      key,
+      values: this.goalData[key].values.map(f => ({
+        titulo: f.title,
+        value: f.value
+      }))
+    }));
+
+    const payload: any = {
+      created_by: 'admin_user', // idealmente lo tomas del contexto auténticado
+      goal_sections: sections
+    };
+
+    if (!this.recordId) {
+      payload.id_company = this.id_company;
+    }
+
+    return payload;
+  }
+
+  async loadGoals(): Promise<void> {
+    try {
+      const resp = await this.opspService.getGoalsByCompany(this.id_company);
+      if (resp?.data && Array.isArray(resp.data) && resp.data.length) {
+        const existing = resp.data[0];
+        this.recordId = existing.id;
+        this.mapBackendToUI(existing);
+      }
+    } catch (err) {
+      console.error('Error cargando metas:', err);
+    }
+  }
+
+  async save(): Promise<void> {
+    const payload = this.buildPayload();
+
+    try {
+      if (this.recordId) {
+        await this.opspService.updateGoal(this.recordId, payload);
+        Swal.fire({
+          icon: 'success',
+          title: '¡Actualizado!',
+          text: 'Las metas se actualizaron correctamente.',
+          confirmButtonColor: '#003660'
+        });
+      } else {
+        await this.opspService.createGoal(payload);
+        Swal.fire({
+          icon: 'success',
+          title: '¡Creado!',
+          text: 'Las metas se guardaron correctamente.',
+          confirmButtonColor: '#003660'
+        });
+        // recargar para capturar el id nuevo
+        await this.loadGoals();
+      }
+    } catch (error) {
+      console.error('Error guardando metas:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo guardar las metas. Intenta de nuevo.',
+        confirmButtonColor: '#D32F2F'
+      });
+    }
   }
 }

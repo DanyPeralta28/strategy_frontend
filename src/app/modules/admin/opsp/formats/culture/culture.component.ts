@@ -18,7 +18,7 @@ export class CultureComponent implements OnInit {
   };
 
   // contexto / constantes (ajústalas si vienen dinámicas)
-  id_company: string = 'BANRURAL_GT3';
+  id_company: string = 'BANRURAL_GT2';
   created_by: string = 'admin_user';
 
   cultureId?: number;

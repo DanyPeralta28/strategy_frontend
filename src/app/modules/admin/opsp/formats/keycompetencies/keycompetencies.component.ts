@@ -32,7 +32,7 @@ export class KeycompetenciesComponent implements OnInit {
   };
 
   // contexto
-  id_company: string = 'BANRURAL_GT3';
+  id_company: string = 'BANRURAL_GT2';
   created_by: string = 'admin_user';
 
   originalSnapshot: KeyCompetenciesForm = { ...this.form };

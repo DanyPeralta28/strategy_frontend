@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
+import { OpspService } from '../../../services/opsp.service';
 
 interface Channel {
   name: string;
@@ -27,9 +29,36 @@ interface Territory {
   imports: [CommonModule, FormsModule],
   templateUrl: './territory.component.html',
 })
-export class TerritoryComponent {
+export class TerritoryComponent implements OnInit {
   newTerritory = '';
   territories: Territory[] = [];
+  territoryId: number | null = null;
+
+  // Estos deberían venir del contexto real (por ahora hardcodeados)
+  id_company = 'BANRURAL_GT2';
+  created_by = 'admin_user';
+
+  constructor(private opspService: OpspService) { }
+
+  ngOnInit(): void {
+    this.loadTerritories();
+  }
+
+  async loadTerritories(): Promise<void> {
+    try {
+      const resp = await this.opspService.getTerritoriesByCompany(this.id_company);
+      if (resp?.data && Array.isArray(resp.data) && resp.data.length) {
+        const found = resp.data[0];
+        this.territoryId = found.id;
+        this.territories = JSON.parse(JSON.stringify(found.geographic_location || []));
+      } else {
+        this.territories = [];
+        this.territoryId = null;
+      }
+    } catch (err) {
+      console.error('Error cargando territorios:', err);
+    }
+  }
 
   addTerritory() {
     const name = this.newTerritory.trim();
@@ -67,10 +96,48 @@ export class TerritoryComponent {
     p.channels.splice(cIndex, 1);
   }
 
-  saveAll() {
-    console.log('Estructura completa:', JSON.stringify(this.territories, null, 2));
-    console.log('Estructura completa:', this.territories);
-    // Aquí podrías enviar los datos a un backend, por ejemplo:
-    // this.territoryService.save(this.territories).subscribe(...)
+  async saveAll() {
+    // opcional: podrías filtrar territorios vacíos aquí si hace falta
+    const geographic_location = this.territories;
+
+    // construir el payload
+    const payload: any = {
+      geographic_location,
+      created_by: this.created_by,
+    };
+
+    try {
+      if (this.territoryId) {
+        // update (no incluir id_company ni status)
+        await this.opspService.updateTerritory(this.territoryId, payload);
+        Swal.fire({
+          icon: 'success',
+          title: '¡Actualizado!',
+          text: 'Los territorios se han actualizado correctamente.',
+          confirmButtonColor: '#003660',
+        });
+      } else {
+        // create: sí incluir id_company
+        payload.id_company = this.id_company;
+        const resp = await this.opspService.createTerritory(payload);
+        if (resp?.data && Array.isArray(resp.data) && resp.data[0]?.id) {
+          this.territoryId = resp.data[0].id;
+        }
+        Swal.fire({
+          icon: 'success',
+          title: '¡Creado!',
+          text: 'Los territorios se han guardado correctamente.',
+          confirmButtonColor: '#003660',
+        });
+      }
+    } catch (error) {
+      console.error('Error guardando territorios:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo guardar la información. Intenta nuevamente.',
+        confirmButtonColor: '#D32F2F',
+      });
+    }
   }
 }
