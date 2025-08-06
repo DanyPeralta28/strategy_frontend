@@ -1,0 +1,96 @@
+<div class="w-full max-w-7xl mx-auto p-6 sm:p-10 space-y-10">
+        <!-- Encabezado -->
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-extrabold text-[#003660]">
+                Efectivo: Estrategias para Optimizar el Efectivo
+            </h2>
+        </div>
+
+    <div *ngFor="let stage of stages; let i = index" class="bg-white border border-gray-200 rounded-xl shadow-md">
+        <!-- Editable Stage Title -->
+        <div class="bg-[#003660] text-white px-4 py-2 rounded-t-xl flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <span class="bg-[#A3B81A] text-white rounded-full w-6 h-6 flex items-center justify-center font-bold">
+                    {{ stage.letter }}
+                </span>
+                <ng-container *ngIf="!stage.editing">
+                    <span class="font-semibold">{{ stage.title }}</span>
+                </ng-container>
+                <ng-container *ngIf="stage.editing">
+                    <input type="text" [(ngModel)]="stage.title"
+                        [ngStyle]="{ width: getInputWidth(stage.title) + 'px' }"
+                        class="bg-white text-[#003660] rounded-md px-2 py-1 font-semibold transition-all duration-200" />
+                </ng-container>
+            </div>
+            <button (click)="toggleEdit(i)">
+                <svg *ngIf="!stage.editing" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3-6 6H9v-3z" />
+                </svg>
+                <svg *ngIf="stage.editing" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Tabla de ideas -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full table-auto text-sm text-gray-700">
+                <thead>
+                    <tr class="bg-gray-100 text-left">
+                        <th class="px-4 py-2 w-8">#</th>
+                        <th class="px-4 py-2">Ideas para mejorar</th>
+                        <th class="px-4 py-2">Reducción del Ciclo</th>
+                        <th class="px-4 py-2">Elimina Errores</th>
+                        <th class="px-4 py-2">Mejora el Modelo de Negocio y GAP</th>
+                        <th class="px-4 py-2"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of stage.items; let j = index">
+                        <td class="px-4 py-2 font-semibold">{{ j + 1 }}</td>
+                        <td class="px-4 py-2">
+                            <input type="text" [(ngModel)]="item.idea"
+                                class="w-full border border-gray-300 rounded-md p-1" />
+                        </td>
+                        <td class="px-2 py-2">
+                            <input type="text" [(ngModel)]="item.reduction"
+                                class="w-full border border-gray-300 rounded-md p-1 text-center" />
+                        </td>
+                        <td class="px-2 py-2">
+                            <input type="text" [(ngModel)]="item.errors"
+                                class="w-full border border-gray-300 rounded-md p-1 text-center" />
+                        </td>
+                        <td class="px-2 py-2">
+                            <input type="text" [(ngModel)]="item.gap"
+                                class="w-full border border-gray-300 rounded-md p-1 text-center" />
+                        </td>
+                        <td class="px-2 py-2 text-right">
+                            <button *ngIf="stage.items.length > 1" type="button" (click)="removeItem(i, j)"
+                                class="text-red-500 hover:text-red-700 font-bold text-lg">×</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Botón Agregar Idea -->
+        <div class="p-4 text-right">
+            <button type="button" (click)="addItem(i)"
+                class="bg-[#003660] hover:bg-[#005f8c] text-white text-sm px-4 py-1 rounded-md shadow">
+                + Agregar idea
+            </button>
+        </div>
+    </div>
+
+    <!-- Botón Guardar -->
+    <div class="text-right pt-4">
+        <button type="button"
+            class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow transition-all"
+            (click)="save()">
+            Guardar
+        </button>
+    </div>
+</div>

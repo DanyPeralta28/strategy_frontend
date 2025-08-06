@@ -35,9 +35,17 @@ export const defaultNavigation: FuseNavigationItem[] = [
     {
         id: 'cash',
         title: 'Cash',
-        type: 'basic',
+        type: 'collapsable',
         icon: 'heroicons_outline:banknotes',
-        link: '/cash'
+        children: [
+            {
+                id: 'cash.formatos',
+                title: 'Formatos',
+                type: 'basic',
+                icon: 'heroicons_outline:document-text',
+                link: '/cash/formats'
+            }
+        ]
     },
     {
         id: 'ejecucion',
@@ -80,9 +88,17 @@ export const compactNavigation: FuseNavigationItem[] = [
     {
         id: 'cash',
         title: 'Cash',
-        type: 'basic',
+        type: 'collapsable',
         icon: 'heroicons_outline:banknotes',
-        link: '/cash'
+        children: [
+            {
+                id: 'cash.formatos',
+                title: 'Formatos',
+                type: 'basic',
+                icon: 'heroicons_outline:document-text',
+                link: '/cash/formats'
+            }
+        ]
     },
     {
         id: 'ejecucion',
@@ -125,9 +141,17 @@ export const futuristicNavigation: FuseNavigationItem[] = [
     {
         id: 'cash',
         title: 'Cash',
-        type: 'basic',
+        type: 'collapsable',
         icon: 'heroicons_outline:banknotes',
-        link: '/cash'
+        children: [
+            {
+                id: 'cash.formatos',
+                title: 'Formatos',
+                type: 'basic',
+                icon: 'heroicons_outline:document-text',
+                link: '/cash/formats'
+            }
+        ]
     },
     {
         id: 'ejecucion',

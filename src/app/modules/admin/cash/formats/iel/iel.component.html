@@ -1,0 +1,138 @@
+<div class="w-full max-w-7xl mx-auto p-6 sm:p-10 space-y-10">
+    <!-- Encabezado -->
+    <div class="text-center mb-10">
+        <h2 class="text-3xl font-extrabold text-[#003660]">
+            Índice de Eficiencia laboral: Ajuste para predecir la Productividad Laboral
+        </h2>
+    </div>
+
+    <!-- ===== Botón Agregar Período ===== -->
+    <div class="text-right">
+        <button type="button"
+            class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium text-sm px-4 py-2 rounded-xl shadow"
+            (click)="addPeriod()">
+            + Agregar período
+        </button>
+    </div>
+
+    <!-- ===== Cards de Períodos ===== -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngFor="let period of periods; let i = index"
+            class="bg-white border border-gray-200 rounded-xl p-6 shadow-md relative">
+            <!-- Botón eliminar -->
+            <button *ngIf="periods.length > 1" type="button"
+                class="absolute top-2 right-2 text-red-600 hover:text-red-800" (click)="removePeriod(i)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <!-- Cabecera -->
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-2xl font-semibold text-[#003660]">Período</h3>
+                <input type="text" [(ngModel)]="period.year" placeholder="AÑO"
+                    class="w-20 border border-gray-300 rounded-md p-2 text-sm text-center" />
+            </div>
+
+            <!-- Campos -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ingresos</label>
+                    <input type="number" [(ngModel)]="period.revenue" placeholder="Ingresos"
+                        class="w-full p-2 border border-gray-300 rounded-md text-sm" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Costo de mercaderías vendidas
+                    </label>
+                    <input type="number" [(ngModel)]="period.cogs" placeholder="Costo de mercaderías vendidas"
+                        class="w-full p-2 border border-gray-300 rounded-md text-sm" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">$ Margen Bruto</label>
+                    <input type="number" [(ngModel)]="period.grossMargin" placeholder="$ Margen Bruto"
+                        class="w-full p-2 border border-gray-300 rounded-md text-sm" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        $ Mano de Obra Directa
+                    </label>
+                    <input type="number" [(ngModel)]="period.directLabor" placeholder="$ Mano de Obra Directa"
+                        class="w-full p-2 border border-gray-300 rounded-md text-sm" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Fórmula IEL ===== -->
+    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md space-y-4">
+        <h4 class="text-xl font-bold text-[#003660] border-b pb-2">
+            Índice de Eficiencia Laboral (IEL) =
+            <span class="font-semibold">Margen Bruto</span> ÷
+            <span class="font-semibold">Mano de Obra Directa</span>
+        </h4>
+        <div class="space-y-4">
+            <div *ngFor="let period of periods" class="flex flex-wrap items-center gap-2">
+                <!-- Período = -->
+                <span class="font-medium min-w-[64px]">Período</span>
+                <input [value]="period.year" readonly
+                    class="w-16 bg-gray-50 border-b-2 border-[#658C2F] text-center text-sm p-1" />
+                <span class="mx-1">=</span>
+
+                <!-- Margen Bruto / -->
+                <input [value]="period.grossMargin || 0" readonly
+                    class="w-20 bg-gray-50 border border-gray-300 text-center text-sm p-1" />
+                <span class="mx-1">÷</span>
+
+                <!-- Mano de Obra Directa = -->
+                <input [value]="period.directLabor || 0" readonly
+                    class="w-20 bg-gray-50 border border-gray-300 text-center text-sm p-1" />
+                <span class="mx-1">=</span>
+
+                <!-- Resultado IEL -->
+                <input [value]="getIel(period) | number:'1.2-2'" readonly
+                    class="w-20 bg-gray-50 border border-gray-300 text-center text-sm p-1 font-semibold text-[#658C2F]" />
+            </div>
+        </div>
+    </div>
+
+    <div class="triangle-wrapper">
+        <div class="corner top">Talento del Equipo</div>
+        <div class="corner bottom-left">Promesa de Marca</div>
+        <div class="corner bottom-right">Disciplinas en la Ejecución</div>
+
+        <div class="triangle">
+            <div class="center-text">
+                Índice para<br />
+                Optimizar la eficiencia<br />
+                en el trabajo
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Ranking de Impacto ===== -->
+    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md space-y-4">
+        <h4 class="text-xl font-bold text-[#003660] border-b pb-2">
+            Calificar en orden de impacto (1, 2, 3) para mejorar el Índice de Eficiencia Laboral
+        </h4>
+        <div *ngFor="let item of impactItems; let i = index" class="flex items-center space-x-4">
+            <!-- Input de ranking -->
+            <input type="number" [(ngModel)]="item.rank" min="1" max="3" placeholder=""
+                class="w-12 p-2 border border-gray-300 rounded-md text-sm text-center" />
+            <!-- Etiqueta descriptiva -->
+            <label class="flex-1 text-sm text-gray-700">
+                {{ item.label }}
+            </label>
+        </div>
+    </div>
+
+    <!-- ===== Botón Guardar ===== -->
+    <div class="text-right pt-4">
+        <button type="button"
+            class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow transition-all"
+            (click)="save()">
+            Guardar
+        </button>
+    </div>
+</div>

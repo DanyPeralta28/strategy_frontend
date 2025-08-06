@@ -1,0 +1,59 @@
+.triangle-wrapper {
+  position: relative;
+  width: 300px;
+  margin: 60px auto;
+}
+
+/* Triángulo equilátero con fondo degradado */
+.triangle {
+  width: 100%;
+  padding-bottom: 86.6%; /* altura = √3/2 * base */
+  background: linear-gradient(to bottom, #a3b81a, #8fa21f);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  position: relative;
+  z-index: 1;
+}
+
+/* Texto centrado dentro del triángulo */
+.center-text {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+  font-weight: bold;
+  z-index: 2;
+  line-height: 1.3;
+}
+
+/* Vértices */
+.corner {
+  position: absolute;
+  font-weight: bold;
+  color: #556e00;
+  z-index: 3;
+  font-size: 14px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.corner.top {
+  top: -1.8em;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.corner.bottom-left {
+  bottom: -2.2em;
+  left: -40px;
+  width: 60%;
+  text-align: left;
+}
+
+.corner.bottom-right {
+  bottom: -2.2em;
+  right: -40px;
+  width: 60%;
+  text-align: right;
+}

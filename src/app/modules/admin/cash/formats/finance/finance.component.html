@@ -1,0 +1,100 @@
+<div class="w-full max-w-7xl mx-auto p-6 sm:p-10 space-y-6">
+    <!-- Encabezado -->
+    <div class="text-center mb-10">
+        <h2 class="text-3xl font-extrabold text-[#003660]">
+            Optimización del Financiamiento: Checklist para el Éxito
+        </h2>
+    </div>
+
+    <div *ngFor="let item of fundingItems; let i = index"
+        class="bg-white border border-[#A3B81A] rounded-xl p-6 shadow-md space-y-4">
+
+        <!-- Título y puntaje -->
+        <div class="flex justify-between items-start">
+            <h3 class="text-lg font-bold text-[#003660]">
+                {{ i + 1 }}. {{ item.title }}
+            </h3>
+            <div class="text-sl text-gray-700 text-right">
+                <label class="text-sl mr-2">Puntaje <span class="text-sl">1–10</span></label>
+                <input type="number" min="1" max="10" [(ngModel)]="item.score"
+                    class="w-16 border border-gray-300 rounded-md p-1 text-center" />
+            </div>
+        </div>
+
+        <!-- Subitems -->
+        <div class="grid gap-2">
+            <div *ngFor="let check of item.checks; let j = index" class="flex items-center gap-2">
+                <input type="checkbox" [(ngModel)]="item.selected[j]"
+                    class="accent-[#A3B81A] w-4 h-4 border border-gray-300 rounded" />
+                <label class="text-sl text-black">{{ check }}</label>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="text-lg font-bold text-[#003660]">
+        Atributos de Financiamiento a Optimizar
+    </h3>
+
+    <table class="min-w-full text-sm border-separate [border-spacing:0]">
+        <thead>
+            <tr class="bg-[#003660] text-white">
+                <th class="text-left px-4 py-3 rounded-tl-xl w-12">#</th>
+                <th class="px-4 py-3 text-left">Descripción</th>
+                <th class="px-4 py-3 text-center">Líder</th>
+                <th class="px-4 py-3 text-center">Trimestre</th>
+                <th class="px-4 py-3 rounded-tr-xl text-center w-12"></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr *ngFor="let attr of attributes; let i = index"
+                class="border-b last:border-none bg-white hover:bg-[#f5f9f1] transition">
+
+                <td class="border-l border-[#A3B81A] px-4 py-3 font-bold text-center">{{ i + 1 }}.</td>
+
+                <td class="border-x border-[#A3B81A] px-2 py-2">
+                    <input type="text" [(ngModel)]="attr.descripcion"
+                        class="w-full border border-gray-300 rounded-md p-1 bg-gray-50 text-sm" />
+                </td>
+
+                <td class="border-x border-[#A3B81A] px-2 py-2 text-center">
+                    <input type="text" [(ngModel)]="attr.lider"
+                        class="w-full border border-gray-300 rounded-md p-1 bg-gray-50 text-sm text-center" />
+                </td>
+
+                <td class="border-x border-[#A3B81A] px-2 py-2 text-center">
+                    <select [(ngModel)]="attr.trimestre"
+                        class="w-full border border-gray-300 rounded-md p-1 bg-gray-50 text-sm text-center">
+                        <option value="" disabled>Selecciona</option>
+                        <option value="Q1">Q1</option>
+                        <option value="Q2">Q2</option>
+                        <option value="Q3">Q3</option>
+                        <option value="Q4">Q4</option>
+                    </select>
+                </td>
+
+                <!-- Botón eliminar -->
+                <td class="border-r border-[#A3B81A] px-2 py-2 text-center">
+                    <button *ngIf="attributes.length > 1" (click)="removeAttribute(i)"
+                        class="text-red-600 hover:text-red-800 font-bold text-lg leading-none">×</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Botón agregar -->
+    <div class="mt-4">
+        <button (click)="addAttribute()" class="bg-[#A3B81A] text-white px-4 py-2 rounded hover:bg-[#8DA812]">
+            + Agregar Atributo
+        </button>
+    </div>
+
+    <!-- Botón para guardar todo el formato -->
+    <!-- Botón Guardar -->
+    <div class="text-right">
+        <button (click)="save()"
+            class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
+            Guardar
+        </button>
+    </div>
+</div>
