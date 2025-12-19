@@ -79,6 +79,17 @@
                         </div>
                     </div>
                 </div>
+                <!-- Vacío -->
+                <ng-template #emptyState>
+                    <div class="border border-dashed border-gray-300 rounded-lg p-3 bg-gray-50">
+                        <div class="text-sm font-semibold text-slate-400">Sin KPIs configurados</div>
+                        <div class="text-sm text-slate-400">Resultado: —</div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="h-3 w-3 rounded-full bg-gray-300"></span>
+                            <span class="text-xs text-slate-400">Sin dato</span>
+                        </div>
+                    </div>
+                </ng-template>
             </div><br>
 
             <!-- Valores, Propósito y Territorio -->
@@ -86,21 +97,33 @@
                 <!-- Valores Centrales -->
                 <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
                     <h2 class="text-xl font-bold text-slate-800 mb-2">Valores Creencias</h2>
-                    <ul class="list-disc list-inside text-slate-600">
+                    <ul *ngIf="valores.length > 0; else noValores" class="list-disc list-inside text-slate-600">
                         <li *ngFor="let valor of valores">{{ valor }}</li>
                     </ul>
+                    <ng-template #noValores>
+                        <p class="text-slate-500 italic">No hay valores configurados</p>
+                    </ng-template>
                 </div>
 
-                <!-- Propósito -->
                 <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
                     <h2 class="text-xl font-bold text-slate-800 mb-2">Propósito</h2>
-                    <p class="text-slate-600">{{ proposito }}</p>
+                    <ng-container *ngIf="proposito; else noProposito">
+                        <p class="text-slate-600">{{ proposito }}</p>
+                    </ng-container>
+                    <ng-template #noProposito>
+                        <p class="text-slate-500 italic">No hay propósito configurado</p>
+                    </ng-template>
                 </div>
 
                 <!-- Territorio -->
                 <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
                     <h2 class="text-xl font-bold text-slate-800 mb-2">Territorio</h2>
-                    <p class="text-slate-600">{{ territorio }}</p>
+                    <ul *ngIf="territorios.length > 0; else noTerritorios" class="list-disc list-inside text-slate-600">
+                        <li *ngFor="let territorio of territorios">{{ territorio }}</li>
+                    </ul>
+                    <ng-template #noTerritorios>
+                        <p class="text-slate-500 italic">No hay Territorios configurados</p>
+                    </ng-template>
                 </div>
             </div>
 
@@ -162,99 +185,67 @@
                             </tr>
                         </tbody>
                     </table>
+                    <div class="mt-4 flex justify-end">
+                        <button type="button" (click)="saveAccionesConsistentes()"
+                            class="bg-[#003660] hover:bg-[#004b8d] text-white font-semibold px-6 py-2 rounded-md shadow-md transition">
+                            Guardar acciones
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- METAS -->
             <div class="mt-10 space-y-6">
-                <!-- Título de la sección -->
                 <h3 class="text-[#003660] font-bold text-xl mb-6">Metas</h3>
 
-                <!-- Grid de 3 columnas -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- 3–5 AÑOS -->
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6 w-full">
+                        <h4 class="font-bold text-[#003660] text-lg mb-3">3–5 AÑOS</h4>
 
-                    <!-- Metas 3–5 años -->
-                    <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6 space-y-3 w-full">
-                        <h4 class="font-bold text-[#003660] text-lg mb-2">3–5 AÑOS</h4>
-                        <div class="flex justify-between items-center text-sm border-b pb-2">
-                            <span class="font-bold">Ingresos</span>
-                            <span class="text-right">{{ metasPlazo.ingresos }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm border-b pb-2">
-                            <span class="font-bold">Utilidad</span>
-                            <span class="text-right">{{ metasPlazo.utilidad }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm">
-                            <span class="font-bold">Efectivo</span>
-                            <span class="text-right">{{ metasPlazo.efectivo }}</span>
-                        </div>
+                        <ng-container *ngIf="metasPlazoCampos.length; else noPlazo">
+                            <div *ngFor="let c of metasPlazoCampos"
+                                class="flex justify-between items-center text-sm border-b last:border-b-0 py-2">
+                                <span class="font-semibold">{{ c.titulo }}</span>
+                                <span class="text-right">{{ c.value }}</span>
+                            </div>
+                        </ng-container>
+                        <ng-template #noPlazo>
+                            <p class="text-slate-500 italic">Sin metas configuradas.</p>
+                        </ng-template>
                     </div>
 
-                    <!-- Metas Anuales -->
-                    <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6 space-y-3 w-full">
-                        <h4 class="font-bold text-[#003660] text-lg mb-2">Anual</h4>
-                        <div class="flex justify-between items-center text-sm border-b pb-2">
-                            <span class="font-bold">Ingresos</span>
-                            <span class="text-right">{{ metasAnuales.ingresos }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm border-b pb-2">
-                            <span class="font-bold">Utilidad</span>
-                            <span class="text-right">{{ metasAnuales.utilidad }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm border-b pb-2">
-                            <span class="font-bold">Margen Bruto</span>
-                            <span class="text-right">{{ metasAnuales.margenBruto }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm border-b pb-2">
-                            <span class="font-bold">Efectivo</span>
-                            <span class="text-right">{{ metasAnuales.efectivo }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm border-b pb-2">
-                            <span class="font-bold">CxC</span>
-                            <span class="text-right">{{ metasAnuales.cuentasPorCobrar }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm border-b pb-2">
-                            <span class="font-bold">Rot. Inventario</span>
-                            <span class="text-right">{{ metasAnuales.rotacionInventario }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm">
-                            <span class="font-bold">Ingreso / Emp.</span>
-                            <span class="text-right">{{ metasAnuales.ingresoEmpleado }}</span>
-                        </div>
+                    <!-- ANUAL -->
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6 w-full">
+                        <h4 class="font-bold text-[#003660] text-lg mb-3">Anual</h4>
+
+                        <ng-container *ngIf="metasAnualesCampos.length; else noAnual">
+                            <div *ngFor="let c of metasAnualesCampos"
+                                class="flex justify-between items-center text-sm border-b last:border-b-0 py-2">
+                                <span class="font-semibold">{{ c.titulo }}</span>
+                                <span class="text-right">{{ c.value }}</span>
+                            </div>
+                        </ng-container>
+                        <ng-template #noAnual>
+                            <p class="text-slate-500 italic">Sin metas configuradas.</p>
+                        </ng-template>
                     </div>
 
-                    <!-- Metas Trimestre Vigente -->
-                    <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6 space-y-3 w-full">
-                        <h4 class="font-bold text-[#003660] text-lg mb-2">Trimestre {{ metaTrimestreVigente.trimestre }}
+                    <!-- TRIMESTRE VIGENTE -->
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6 w-full">
+                        <h4 class="font-bold text-[#003660] text-lg mb-3">Trimestre {{ trimestreEtiqueta || 'vigente' }}
                         </h4>
-                        <div class="flex justify-between items-center text-sm border-b pb-2">
-                            <span class="font-bold">Ingresos</span>
-                            <span class="text-right">{{ metaTrimestreVigente.ingresos }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm border-b pb-2">
-                            <span class="font-bold">Utilidad</span>
-                            <span class="text-right">{{ metaTrimestreVigente.utilidad }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm border-b pb-2">
-                            <span class="font-bold">Margen Bruto</span>
-                            <span class="text-right">{{ metaTrimestreVigente.margenBruto }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm border-b pb-2">
-                            <span class="font-bold">Efectivo</span>
-                            <span class="text-right">{{ metaTrimestreVigente.efectivo }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm border-b pb-2">
-                            <span class="font-bold">CxC</span>
-                            <span class="text-right">{{ metaTrimestreVigente.cuentasPorCobrar }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm border-b pb-2">
-                            <span class="font-bold">Rot. Inventario</span>
-                            <span class="text-right">{{ metaTrimestreVigente.rotacionInventario }}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm">
-                            <span class="font-bold">Ingreso / Emp.</span>
-                            <span class="text-right">{{ metaTrimestreVigente.ingresoEmpleado }}</span>
-                        </div>
+
+                        <ng-container *ngIf="metaTrimestreCampos.length; else noTrim">
+                            <div *ngFor="let c of metaTrimestreCampos"
+                                class="flex justify-between items-center text-sm border-b last:border-b-0 py-2">
+                                <span class="font-semibold">{{ c.titulo }}</span>
+                                <span class="text-right">{{ c.value }}</span>
+                            </div>
+                        </ng-container>
+                        <ng-template #noTrim>
+                            <p class="text-slate-500 italic">Sin metas configuradas para el trimestre.</p>
+                        </ng-template>
                     </div>
                 </div>
             </div>
@@ -290,13 +281,11 @@
                         </ul>
                     </div>
 
-                    <!-- Prioridades Trimestre Vigente -->
+                    <!-- Prioridades Trimestrales (todas) -->
                     <div class="bg-white border border-gray-200 rounded-xl shadow-md p-6 w-full">
-                        <h4 class="font-bold text-[#003660] text-lg mb-4">
-                            Trimestre {{ metaTrimestreVigente.trimestre }}
-                        </h4>
+                        <h4 class="font-bold text-[#003660] text-lg mb-4">{{ trimestreTitulo }}</h4>
                         <ul class="space-y-4 text-sm text-slate-700">
-                            <li *ngFor="let prioridad of prioridadesTrimestreVigente; let i = index">
+                            <li *ngFor="let prioridad of prioridadesTrimestrales; let i = index">
                                 <div class="space-y-1">
                                     <p class="font-semibold">
                                         {{ i + 1 }}. {{ prioridad.descripcion }}
@@ -362,8 +351,14 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 mt-10">
                 <!-- Competencias Clave -->
                 <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
-                    <h4 class="text-lg font-bold text-slate-800 mb-2">Competencias Clave</h4>
-                    <p class="text-slate-600 text-sm leading-relaxed">{{ competenciasClave }}</p>
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">Competencias Clave</h2>
+                    <ul *ngIf="competenciasClave.length > 0; else noValores"
+                        class="list-disc list-inside text-slate-600">
+                        <li *ngFor="let competencia of competenciasClave">{{ competencia }}</li>
+                    </ul>
+                    <ng-template #noValores>
+                        <p class="text-slate-500 italic">No hay Competencias Clave configuradas</p>
+                    </ng-template>
                 </div>
 
                 <!-- Utilidad / X -->
@@ -380,14 +375,27 @@
 
                 <!-- Flywheel -->
                 <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
-                    <h4 class="text-lg font-bold text-slate-800 mb-2">Flywheel</h4>
-                    <p class="text-slate-600 text-sm leading-relaxed">{{ flywheel }}</p>
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">Flywheel</h2>
+
+                    <ul *ngIf="flywheel && flywheel.length > 0; else noFlywheelTpl"
+                        class="list-disc list-inside text-slate-600">
+                        <li *ngFor="let item of flywheel">{{ item }}</li>
+                    </ul>
+
+                    <ng-template #noFlywheelTpl>
+                        <p class="text-slate-500 italic">No hay flywheel configuradas</p>
+                    </ng-template>
                 </div>
 
                 <!-- Factor X -->
                 <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
-                    <h4 class="text-lg font-bold text-slate-800 mb-2">Factor X</h4>
-                    <p class="text-slate-600 text-sm leading-relaxed">{{ factorX }}</p>
+                    <h2 class="text-xl font-bold text-slate-800 mb-2">Factor X</h2>
+                    <ul *ngIf="factorX && factorX.length > 0; else noFactorXTpl"
+                        class="list-disc list-inside text-slate-600">
+                        <li *ngFor="let item of factorX">{{ item }}</li>
+                    </ul> <ng-template #noFactorXTpl>
+                        <p class="text-slate-500 italic">No hay factorX configuradas</p>
+                    </ng-template>
                 </div>
 
                 <!-- 7 Estratos - Estrategia en una Frase -->
@@ -409,11 +417,21 @@
                 </div>
 
                 <!-- Jugadores A (editable) -->
-                <div class="rounded-xl bg-white p-6 shadow border border-gray-400">
-                    <h4 class="text-lg font-bold text-slate-800 mb-2">Jugadores A</h4>
-                    <input type="text" [(ngModel)]="jugadoresA"
-                        class="w-full px-3 py-2 border border-gray-300 rounded text-slate-700 text-sm bg-white"
-                        placeholder="Ej: 40%" />
+                <div class="rounded-xl bg-white p-6 shadow border border-gray-400 flex items-center gap-3">
+                    <div class="flex-1">
+                        <h4 class="text-lg font-bold text-slate-800 mb-2">Jugadores A</h4>
+                        <input type="text" [(ngModel)]="jugadoresA"
+                            class="w-full px-3 py-2 border border-gray-300 rounded text-slate-700 text-sm bg-white"
+                            placeholder="Ej: 40%" />
+                    </div>
+
+                    <!-- Botón guardar -->
+                    <button (click)="saveJugadoresA()" class="p-2 text-[#003660] hover:text-[#0074CC] transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </button>
                 </div>
             </div>
 
@@ -447,9 +465,21 @@
 
             <!-- Ganar el Juego – Trimestral -->
             <div class="mt-10">
-                <h3 class="text-[#003660] font-bold text-xl mb-4">Ganar el Juego (Trimestral)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-[#003660] font-bold text-xl">Ganar el Juego (Trimestral)</h3>
 
+                    <button (click)="saveWinGameTrimestral()" [disabled]="savingJuego"
+                        class="flex items-center gap-2 bg-[#003660] hover:bg-[#004b8d] text-white font-semibold px-4 py-2 rounded disabled:opacity-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v1" />
+                        </svg>
+                        {{ savingJuego ? 'Guardando…' : 'Guardar' }}
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Fecha límite -->
                     <div class="rounded-xl bg-white p-6 shadow border border-gray-300">
                         <h4 class="text-lg font-bold text-slate-800 mb-2">Fecha límite</h4>
@@ -496,7 +526,6 @@
                             class="w-full px-3 py-2 bg-white border border-gray-300 rounded text-slate-700 text-sm"
                             rows="2" placeholder="Ej: Día libre, bono, almuerzo especial..."></textarea>
                     </div>
-
                 </div>
             </div>
 

@@ -26,7 +26,7 @@ export class CorevaluesComponent implements OnInit {
   originalCoreValues: CoreValueItem[] = [];
 
   // contexto fijo por ahora; puedes inyectar / obtener de ruta
-  id_company: string = 'BANRURAL_GT2';
+  id_company: string = 'BANRURAL_GT99';
   created_by: string = 'admin_user';
 
   constructor(public opspService: OpspService) { }

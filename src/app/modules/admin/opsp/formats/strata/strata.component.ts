@@ -21,7 +21,7 @@ export class StrataComponent implements OnInit {
   sevenForm!: FormGroup;
 
   // contexto / estado
-  id_company: string = 'BANRURAL_GT2';
+  id_company: string = 'BANRURAL_GT99';
   existingStrataId: number | null = null;
   existingBhagId: number | null = null;
   originalBhagDescription: string = '';

@@ -23,7 +23,7 @@ export class BrandpromisesComponent implements OnInit {
   id?: number;
 
   // contexto
-  id_company: string = 'BANRURAL_GT2';
+  id_company: string = 'BANRURAL_GT99';
   created_by: string = 'admin_user';
 
   // snapshot para detectar cambios

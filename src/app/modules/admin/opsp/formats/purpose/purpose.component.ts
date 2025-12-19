@@ -22,7 +22,7 @@ export class PurposeComponent implements OnInit {
     created_by: 'admin_user'
   };
 
-  id_company: string = 'BANRURAL_GT2'; // ajustar según contexto real
+  id_company: string = 'BANRURAL_GT99'; // ajustar según contexto real
 
   constructor(public opspService: OpspService) {}
 

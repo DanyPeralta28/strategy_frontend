@@ -47,13 +47,21 @@ export const defaultNavigation: FuseNavigationItem[] = [
             }
         ]
     },
-    {
+        {
         id: 'ejecucion',
         title: 'Ejecución',
-        type: 'basic',
+        type: 'collapsable',
         icon: 'heroicons_outline:play-circle',
-        link: '/ejecucion'
-    },
+        children: [
+            {
+                id: 'cash.formatos',
+                title: 'Formatos',
+                type: 'basic',
+                icon: 'heroicons_outline:document-text',
+                link: '/ejecucion/formats'
+            }
+        ]
+    }
 ];
 export const compactNavigation: FuseNavigationItem[] = [
     {

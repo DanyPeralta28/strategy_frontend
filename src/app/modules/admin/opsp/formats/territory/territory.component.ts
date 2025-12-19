@@ -35,7 +35,7 @@ export class TerritoryComponent implements OnInit {
   territoryId: number | null = null;
 
   // Estos deberían venir del contexto real (por ahora hardcodeados)
-  id_company = 'BANRURAL_GT2';
+  id_company = 'BANRURAL_GT99';
   created_by = 'admin_user';
 
   constructor(private opspService: OpspService) { }

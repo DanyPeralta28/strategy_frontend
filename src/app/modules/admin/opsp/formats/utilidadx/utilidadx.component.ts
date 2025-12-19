@@ -15,7 +15,7 @@ export class UtilidadxComponent implements OnInit {
   utilidadPorX: string = '';
 
   // Estado para create vs update
-  id_company: string = 'BANRURAL_GT2';    // reemplazar según contexto real
+  id_company: string = 'BANRURAL_GT99';    // reemplazar según contexto real
   existingId: number | null = null;
   originalDefinition: string = '';
   created_by: string = 'admin_user';

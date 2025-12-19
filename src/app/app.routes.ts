@@ -77,6 +77,7 @@ export const appRoutes: Route[] = [
             { path: 'opsp', loadChildren: () => import('app/modules/admin/opsp/opsp.routes') },
             { path: 'followup', loadChildren: () => import('app/modules/admin/followup/followup.routes') },
             { path: 'cash', loadChildren: () => import('app/modules/admin/cash/cash.routes') },
+            { path: 'ejecucion', loadChildren: () => import('app/modules/admin/ejecucion/ejecucion.routes') },
         ]
     }
 ];

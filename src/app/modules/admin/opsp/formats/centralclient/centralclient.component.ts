@@ -13,7 +13,7 @@ import { OpspService } from '../../../services/opsp.service';
 })
 export class CentralClientComponent implements OnInit {
   // contexto (ajústalo si lo pasas dinámicamente)
-  id_company: string = 'BANRURAL_GT2';
+  id_company: string = 'BANRURAL_GT99';
   created_by: string = 'admin_user';
 
   centralClientId?: number;

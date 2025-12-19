@@ -24,7 +24,7 @@ interface GoalSection {
 })
 export class GoalsComponent implements OnInit {
   // compañía fija por ahora; podrías sacarla de contexto / ruta según tu flujo
-  id_company = 'BANRURAL_GT2';
+  id_company = 'BANRURAL_GT99';
   recordId: number | null = null; // si ya existe, se llena
 
   goalData: Record<string, GoalSection> = {

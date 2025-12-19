@@ -21,13 +21,14 @@ export const ApiRoutes = {
   formatBhag: '/api/format-bhag',
   winGame: '/api/win-game',
   playersA: '/api/players-a',
+  consistentActions: '/api/consistent-actions',
 };
 
 @Injectable({
   providedIn: 'root'
 })
 export class OpspService {
-  private readonly baseUrl = 'https://wvm8wh9w-3000.use2.devtunnels.ms';
+  private readonly baseUrl = 'https://l9kpxb5b-3000.use2.devtunnels.ms';
 
   constructor(private http: HttpClient) { }
 
@@ -407,5 +408,26 @@ export class OpspService {
 
   deletePlayerA(id: any): Promise<any> {
     return firstValueFrom(this.http.delete(`${this.baseUrl}${ApiRoutes.playersA}/${id}`));
+  }
+
+  // ACCIONES CONSISTENTES
+  getAllConsistentActions(): Promise<any> {
+    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.consistentActions}`));
+  }
+
+  getConsistentActionsByCompany(id: any): Promise<any> {
+    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.consistentActions}?id_company=${id}`));
+  }
+
+  createConsistentActions(data: any): Promise<any> {
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.consistentActions}`, data));
+  }
+
+  updateConsistentActions(id: any, data: any): Promise<any> {
+    return firstValueFrom(this.http.put(`${this.baseUrl}${ApiRoutes.consistentActions}/${id}`, data));
+  }
+
+  deleteConsistentActions(id: any): Promise<any> {
+    return firstValueFrom(this.http.delete(`${this.baseUrl}${ApiRoutes.consistentActions}/${id}`));
   }
 }

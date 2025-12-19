@@ -1,98 +1,110 @@
+// followup.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class FollowupService {
-  private readonly baseUrl = 'https://wvm8wh9w-3000.use2.devtunnels.ms';
+  private readonly baseUrl = 'https://l9kpxb5b-3000.use2.devtunnels.ms';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   // ----------- Priority Weeks -----------
-  createPriorityWeek(data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}${ApiRoutes.priorityWeeks}`, data);
+  createPriorityWeek(data: any): Promise<any> {
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.priorityWeeks}`, data));
   }
-  getAllPriorityWeeks(): Observable<any> {
-    return this.http.get(`${this.baseUrl}${ApiRoutes.priorityWeeks}`);
+  getAllPriorityWeeks(): Promise<any> {
+    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.priorityWeeks}`));
   }
-  getPriorityWeekById(id: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}${ApiRoutes.priorityWeeks}/${id}`);
+  getPriorityWeekById(id: number | string): Promise<any> {
+    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.priorityWeeks}?id_company=${id}`));
   }
-  updatePriorityWeek(id: number, data: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}${ApiRoutes.priorityWeeks}/${id}`, data);
+  updatePriorityWeek(id: number | string, data: any): Promise<any> {
+    return firstValueFrom(this.http.put(`${this.baseUrl}${ApiRoutes.priorityWeeks}/${id}`, data));
   }
-  deletePriorityWeek(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}${ApiRoutes.priorityWeeks}/${id}`);
+  deletePriorityWeek(id: number | string): Promise<any> {
+    return firstValueFrom(this.http.delete(`${this.baseUrl}${ApiRoutes.priorityWeeks}/${id}`));
   }
-  getPriorityWeeksFiltered(idCompany: number, idEntity: number, team: string, week: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}${ApiRoutes.priorityWeeks}/group/${idCompany}/${idEntity}/${team}/${week}`);
+  getPriorityWeeksFiltered(
+    idCompany: number | string,
+    idEntity: number | string,
+    team: string,
+    week: number | string
+  ): Promise<any> {
+    return firstValueFrom(
+      this.http.get(
+        `${this.baseUrl}${ApiRoutes.priorityWeeks}/group/${idCompany}/${idEntity}/${team}/${week}`
+      )
+    );
   }
 
   // ----------- Start Weeks -----------
-  createStartWeek(data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}${ApiRoutes.startWeeks}`, data);
+  createStartWeek(data: any): Promise<any> {
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.startWeeks}`, data));
   }
-  getAllStartWeeks(): Observable<any> {
-    return this.http.get(`${this.baseUrl}${ApiRoutes.startWeeks}`);
+  getAllStartWeeks(): Promise<any> {
+    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.startWeeks}`));
   }
-  getStartWeekById(id: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}${ApiRoutes.startWeeks}/${id}`);
+  getStartWeekById(id: number | string): Promise<any> {
+    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.startWeeks}?id_company=${id}`));
   }
-  updateStartWeek(id: number, data: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}${ApiRoutes.startWeeks}/${id}`, data);
+  updateStartWeek(id: number | string, data: any): Promise<any> {
+    return firstValueFrom(this.http.put(`${this.baseUrl}${ApiRoutes.startWeeks}/${id}`, data));
   }
-  deleteStartWeek(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}${ApiRoutes.startWeeks}/${id}`);
+  deleteStartWeek(id: number | string): Promise<any> {
+    return firstValueFrom(this.http.delete(`${this.baseUrl}${ApiRoutes.startWeeks}/${id}`));
   }
 
   // ----------- Group Control -----------
-  createGroupControl(data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}${ApiRoutes.groupControl}`, data);
+  createGroupControl(data: any): Promise<any> {
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.groupControl}`, data));
   }
-  getAllGroupControls(): Observable<any> {
-    return this.http.get(`${this.baseUrl}${ApiRoutes.groupControl}`);
+  getAllGroupControls(): Promise<any> {
+    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.groupControl}`));
   }
-  getGroupControlById(id: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}${ApiRoutes.groupControl}/${id}`);
+  getGroupControlById(id: number | string): Promise<any> {
+    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.groupControl}?id_company=${id}`));
   }
-  updateGroupControl(id: number, data: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}${ApiRoutes.groupControl}/${id}`, data);
+  updateGroupControl(id: number | string, data: any): Promise<any> {
+    return firstValueFrom(this.http.put(`${this.baseUrl}${ApiRoutes.groupControl}/${id}`, data));
   }
-  deleteGroupControl(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}${ApiRoutes.groupControl}/${id}`);
+  deleteGroupControl(id: number | string): Promise<any> {
+    return firstValueFrom(this.http.delete(`${this.baseUrl}${ApiRoutes.groupControl}/${id}`));
   }
 
   // ----------- Team Viewer -----------
-  getEntitiesByCompany(companyId: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}${ApiRoutes.teamViewerEntities}/${companyId}`);
+  getEntitiesByCompany(companyId: number | string): Promise<any> {
+    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.teamViewerEntities}/${companyId}`));
   }
-  getTeamMembersByEntity(userId: number, entityId: number, companyId: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}${ApiRoutes.teamViewerTeamMembersByEntity}/${userId}/${entityId}/${companyId}`);
+  getTeamMembersByEntity(userId: number | string, entityId: number | string, companyId: number | string): Promise<any> {
+    return firstValueFrom(
+      this.http.get(`${this.baseUrl}${ApiRoutes.teamViewerTeamMembersByEntity}/${userId}/${entityId}/${companyId}`)
+    );
   }
-  getTeamMembersByTeam(teamId: number, entityId: number, companyId: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}${ApiRoutes.teamViewerTeamMembersByTeam}/${teamId}/${entityId}/${companyId}`);
+  getTeamMembersByTeam(teamId: number | string, entityId: number | string, companyId: number | string): Promise<any> {
+    return firstValueFrom(
+      this.http.get(`${this.baseUrl}${ApiRoutes.teamViewerTeamMembersByTeam}/${teamId}/${entityId}/${companyId}`)
+    );
   }
-  getUserById(userId: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}${ApiRoutes.teamViewerUser}/${userId}`);
+  getUserById(userId: number | string): Promise<any> {
+    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.teamViewerUser}/${userId}`));
   }
 
   // ----------- Consistent Actions -----------
-  createConsistentAction(data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}${ApiRoutes.consistentActions}`, data);
+  createConsistentAction(data: any): Promise<any> {
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.consistentActions}`, data));
   }
-  getAllConsistentActions(): Observable<any> {
-    return this.http.get(`${this.baseUrl}${ApiRoutes.consistentActions}`);
+  getAllConsistentActions(): Promise<any> {
+    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.consistentActions}`));
   }
-  getConsistentActionById(id: number): Observable<any> {
-    return this.http.get(`${this.baseUrl}${ApiRoutes.consistentActions}/${id}`);
+  getConsistentActionById(id: number | string): Promise<any> {
+    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.consistentActions}/${id}`));
   }
-  updateConsistentAction(id: number, data: any): Observable<any> {
-    return this.http.put(`${this.baseUrl}${ApiRoutes.consistentActions}/${id}`, data);
+  updateConsistentAction(id: number | string, data: any): Promise<any> {
+    return firstValueFrom(this.http.put(`${this.baseUrl}${ApiRoutes.consistentActions}/${id}`, data));
   }
-  deleteConsistentAction(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}${ApiRoutes.consistentActions}/${id}`);
+  deleteConsistentAction(id: number | string): Promise<any> {
+    return firstValueFrom(this.http.delete(`${this.baseUrl}${ApiRoutes.consistentActions}/${id}`));
   }
 }
 

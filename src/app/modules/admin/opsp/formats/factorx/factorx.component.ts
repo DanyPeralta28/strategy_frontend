@@ -14,7 +14,7 @@ import { OpspService } from '../../../services/opsp.service'; // ajusta la ruta 
 })
 export class FactorxComponent implements OnInit {
   // Ajusta esto si obtienes la compañía dinámicamente
-  id_company = 'BANRURAL_GT2';
+  id_company = 'BANRURAL_GT99';
   factorXId: number | null = null;
 
   stepGrid: any[] = [
