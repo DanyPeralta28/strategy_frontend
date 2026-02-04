@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CashService } from '../../../services/cash.service'; // <-- ajusta la ruta
 import Swal from 'sweetalert2';
+import { environment } from 'environments/environment';
 
 interface Period {
   year: string;
@@ -27,8 +28,8 @@ interface ImpactItem {
 })
 export class IelComponent implements OnInit {
   // ====== Config del contexto (ajusta según tu app) ======
-  id_company = 'BANRURAL_GT99';
-  created_by = 'admin_user';
+  id_company = environment.defaultCompanyId;
+  created_by = environment.defaultCreatedBy;
 
   // ====== Estado UI ======
   periods: Period[] = [
@@ -126,7 +127,7 @@ export class IelComponent implements OnInit {
   // ====== Guardar (POST o PUT según corresponda) ======
   async save(): Promise<void> {
     // validar impacto
-    const ranks = this.impactItems.map(it => Number(it.rank));
+    const ranks = this.impactItems.map(it => it.rank);
     const validSet = new Set(ranks);
 
     const isValid =
@@ -220,3 +221,6 @@ function numOrNull(v: any): number | null {
   const n = Number(v);
   return Number.isFinite(n) ? n : null;
 }
+
+
+

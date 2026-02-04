@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { CashService } from '../../../services/cash.service'; // <-- ajusta la ruta
+import { environment } from 'environments/environment';
 
 interface FundingItem {
   title: string;
@@ -25,8 +26,8 @@ interface FinancingAttribute {
 })
 export class FinanceComponent implements OnInit {
   // Contexto (ajusta según tu app)
-  id_company = 'BANRURAL_GT99';
-  created_by = 'admin_user';
+  id_company = environment.defaultCompanyId;
+  created_by = environment.defaultCreatedBy;
 
   fundingItems: FundingItem[] = [
     {
@@ -293,3 +294,6 @@ export class FinanceComponent implements OnInit {
     }
   }
 }
+
+
+

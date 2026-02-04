@@ -9,6 +9,7 @@ import {
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-strata',
@@ -21,7 +22,7 @@ export class StrataComponent implements OnInit {
   sevenForm!: FormGroup;
 
   // contexto / estado
-  id_company: string = 'BANRURAL_GT99';
+  id_company: string = environment.defaultCompanyId;
   existingStrataId: number | null = null;
   existingBhagId: number | null = null;
   originalBhagDescription: string = '';
@@ -29,7 +30,7 @@ export class StrataComponent implements OnInit {
   originalProfitPerXDefinition: string = '';
   centralClientSummary: string = '';
   status = 1;
-  created_by = 'admin_user';
+  created_by = environment.defaultCreatedBy;
   user_name = 'jdoe';
 
   brandPromiseId?: number;
@@ -369,3 +370,4 @@ export class StrataComponent implements OnInit {
     });
   }
 }
+

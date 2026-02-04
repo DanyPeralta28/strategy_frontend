@@ -12,7 +12,7 @@ import { RouterModule } from '@angular/router';
 export class FormatsComponent {
   formatos = [
     { nombre: 'FACE', descripcion: 'Cuadro de Funciones y Responsabilidad', link: 'face' },
-    { nombre: 'PACE', descripcion: ': Cuadro de Procesos y Responsabilidad', link: 'pace' },
+    { nombre: 'PACE', descripcion: 'Cuadro de Procesos y Responsabilidad', link: 'pace' },
     { nombre: 'Hábitos de Rockefeller', descripcion: 'Hábitos de Rockefeller', link: 'rockefeller' },
     { nombre: 'WWW', descripcion: 'Seguimiento de responsabilidad', link: 'www' },
   ];

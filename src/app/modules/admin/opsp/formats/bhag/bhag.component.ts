@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service'
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-bhag',
@@ -15,14 +16,13 @@ export class BhagComponent {
   form = {
     description: '',
     id: '',
-    created_by: "admin_user"
+    created_by: environment.defaultCreatedBy
   };
-  id_company: any;
+  id_company: string = environment.defaultCompanyId;
 
   constructor(public opspService: OpspService) { }
 
   ngOnInit() {
-    this.id_company = "BANRURAL_GT99";
     this.loadBhag();
   }
 
@@ -87,3 +87,4 @@ export class BhagComponent {
       });
   }
 }
+

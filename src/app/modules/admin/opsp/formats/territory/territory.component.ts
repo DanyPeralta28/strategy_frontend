@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
+import { environment } from 'environments/environment';
 
 interface Channel {
   name: string;
@@ -35,8 +36,8 @@ export class TerritoryComponent implements OnInit {
   territoryId: number | null = null;
 
   // Estos deberían venir del contexto real (por ahora hardcodeados)
-  id_company = 'BANRURAL_GT99';
-  created_by = 'admin_user';
+  id_company = environment.defaultCompanyId;
+  created_by = environment.defaultCreatedBy;
 
   constructor(private opspService: OpspService) { }
 
@@ -141,3 +142,5 @@ export class TerritoryComponent implements OnInit {
     }
   }
 }
+
+

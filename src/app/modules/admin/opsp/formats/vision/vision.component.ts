@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service'
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-vision',
@@ -22,10 +23,10 @@ export class VisionComponent {
   existingPurposeId: number | null = null;
   originalPurposeDescription: string = '';
   user_name: string = 'jdoe';
-  created_by: string = 'admin_user';
+  created_by: string = environment.defaultCreatedBy;
   status = 1;
 
-  id_company: any;
+  id_company: string = environment.defaultCompanyId;
   bhag: any;
 
   estados = [
@@ -45,8 +46,6 @@ export class VisionComponent {
 
 
   ngOnInit(): void {
-    this.id_company = "BANRURAL_GT99";
-
     this.visionForm = this.fb.group({
       valores: [''],
       proposito: [''],
@@ -597,3 +596,7 @@ export class VisionComponent {
     });
   }
 }
+
+
+
+

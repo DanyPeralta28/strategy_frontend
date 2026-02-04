@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-brandpromises',
@@ -23,8 +24,8 @@ export class BrandpromisesComponent implements OnInit {
   id?: number;
 
   // contexto
-  id_company: string = 'BANRURAL_GT99';
-  created_by: string = 'admin_user';
+  id_company: string = environment.defaultCompanyId;
+  created_by: string = environment.defaultCreatedBy;
 
   // snapshot para detectar cambios
   private originalSnapshot = {
@@ -145,3 +146,6 @@ export class BrandpromisesComponent implements OnInit {
       });
   }
 }
+
+
+

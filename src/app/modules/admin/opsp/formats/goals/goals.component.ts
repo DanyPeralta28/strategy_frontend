@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service'; // ajusta la ruta si hace falta
+import { environment } from 'environments/environment';
 
 interface GoalField {
   title: string;
@@ -24,7 +25,7 @@ interface GoalSection {
 })
 export class GoalsComponent implements OnInit {
   // compañía fija por ahora; podrías sacarla de contexto / ruta según tu flujo
-  id_company = 'BANRURAL_GT99';
+  id_company = environment.defaultCompanyId;
   recordId: number | null = null; // si ya existe, se llena
 
   goalData: Record<string, GoalSection> = {
@@ -120,7 +121,7 @@ export class GoalsComponent implements OnInit {
     }));
 
     const payload: any = {
-      created_by: 'admin_user', // idealmente lo tomas del contexto auténticado
+      created_by: environment.defaultCreatedBy, // idealmente lo tomas del contexto auténticado
       goal_sections: sections
     };
 
@@ -178,3 +179,5 @@ export class GoalsComponent implements OnInit {
     }
   }
 }
+
+

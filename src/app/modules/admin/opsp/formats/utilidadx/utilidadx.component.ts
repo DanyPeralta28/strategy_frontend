@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-utilidadx',
@@ -15,10 +16,10 @@ export class UtilidadxComponent implements OnInit {
   utilidadPorX: string = '';
 
   // Estado para create vs update
-  id_company: string = 'BANRURAL_GT99';    // reemplazar según contexto real
+  id_company: string = environment.defaultCompanyId;    // reemplazar según contexto real
   existingId: number | null = null;
   originalDefinition: string = '';
-  created_by: string = 'admin_user';
+  created_by: string = environment.defaultCreatedBy;
 
   constructor(private opspService: OpspService) { }
 
@@ -114,3 +115,7 @@ export class UtilidadxComponent implements OnInit {
       });
   }
 }
+
+
+
+

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-central-client',
@@ -13,8 +14,8 @@ import { OpspService } from '../../../services/opsp.service';
 })
 export class CentralClientComponent implements OnInit {
   // contexto (ajústalo si lo pasas dinámicamente)
-  id_company: string = 'BANRURAL_GT99';
-  created_by: string = 'admin_user';
+  id_company: string = environment.defaultCompanyId;
+  created_by: string = environment.defaultCreatedBy;
 
   centralClientId?: number;
   descripcionResumen: string = '';
@@ -144,3 +145,6 @@ export class CentralClientComponent implements OnInit {
     }
   }
 }
+
+
+

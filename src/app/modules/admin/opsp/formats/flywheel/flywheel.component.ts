@@ -9,6 +9,7 @@ import {
 } from '@angular/cdk/drag-drop';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
+import { environment } from 'environments/environment';
 
 interface FlywheelItem {
   id?: number;
@@ -35,9 +36,9 @@ export class FlywheelComponent implements OnInit {
   originalSequence: string[] = [];
 
   // contexto / estado
-  id_company: string = 'BANRURAL_GT99'; // ajustar según contexto real
+  id_company: string = environment.defaultCompanyId; // ajustar según contexto real
   flywheelCode: number = 101; // default, puede venir desde backend
-  created_by: string = 'admin_user';
+  created_by: string = environment.defaultCreatedBy;
 
   constructor(public opspService: OpspService) { }
 
@@ -299,3 +300,7 @@ export class FlywheelComponent implements OnInit {
     };
   }
 }
+
+
+
+

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { CashService } from '../../../services/cash.service'; // ajusta la ruta
+import { environment } from 'environments/environment';
 
 interface ValueArea {
   label: string;
@@ -23,8 +24,8 @@ interface Priority {
 })
 export class ValueComponent implements OnInit {
   // contexto (ajusta según tu app)
-  id_company = 'BANRURAL_GT99';
-  created_by = 'admin_user';
+  id_company = environment.defaultCompanyId;
+  created_by = environment.defaultCreatedBy;
 
   areas: ValueArea[] = [
     { label: 'Contratos a Largo plazo', rating: null },
@@ -158,3 +159,6 @@ export class ValueComponent implements OnInit {
     }
   }
 }
+
+
+

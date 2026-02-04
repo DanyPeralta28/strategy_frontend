@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { environment } from 'environments/environment';
 
 export const ApiRoutes = {
   formatVisions: '/api/format-visions',
@@ -28,21 +29,37 @@ export const ApiRoutes = {
   providedIn: 'root'
 })
 export class OpspService {
-  private readonly baseUrl = 'https://l9kpxb5b-3000.use2.devtunnels.ms';
+  private readonly baseUrl = environment.apiBaseUrl;
+  private readonly entityId = environment.defaultEntityId;
 
   constructor(private http: HttpClient) { }
 
+  private withEntityQuery(url: string): string {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}id_entity=${this.entityId}`;
+  }
+
+  private withEntityPayload(data: any): any {
+    if (!data || typeof data !== 'object') {
+      return { id_entity: this.entityId };
+    }
+    if (Object.prototype.hasOwnProperty.call(data, 'id_entity')) {
+      return data;
+    }
+    return { ...data, id_entity: this.entityId };
+  }
+
   // Format BHAG
   getAllBhags(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatBhag}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatBhag}`)));
   }
 
   getBhagByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatBhag}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatBhag}?id_company=${id}`)));
   }
 
   createBhag(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatBhag}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatBhag}`, this.withEntityPayload(data)));
   }
 
   updateBhag(id: any, data: any): Promise<any> {
@@ -55,15 +72,15 @@ export class OpspService {
 
   // Format Visions
   getAllVisions(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatVisions}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatVisions}`)));
   }
 
   getVisionByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatVisions}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatVisions}?id_company=${id}`)));
   }
 
   createVision(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatVisions}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatVisions}`, this.withEntityPayload(data)));
   }
 
   updateVision(id: any, data: any): Promise<any> {
@@ -76,15 +93,15 @@ export class OpspService {
 
   // Format Stratas
   getAllStratas(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatStratas}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatStratas}`)));
   }
 
   getStrataByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatStratas}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatStratas}?id_company=${id}`)));
   }
 
   createStrata(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatStratas}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatStratas}`, this.withEntityPayload(data)));
   }
 
   updateStrata(id: any, data: any): Promise<any> {
@@ -97,15 +114,15 @@ export class OpspService {
 
   // Format FDT
   getAllFdt(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatFdt}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatFdt}`)));
   }
 
   getFdtByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatFdt}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatFdt}?id_company=${id}`)));
   }
 
   createFdt(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatFdt}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatFdt}`, this.withEntityPayload(data)));
   }
 
   updateFdt(id: any, data: any): Promise<any> {
@@ -118,15 +135,15 @@ export class OpspService {
 
   // Format Factor X
   getAllFactorX(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatFactorX}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatFactorX}`)));
   }
 
   getFactorXByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatFactorX}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatFactorX}?id_company=${id}`)));
   }
 
   createFactorX(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatFactorX}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatFactorX}`, this.withEntityPayload(data)));
   }
 
   updateFactorX(id: any, data: any): Promise<any> {
@@ -139,15 +156,15 @@ export class OpspService {
 
   // Format Brand Promises
   getAllBrandPromises(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatBrandPromises}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatBrandPromises}`)));
   }
 
   getBrandPromiseByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatBrandPromises}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatBrandPromises}?id_company=${id}`)));
   }
 
   createBrandPromise(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatBrandPromises}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatBrandPromises}`, this.withEntityPayload(data)));
   }
 
   updateBrandPromise(id: any, data: any): Promise<any> {
@@ -160,15 +177,15 @@ export class OpspService {
 
   // Format Profit Per X
   getAllProfitPerX(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatProfitPerX}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatProfitPerX}`)));
   }
 
   getProfitPerXByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatProfitPerX}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatProfitPerX}?id_company=${id}`)));
   }
 
   createProfitPerX(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatProfitPerX}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatProfitPerX}`, this.withEntityPayload(data)));
   }
 
   updateProfitPerX(id: any, data: any): Promise<any> {
@@ -181,15 +198,15 @@ export class OpspService {
 
   // Format Central Clients
   getAllCentralClients(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatCentralClients}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatCentralClients}`)));
   }
 
   getCentralClientByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatCentralClients}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatCentralClients}?id_company=${id}`)));
   }
 
   createCentralClient(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatCentralClients}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatCentralClients}`, this.withEntityPayload(data)));
   }
 
   updateCentralClient(id: any, data: any): Promise<any> {
@@ -202,15 +219,15 @@ export class OpspService {
 
   // Format Goals
   getAllGoals(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatGoals}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatGoals}`)));
   }
 
   getGoalsByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatGoals}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatGoals}?id_company=${id}`)));
   }
 
   createGoal(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatGoals}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatGoals}`, this.withEntityPayload(data)));
   }
 
   updateGoal(id: any, data: any): Promise<any> {
@@ -223,15 +240,15 @@ export class OpspService {
 
   // Format Flywheel
   getAllFlywheels(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatFlywheel}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatFlywheel}`)));
   }
 
   getFlywheelByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatFlywheel}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatFlywheel}?id_company=${id}`)));
   }
 
   createFlywheel(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatFlywheel}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatFlywheel}`, this.withEntityPayload(data)));
   }
 
   updateFlywheel(id: any, data: any): Promise<any> {
@@ -244,15 +261,15 @@ export class OpspService {
 
   // Format Core Values
   getAllCoreValues(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatCoreValues}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatCoreValues}`)));
   }
 
   getCoreValuesByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatCoreValues}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatCoreValues}?id_company=${id}`)));
   }
 
   createCoreValue(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatCoreValues}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatCoreValues}`, this.withEntityPayload(data)));
   }
 
   updateCoreValue(id: any, data: any): Promise<any> {
@@ -265,15 +282,15 @@ export class OpspService {
 
   // Format Purposes
   getAllPurposes(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatPurposes}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatPurposes}`)));
   }
 
   getPurposeByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatPurposes}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatPurposes}?id_company=${id}`)));
   }
 
   createPurpose(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatPurposes}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatPurposes}`, this.withEntityPayload(data)));
   }
 
   updatePurpose(id: any, data: any): Promise<any> {
@@ -286,15 +303,15 @@ export class OpspService {
 
   // Format Competencies
   getAllCompetencies(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatCompetencies}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatCompetencies}`)));
   }
 
   getCompetenciesByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatCompetencies}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatCompetencies}?id_company=${id}`)));
   }
 
   createCompetency(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatCompetencies}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatCompetencies}`, this.withEntityPayload(data)));
   }
 
   updateCompetency(id: any, data: any): Promise<any> {
@@ -307,15 +324,15 @@ export class OpspService {
 
   // Format KPI Balances
   getAllKpiBalances(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatKpiBalances}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatKpiBalances}`)));
   }
 
   getKpiBalancesByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatKpiBalances}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatKpiBalances}?id_company=${id}`)));
   }
 
   createKpiBalance(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatKpiBalances}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatKpiBalances}`, this.withEntityPayload(data)));
   }
 
   updateKpiBalance(id: any, data: any): Promise<any> {
@@ -328,15 +345,15 @@ export class OpspService {
 
   // Format Territories
   getAllTerritories(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatTerritories}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatTerritories}`)));
   }
 
   getTerritoriesByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatTerritories}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatTerritories}?id_company=${id}`)));
   }
 
   createTerritory(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatTerritories}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatTerritories}`, this.withEntityPayload(data)));
   }
 
   updateTerritory(id: any, data: any): Promise<any> {
@@ -349,15 +366,15 @@ export class OpspService {
 
   // Format Cultures
   getAllCultures(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatCultures}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatCultures}`)));
   }
 
   getCultureByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.formatCultures}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.formatCultures}?id_company=${id}`)));
   }
 
   createCulture(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatCultures}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.formatCultures}`, this.withEntityPayload(data)));
   }
 
   updateCulture(id: any, data: any): Promise<any> {
@@ -370,15 +387,15 @@ export class OpspService {
 
   // Win The Game
   getAllWinGames(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.winGame}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.winGame}`)));
   }
 
   getWinGamesByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.winGame}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.winGame}?id_company=${id}`)));
   }
 
   createWinGame(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.winGame}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.winGame}`, this.withEntityPayload(data)));
   }
 
   updateWinGame(id: any, data: any): Promise<any> {
@@ -391,15 +408,15 @@ export class OpspService {
 
   // Players A
   getAllPlayersA(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.playersA}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.playersA}`)));
   }
 
   getPlayersAByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.playersA}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.playersA}?id_company=${id}`)));
   }
 
   createPlayerA(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.playersA}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.playersA}`, this.withEntityPayload(data)));
   }
 
   updatePlayerA(id: any, data: any): Promise<any> {
@@ -412,15 +429,15 @@ export class OpspService {
 
   // ACCIONES CONSISTENTES
   getAllConsistentActions(): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.consistentActions}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.consistentActions}`)));
   }
 
   getConsistentActionsByCompany(id: any): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.consistentActions}?id_company=${id}`));
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.consistentActions}?id_company=${id}`)));
   }
 
   createConsistentActions(data: any): Promise<any> {
-    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.consistentActions}`, data));
+    return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.consistentActions}`, this.withEntityPayload(data)));
   }
 
   updateConsistentActions(id: any, data: any): Promise<any> {
@@ -431,3 +448,6 @@ export class OpspService {
     return firstValueFrom(this.http.delete(`${this.baseUrl}${ApiRoutes.consistentActions}/${id}`));
   }
 }
+
+
+

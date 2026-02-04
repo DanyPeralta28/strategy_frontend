@@ -10,6 +10,7 @@ import {
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-fdt',
@@ -22,10 +23,10 @@ export class FdtComponent implements OnInit {
   fdtForm!: FormGroup;
 
   // contexto: reemplaza según tu flujo real (ruta / sesión)
-  id_company: string = 'BANRURAL_GT99';
+  id_company: string = environment.defaultCompanyId;
   existingFdtId: number | null = null;
   status = 1;
-  created_by = 'admin_user';
+  created_by = environment.defaultCreatedBy;
 
   constructor(private fb: FormBuilder, public opspService: OpspService) { }
 
@@ -220,3 +221,5 @@ export class FdtComponent implements OnInit {
       });
   }
 }
+
+

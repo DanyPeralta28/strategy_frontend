@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
+import { environment } from 'environments/environment';
 
 interface CompetencyItem {
   name: string;
@@ -32,8 +33,8 @@ export class KeycompetenciesComponent implements OnInit {
   };
 
   // contexto
-  id_company: string = 'BANRURAL_GT99';
-  created_by: string = 'admin_user';
+  id_company: string = environment.defaultCompanyId;
+  created_by: string = environment.defaultCreatedBy;
 
   originalSnapshot: KeyCompetenciesForm = { ...this.form };
 
@@ -184,3 +185,7 @@ export class KeycompetenciesComponent implements OnInit {
       });
   }
 }
+
+
+
+

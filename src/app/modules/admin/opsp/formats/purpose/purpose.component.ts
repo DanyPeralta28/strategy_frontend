@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-purpose',
@@ -19,10 +20,10 @@ export class PurposeComponent implements OnInit {
     created_by: string;
   } = {
     purpose: '',
-    created_by: 'admin_user'
+    created_by: environment.defaultCreatedBy
   };
 
-  id_company: string = 'BANRURAL_GT99'; // ajustar según contexto real
+  id_company: string = environment.defaultCompanyId; // ajustar según contexto real
 
   constructor(public opspService: OpspService) {}
 
@@ -100,3 +101,7 @@ export class PurposeComponent implements OnInit {
       });
   }
 }
+
+
+
+

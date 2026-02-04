@@ -2,10 +2,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { environment } from 'environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class FollowupService {
-  private readonly baseUrl = 'https://l9kpxb5b-3000.use2.devtunnels.ms';
+  private readonly baseUrl = environment.apiBaseUrl;
 
   constructor(private http: HttpClient) {}
 

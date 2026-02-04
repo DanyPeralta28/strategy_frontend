@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service'; // ajusta la ruta si es diferente
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-factorx',
@@ -14,7 +15,7 @@ import { OpspService } from '../../../services/opsp.service'; // ajusta la ruta 
 })
 export class FactorxComponent implements OnInit {
   // Ajusta esto si obtienes la compañía dinámicamente
-  id_company = 'BANRURAL_GT99';
+  id_company = environment.defaultCompanyId;
   factorXId: number | null = null;
 
   stepGrid: any[] = [
@@ -148,7 +149,7 @@ export class FactorxComponent implements OnInit {
       process_flow_steps,
       bottleneck_list,
       trade_action_list,
-      created_by: 'admin_user'
+      created_by: environment.defaultCreatedBy
     };
 
     if (!this.factorXId) {
@@ -184,3 +185,5 @@ export class FactorxComponent implements OnInit {
       });
   }
 }
+
+

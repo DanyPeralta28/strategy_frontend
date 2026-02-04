@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { FormatsComponent } from 'app/modules/admin/ejecucion/formats/formats.component';
-import { FaceComponent } from 'app/modules/admin/ejecucion/formats/face/face.component';
-import { PaceComponent } from 'app/modules/admin/ejecucion/formats/pace/pace.component';
-import { RockefellerComponent } from 'app/modules/admin/ejecucion/formats/rockefeller/rockefeller.component';
-import { WwwComponent } from 'app/modules/admin/ejecucion/formats/www/www.component';
+import { FormatsComponent } from './formats/formats.component';
+import { FaceComponent } from './formats/face/face.component';
+import { PaceComponent } from './formats/pace/pace.component';
+import { RockefellerComponent } from './formats/rockefeller/rockefeller.component';
+import { WwwComponent } from './formats/www/www.component';
 
 export default [
     {

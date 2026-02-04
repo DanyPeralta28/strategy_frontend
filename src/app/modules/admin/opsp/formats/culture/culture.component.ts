@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-culture',
@@ -18,8 +19,8 @@ export class CultureComponent implements OnInit {
   };
 
   // contexto / constantes (ajústalas si vienen dinámicas)
-  id_company: string = 'BANRURAL_GT99';
-  created_by: string = 'admin_user';
+  id_company: string = environment.defaultCompanyId;
+  created_by: string = environment.defaultCreatedBy;
 
   cultureId?: number;
   private originalSnapshot = {
@@ -122,3 +123,7 @@ export class CultureComponent implements OnInit {
     }
   }
 }
+
+
+
+

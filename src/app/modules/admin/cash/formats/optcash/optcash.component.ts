@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { CashService } from '../../../services/cash.service'; // ajusta ruta
+import { environment } from 'environments/environment';
 
 interface StageItem {
   idea: string;
@@ -26,8 +27,8 @@ interface Stage {
 })
 export class OptcashComponent implements OnInit {
   // contexto (ajusta según tu app)
-  id_company = 'BANRURAL_GT99';
-  created_by = 'admin_user';
+  id_company = environment.defaultCompanyId;
+  created_by = environment.defaultCreatedBy;
 
   stages: Stage[] = [
     {
@@ -216,3 +217,6 @@ export class OptcashComponent implements OnInit {
     }
   }
 }
+
+
+

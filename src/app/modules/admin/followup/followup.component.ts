@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import Swal from 'sweetalert2';
 import { FollowupService } from '../services/followup.service';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-followup',
@@ -14,7 +15,7 @@ import { FollowupService } from '../services/followup.service';
   templateUrl: './followup.component.html',
 })
 export class FollowupComponent {
-  id_company = 'BANRURAL_GT99';
+  id_company = environment.defaultCompanyId;
   id_entity = 'SUCURSAL_001';
   team = 'marketing';
   created_by = { username: 'admin', role: 'coordinator' };
@@ -988,3 +989,4 @@ export class FollowupComponent {
     console.log('🔵 Ganar el Juego Prioridades (Grupal)', data);
   }
 }
+

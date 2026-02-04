@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { environment } from 'environments/environment';
 
 export const ApiRoutes = {
   cashFormatIel: '/api/cash-format-iel',
@@ -11,7 +12,7 @@ export const ApiRoutes = {
 
 @Injectable({ providedIn: 'root' })
 export class CashService {
-  private readonly baseUrl = 'https://l9kpxb5b-3000.use2.devtunnels.ms';
+  private readonly baseUrl = environment.apiBaseUrl;
 
   constructor(private http: HttpClient) {}
 

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OpspService } from '../services/opsp.service';
+import { environment } from 'environments/environment';
 
 type Semaforo = 'excelente' | 'riesgo' | 'problemas' | '';
 interface KpiItemUI {
@@ -34,7 +35,7 @@ interface JuegoItem { color: JuegoColor; descripcion: string; }
     encapsulation: ViewEncapsulation.None,
 })
 export class OpspComponent {
-    id_company = 'BANRURAL_GT99';
+    id_company = environment.defaultCompanyId;
     balanceCategorias: CategoriaUI[] = [];
     valores: string[] = [];
     proposito: string = '';
@@ -329,7 +330,7 @@ export class OpspComponent {
                     kpi: ''
                 })),
             status: 1,
-            created_by: 'admin_user',
+            created_by: environment.defaultCreatedBy,
         };
 
         try {
@@ -337,7 +338,7 @@ export class OpspComponent {
                 await this.opsp.updateConsistentActions(this.consistentActionsId, {
                     action: payload.action,
                     status: 1,
-                    created_by: 'admin_user',
+                    created_by: environment.defaultCreatedBy,
                 });
             } else {
                 const res = await this.opsp.createConsistentActions(payload);
@@ -692,7 +693,7 @@ export class OpspComponent {
                 await this.opsp.updatePlayerA(this.jugadoresAId, {
                     reward: this.jugadoresA,
                     status: 1,
-                    created_by: 'admin_user',
+                    created_by: environment.defaultCreatedBy,
                 });
                 Swal.fire('Éxito', 'Jugadores A actualizado correctamente', 'success');
             } else {
@@ -701,7 +702,7 @@ export class OpspComponent {
                     id_company: this.id_company,
                     reward: this.jugadoresA,
                     status: 1,
-                    created_by: 'admin_user',
+                    created_by: environment.defaultCreatedBy,
                 });
                 this.jugadoresAId = resp?.data?.id ?? null;
                 Swal.fire('Éxito', 'Jugadores A creado correctamente', 'success');
@@ -786,7 +787,7 @@ export class OpspComponent {
             celebration_plan: this.juego.celebracion,
             reward: this.juego.premio,
             status: 1,
-            created_by: 'admin_user',
+            created_by: environment.defaultCreatedBy,
         };
 
         this.savingJuego = true;
@@ -811,3 +812,5 @@ export class OpspComponent {
         }
     }
 }
+
+

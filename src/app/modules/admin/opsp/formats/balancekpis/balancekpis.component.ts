@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'app-balancekpis',
@@ -31,9 +32,9 @@ export class BalancekpisComponent implements OnInit {
   };
 
   // contexto
-  id_company: string = 'BANRURAL_GT99'; // reemplaza según flujo real
+  id_company: string = environment.defaultCompanyId; // reemplaza según flujo real
   existingKpiBalanceId: number | null = null;
-  created_by: string = 'admin_user';
+  created_by: string = environment.defaultCreatedBy;
 
   constructor(public opspService: OpspService) {}
 
@@ -217,3 +218,6 @@ export class BalancekpisComponent implements OnInit {
       });
   }
 }
+
+
+
