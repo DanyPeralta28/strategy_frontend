@@ -1,10 +1,15 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OpspService } from '../services/opsp.service';
-import { environment } from 'environments/environment';
+import { FollowupService } from '../services/followup.service';
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
+import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
 
 type Semaforo = 'excelente' | 'riesgo' | 'problemas' | '';
 interface KpiItemUI {
@@ -25,20 +30,39 @@ interface CampoMeta {
 
 type JuegoColor = 'verdeOscuro' | 'verde' | 'amarillo' | 'rojo';
 interface JuegoItem { color: JuegoColor; descripcion: string; }
+interface FilterEntityOption { id: number | string; name: string; }
+interface FilterTeamOption { id: number | string; name: string; }
+interface FilterUserOption {
+    id: number | string;
+    name: string;
+    checked: boolean;
+    color?: string;
+    status_dashboard?: number;
+}
+interface OpspDashboardFiltersState {
+    entidadId: string | null;
+    equipoId: string | null;
+    userIds: string[];
+}
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
 
 @Component({
     selector: 'opsp',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule],
+    imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
     templateUrl: './opsp.component.html',
     styleUrls: ['./opsp.component.scss'],
     encapsulation: ViewEncapsulation.None,
 })
 export class OpspComponent {
-    id_company = environment.defaultCompanyId;
+    @ViewChild('dashboardPdfContent') dashboardPdfContent?: ElementRef<HTMLElement>;
+    @ViewChild('dashboardPdfReportContent') dashboardPdfReportContent?: ElementRef<HTMLElement>;
+    id_company = getSessionCompanyId();
     balanceCategorias: CategoriaUI[] = [];
     valores: string[] = [];
     proposito: string = '';
+    centralClientSummary: string = '';
     territorios: string[] = [];
     accionesConsistentes: string[] = [];
     savingAcciones = false;
@@ -65,7 +89,14 @@ export class OpspComponent {
     trimestreVigente: string = this.metaTrimestreVigente?.trimestre || '';
     prioridadesPlazo: string[] = []; // 3–5 años
     prioridadesAnuales: { descripcion: string; quien: string }[] = [];
-    prioridadesTrimestrales: { descripcion: string; quien: string }[] = [];
+    prioridadesTrimestrales: {
+        descripcion: string;
+        quien: string;
+        plazo: string;
+        esOKR: boolean;
+        esIndividual: boolean | null;
+        subprioridades: string[];
+    }[] = [];
     trimestreTitulo = 'Trimestrales'; // solo título visual
     ganarJuego1 = [
         { color: 'verdeOscuro', descripcion: '' },
@@ -104,75 +135,31 @@ export class OpspComponent {
     private existingWinGameId: number | null = null;
     savingJuego = false;
 
-    entidades: string[] = ['Empresa A', 'Empresa B', 'Empresa C'];
-    equipos: string[] = ['Ventas', 'Finanzas', 'Operaciones'];
+    entidades: FilterEntityOption[] = [];
+    equipos: FilterTeamOption[] = [];
     // Filtro
-    usuarios = [
-        { id: 1, name: 'Carlos', checked: false },
-        { id: 2, name: 'Lucía', checked: false },
-        { id: 3, name: 'Andrés', checked: false },
-        { id: 4, name: 'María', checked: false }
-    ];
+    usuarios: FilterUserOption[] = [];
 
-    userData = [
-        {
-            userId: 1,
-            kpis: [
-                { description: 'Ventas Q2', sv: 100, v: 90, r: 80 }
-            ],
-            priorities: [
-                { name: 'Finalizar campaña', when: '2025-08-25' }
-            ],
-            ganarJuego: {
-                kpis: { critical: '500', sv: '600', v: '550', a: '500', r: '450', result: '540', color: '#66CC66' },
-                priorities: { critical: '3 proyectos', sv: '4', v: '3', a: '2', r: '1', result: '3', color: '#66CC66' }
-            }
-        },
-        {
-            userId: 2,
-            kpis: [
-                { description: 'Satisfacción Cliente', sv: 95, v: 90, r: 85 }
-            ],
-            priorities: [
-                { name: 'Optimizar CRM', when: '2025-09-05' }
-            ],
-            ganarJuego: {
-                kpis: { critical: '90%', sv: '95%', v: '90%', a: '85%', r: '80%', result: '89%', color: '#FFCC00' },
-                priorities: { critical: '3 tareas', sv: '5', v: '4', a: '3', r: '2', result: '3', color: '#66CC66' }
-            }
-        },
-        {
-            userId: 3,
-            kpis: [
-                { description: 'Ventas Q2', sv: 100, v: 90, r: 80 }
-            ],
-            priorities: [
-                { name: 'Finalizar campaña', when: '2025-08-25' }
-            ],
-            ganarJuego: {
-                kpis: { critical: '500', sv: '600', v: '550', a: '500', r: '450', result: '540', color: '#66CC66' },
-                priorities: { critical: '3 proyectos', sv: '4', v: '3', a: '2', r: '1', result: '3', color: '#66CC66' }
-            }
-        },
-        {
-            userId: 4,
-            kpis: [
-                { description: 'Satisfacción Cliente', sv: 95, v: 90, r: 85 }
-            ],
-            priorities: [
-                { name: 'Optimizar CRM', when: '2025-09-05' }
-            ],
-            ganarJuego: {
-                kpis: { critical: '90%', sv: '95%', v: '90%', a: '85%', r: '80%', result: '89%', color: '#FFCC00' },
-                priorities: { critical: '3 tareas', sv: '5', v: '4', a: '3', r: '2', result: '3', color: '#66CC66' }
-            }
-        }
-    ];
+    userData: any[] = [];
 
     showUserDropdown = false;
+    showOtrosMenu = false;
+    currentUserSlideIndex = 0;
+    otrosVisibility = {
+        centralClient: true,
+        vision: true,
+        strata: true,
+    };
 
     get selectedUsers() {
         return this.usuarios.filter(u => u.checked);
+    }
+
+    get activeSelectedUser(): FilterUserOption | null {
+        const users = this.selectedUsers;
+        if (!users.length) return null;
+        const index = Math.min(this.currentUserSlideIndex, users.length - 1);
+        return users[index] ?? null;
     }
 
     get selectedUserNames(): string {
@@ -180,15 +167,359 @@ export class OpspComponent {
         return names.length ? names.join(', ') : 'Seleccionar usuarios';
     }
 
-    getSelectedUserData(userId: number) {
-        return this.userData.find(u => u.userId === userId);
+    get selectedEntityName(): string {
+        const found = this.entidades.find(e => String(e.id) === String(this.selectedEntidad));
+        return found?.name || String(this.selectedEntidad ?? '');
     }
 
-    selectedEntidad: string = '';
-    selectedEquipo: string = '';
-    selectedUsuario: string = '';
+    get selectedTeamName(): string {
+        const found = this.equipos.find(e => String(e.id) === String(this.selectedEquipo) || String(e.name) === String(this.selectedEquipo));
+        return found?.name || String(this.selectedEquipo ?? '');
+    }
 
-    constructor(private opsp: OpspService) {
+    getSelectedUserData(userId: number | string, selectedIndex?: number) {
+        const byId = this.userData.find(u => String(u.userId) === String(userId));
+        if (byId) return byId;
+
+        // Fallback temporal por indice para evitar vista vacia si hay desalineacion puntual.
+        if (typeof selectedIndex === 'number' && this.userData.length > 0) {
+            return this.userData[selectedIndex % this.userData.length];
+        }
+
+        return undefined;
+    }
+
+    getDashboardUserSectionStyle(userId: number | string): { [key: string]: string } {
+        const user = this.usuarios.find((u) => String(u.id) === String(userId));
+        return { backgroundColor: user?.color || '#f8fafc' };
+    }
+
+    get canGoPrevUserSlide(): boolean {
+        return this.currentUserSlideIndex > 0;
+    }
+
+    get canGoNextUserSlide(): boolean {
+        return this.currentUserSlideIndex < this.selectedUsers.length - 1;
+    }
+
+    prevUserSlide(): void {
+        if (!this.canGoPrevUserSlide) return;
+        this.currentUserSlideIndex--;
+    }
+
+    nextUserSlide(): void {
+        if (!this.canGoNextUserSlide) return;
+        this.currentUserSlideIndex++;
+    }
+
+    onUserSelectionChange(): void {
+        this.persistDashboardFilters();
+        const maxIndex = Math.max(this.selectedUsers.length - 1, 0);
+        if (this.currentUserSlideIndex > maxIndex) {
+            this.currentUserSlideIndex = maxIndex;
+        }
+        this.loadMultiUsersDashboardData();
+    }
+
+    selectedEntidad: number | string | null = null;
+    selectedEquipo: number | string | null = null;
+    selectedUsuario: string = '';
+    private readonly requesterUserId = getSessionUserId();
+    private readonly filtersStorageKey = 'opsp_dashboard_filters_v1';
+
+    constructor(
+        private opsp: OpspService,
+        private followupService: FollowupService,
+        private router: Router
+    ) {
+    }
+
+    get isAdminTeamUser(): boolean {
+        return [2, 3].includes(Number(getSessionLevelUser()));
+    }
+
+    goToFormat(link: string): void {
+        if (!link) return;
+        this.router.navigate(['/opsp/formats', link]);
+    }
+
+    exportDashboardToExcel(): void {
+        const summaryRows = [
+            {
+                Compania: this.id_company ?? '',
+                Entidad: this.selectedEntityName || '',
+                Equipo: this.selectedTeamName || '',
+                Usuarios: this.selectedUsers.map(u => u.name).join(', ') || '',
+                BHAG: this.bhag || '',
+                Proposito: this.proposito || '',
+                'Cliente central': this.centralClientSummary || '',
+                Territorios: this.territorios.join(' | ') || '',
+                Valores: this.valores.join(' | ') || '',
+            }
+        ];
+
+        const balanceRows = this.balanceCategorias.flatMap(cat =>
+            (cat.kpis || []).map(kpi => ({
+                Categoria: cat.nombre || '',
+                KPI: kpi.nombre || '',
+                Resultado: kpi.resultado || '',
+                Estado: this.semaforoToLabel(kpi.color),
+            }))
+        );
+
+        const prioritiesRows = [
+            ...this.prioridadesPlazo.map((p, i) => ({
+                Tipo: '3-5 años',
+                '#': i + 1,
+                Prioridad: p || '',
+                Responsable: '',
+                Plazo: '',
+                OKR: '',
+                Alcance: '',
+                Subprioridades: '',
+            })),
+            ...this.prioridadesAnuales.map((p, i) => ({
+                Tipo: 'Anual',
+                '#': i + 1,
+                Prioridad: p.descripcion || '',
+                Responsable: p.quien || '',
+                Plazo: '',
+                OKR: '',
+                Alcance: '',
+                Subprioridades: '',
+            })),
+            ...this.prioridadesTrimestrales.map((p, i) => ({
+                Tipo: 'Trimestral',
+                '#': i + 1,
+                Prioridad: p.descripcion || '',
+                Responsable: p.quien || '',
+                Plazo: p.plazo || '',
+                OKR: p.esOKR ? 'Si' : 'No',
+                Alcance: p.esIndividual == null ? '' : (p.esIndividual ? 'Individual' : 'Equipo'),
+                Subprioridades: Array.isArray(p.subprioridades) ? p.subprioridades.join(' | ') : '',
+            })),
+            ...this.metaTrimestreCampos.map((m, i) => ({
+                Tipo: 'Meta trimestral',
+                '#': i + 1,
+                Prioridad: m.titulo || '',
+                Responsable: '',
+                Plazo: this.trimestreVigente || '',
+                OKR: '',
+                Alcance: '',
+                Subprioridades: m.value || '',
+            })),
+            ...this.metasAnualesCampos.map((m, i) => ({
+                Tipo: 'Meta anual',
+                '#': i + 1,
+                Prioridad: m.titulo || '',
+                Responsable: '',
+                Plazo: '',
+                OKR: '',
+                Alcance: '',
+                Subprioridades: m.value || '',
+            })),
+            ...this.metasPlazoCampos.map((m, i) => ({
+                Tipo: 'Meta largo plazo',
+                '#': i + 1,
+                Prioridad: m.titulo || '',
+                Responsable: '',
+                Plazo: '',
+                OKR: '',
+                Alcance: '',
+                Subprioridades: m.value || '',
+            })),
+        ];
+
+        const gameRows = [
+            ...this.ganarJuego1.map((item, index) => ({
+                Grupo: 'Anual',
+                Indicador: ['Super Verde', 'Verde', 'Amarillo', 'Rojo'][index] || '',
+                Valor: item?.descripcion || '',
+                Color: ['Super Verde', 'Verde', 'Amarillo', 'Rojo'][index] || '',
+            })),
+            ...this.ganarJuego2.map((item, index) => ({
+                Grupo: `Trimestre ${this.trimestreVigente || ''}`.trim(),
+                Indicador: ['Super Verde', 'Verde', 'Amarillo', 'Rojo'][index] || '',
+                Valor: item?.descripcion || '',
+                Color: ['Super Verde', 'Verde', 'Amarillo', 'Rojo'][index] || '',
+            })),
+            {
+                Grupo: 'Win Game',
+                Indicador: 'Fecha limite',
+                Valor: this.juego.fechaLimite || '',
+                Color: '',
+            },
+            {
+                Grupo: 'Win Game',
+                Indicador: 'Equipo',
+                Valor: this.juego.equipo || '',
+                Color: '',
+            },
+            {
+                Grupo: 'Win Game',
+                Indicador: 'Reglas',
+                Valor: this.juego.reglas || '',
+                Color: '',
+            },
+            {
+                Grupo: 'Win Game',
+                Indicador: 'Tablero',
+                Valor: this.juego.tablero || '',
+                Color: '',
+            },
+            {
+                Grupo: 'Win Game',
+                Indicador: 'Celebracion',
+                Valor: this.juego.celebracion || '',
+                Color: '',
+            },
+            {
+                Grupo: 'Win Game',
+                Indicador: 'Premio',
+                Valor: this.juego.premio || '',
+                Color: '',
+            }
+        ];
+
+        const usersKpiRows = this.selectedUsers.flatMap((u) => {
+            const data = this.userData.find(x => String(x?.userId) === String(u.id));
+            return (Array.isArray(data?.kpis) ? data.kpis : []).map((k: any) => ({
+                Usuario: u.name,
+                Descripcion: k?.description ?? '',
+                SV: k?.sv ?? '',
+                V: k?.v ?? '',
+                R: k?.r ?? '',
+            }));
+        });
+
+        const usersPriorityRows = this.selectedUsers.flatMap((u) => {
+            const data = this.userData.find(x => String(x?.userId) === String(u.id));
+            return (Array.isArray(data?.priorities) ? data.priorities : []).map((p: any, index: number) => ({
+                Usuario: u.name,
+                '#': index + 1,
+                Prioridad: p?.name ?? '',
+                Cuando: p?.when ?? '',
+            }));
+        });
+
+        const usersGameRows = this.selectedUsers.flatMap((u) => {
+            const data = this.userData.find(x => String(x?.userId) === String(u.id));
+            if (!data) return [];
+            return [
+                {
+                    Usuario: u.name,
+                    Grupo: 'KPI',
+                    'Numero critico': data?.ganarJuego?.kpis?.critical ?? '',
+                    SV: data?.ganarJuego?.kpis?.sv ?? '',
+                    V: data?.ganarJuego?.kpis?.v ?? '',
+                    A: data?.ganarJuego?.kpis?.a ?? '',
+                    R: data?.ganarJuego?.kpis?.r ?? '',
+                    Resultado: data?.ganarJuego?.kpis?.result ?? '',
+                    Color: data?.ganarJuego?.kpis?.color ?? '',
+                },
+                {
+                    Usuario: u.name,
+                    Grupo: 'Prioridades',
+                    'Numero critico': data?.ganarJuego?.priorities?.critical ?? '',
+                    SV: data?.ganarJuego?.priorities?.sv ?? '',
+                    V: data?.ganarJuego?.priorities?.v ?? '',
+                    A: data?.ganarJuego?.priorities?.a ?? '',
+                    R: data?.ganarJuego?.priorities?.r ?? '',
+                    Resultado: data?.ganarJuego?.priorities?.result ?? '',
+                    Color: data?.ganarJuego?.priorities?.color ?? '',
+                }
+            ];
+        });
+
+        void exportSheetsToExcel('opsp_dashboard', [
+            { name: 'Resumen', rows: summaryRows },
+            { name: 'Balance KPIs', rows: balanceRows },
+            { name: 'Prioridades', rows: prioritiesRows },
+            { name: 'Ganar el Juego', rows: gameRows },
+            { name: 'Usuarios KPIs', rows: usersKpiRows },
+            { name: 'Usuarios Prioridades', rows: usersPriorityRows },
+            { name: 'Usuarios Juegos', rows: usersGameRows },
+        ]);
+    }
+
+    exportDashboardToPdf(): void {
+        void exportElementToPdf(this.dashboardPdfReportContent?.nativeElement, 'opsp_dashboard');
+    }
+
+    private semaforoToLabel(value: Semaforo): string {
+        if (value === 'excelente') return 'Super Verde';
+        if (value === 'riesgo') return 'Verde';
+        if (value === 'problemas') return 'Rojo';
+        return '';
+    }
+
+    private buildExcelWorkbook(
+        sheets: Array<{ name: string; headers: string[]; rows: Array<Array<string | number>> }>
+    ): string {
+        const workbookOpen =
+            `<?xml version="1.0"?>` +
+            `<?mso-application progid="Excel.Sheet"?>` +
+            `<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" ` +
+            `xmlns:o="urn:schemas-microsoft-com:office:office" ` +
+            `xmlns:x="urn:schemas-microsoft-com:office:excel" ` +
+            `xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" ` +
+            `xmlns:html="http://www.w3.org/TR/REC-html40">` +
+            `<Styles>` +
+            `<Style ss:ID="Default" ss:Name="Normal"><Alignment ss:Vertical="Center"/><Font ss:FontName="Calibri" ss:Size="11"/></Style>` +
+            `<Style ss:ID="Header"><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#003660" ss:Pattern="Solid"/></Style>` +
+            `<Style ss:ID="TextWrap"><Alignment ss:Vertical="Top" ss:WrapText="1"/></Style>` +
+            `</Styles>`;
+
+        const workbookClose = `</Workbook>`;
+        const sheetsXml = sheets.map(sheet => this.buildExcelWorksheet(sheet.name, sheet.headers, sheet.rows)).join('');
+        return workbookOpen + sheetsXml + workbookClose;
+    }
+
+    private buildExcelWorksheet(name: string, headers: string[], rows: Array<Array<string | number>>): string {
+        const safeName = this.sanitizeSheetName(name);
+        let xml = `<Worksheet ss:Name="${this.escapeXml(safeName)}"><Table>`;
+
+        xml += '<Row>';
+        headers.forEach(h => {
+            xml += `<Cell ss:StyleID="Header"><Data ss:Type="String">${this.escapeXml(h)}</Data></Cell>`;
+        });
+        xml += '</Row>';
+
+        rows.forEach(row => {
+            xml += '<Row>';
+            row.forEach(value => {
+                const num = typeof value === 'number' ? value : Number(value);
+                const isNumeric = typeof value === 'number' || (!Number.isNaN(num) && value !== '' && value !== null);
+                const type = isNumeric ? 'Number' : 'String';
+                const cellValue = isNumeric ? String(num) : this.escapeXml(String(value ?? ''));
+                xml += `<Cell ss:StyleID="TextWrap"><Data ss:Type="${type}">${cellValue}</Data></Cell>`;
+            });
+            xml += '</Row>';
+        });
+
+        xml += '</Table></Worksheet>';
+        return xml;
+    }
+
+    private sanitizeSheetName(name: string): string {
+        const cleaned = (name || 'Sheet')
+            .replace(/[\\\/\?\*\[\]:]/g, ' ')
+            .trim();
+        return cleaned.substring(0, 31) || 'Sheet';
+    }
+
+    private escapeXml(value: string): string {
+        return value
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&apos;');
+    }
+
+    private formatDateForFile(date: Date): string {
+        const pad = (n: number) => String(n).padStart(2, '0');
+        return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}`;
     }
 
     ngOnInit() {
@@ -196,6 +527,7 @@ export class OpspComponent {
         this.loadValoresByCompany();
         this.loadPropositoByCompany();
         this.loadTerritoriosByCompany();
+        this.loadCentralClientByCompany();
         this.loadAccionesConsistentes();
         this.loadMetasByCompany();
         this.loadPrioridadesVisionByCompany();
@@ -209,6 +541,289 @@ export class OpspComponent {
         this.loadJugadoresAByCompany();
         this.loadFdtFortalezasByCompany();
         this.loadWinGameTrimestralByCompany();
+        if (this.isAdminTeamUser) {
+            this.loadEntitiesForFilters();
+        }
+    }
+
+    toggleOtrosMenu(): void {
+        this.showOtrosMenu = !this.showOtrosMenu;
+    }
+
+    setOtrosVisibility(key: 'centralClient' | 'vision' | 'strata', value: boolean): void {
+        this.otrosVisibility[key] = value;
+    }
+
+    async loadEntitiesForFilters(): Promise<void> {
+        if (!this.isAdminTeamUser) {
+            this.entidades = [];
+            this.equipos = [];
+            this.usuarios = [];
+            return;
+        }
+        try {
+            const resp = await this.followupService.getEntitiesByCompany(this.id_company);
+            const rows = Array.isArray(resp?.data) ? resp.data : [];
+
+            this.entidades = rows
+                .map((r: any) => {
+                    const id = r?.id_entity ?? r?.entity_id ?? r?.id;
+                    const name = (r?.name_entity ?? r?.entity_name ?? r?.name ?? r?.entity ?? '').toString().trim();
+                    return { id, name };
+                })
+                .filter((x: any) => x.id != null && !!x.name);
+
+            const saved = this.getSavedFilters();
+            if (saved?.entidadId) {
+                const savedEntity = this.entidades.find(e => String(e.id) === String(saved.entidadId));
+                if (savedEntity) {
+                    this.selectedEntidad = savedEntity.id;
+                    await this.onEntidadChange(true, saved);
+                    return;
+                }
+            }
+
+            const defaultEntity = this.entidades.find(e => String(e.id) === String(getSessionEntityId()));
+            if (defaultEntity) {
+                this.selectedEntidad = defaultEntity.id;
+                await this.onEntidadChange();
+            }
+        } catch (err) {
+            console.error('Error cargando entidades para OPSP:', err);
+            this.entidades = [];
+            this.selectedEntidad = null;
+            this.equipos = [];
+            this.usuarios = [];
+        }
+    }
+
+    async onEntidadChange(restore = false, saved?: OpspDashboardFiltersState): Promise<void> {
+        if (!restore) this.selectedEquipo = null;
+        this.equipos = [];
+        this.usuarios = [];
+        this.userData = [];
+        this.showUserDropdown = false;
+
+        if (this.selectedEntidad == null || this.selectedEntidad === '') {
+            this.persistDashboardFilters();
+            return;
+        }
+
+        try {
+            const resp = await this.followupService.getTeamMembersByEntity(
+                this.requesterUserId,
+                this.selectedEntidad,
+                this.id_company
+            );
+            const rows = Array.isArray(resp?.data) ? resp.data : [];
+            const teamMap = new Map<string, FilterTeamOption>();
+
+            rows.forEach((r: any) => {
+                // backend real: data puede venir como string[]
+                if (typeof r === 'string') {
+                    const name = r.trim();
+                    if (!name) return;
+                    if (!teamMap.has(name)) {
+                        teamMap.set(name, { id: name, name });
+                    }
+                    return;
+                }
+
+                // fallback por compatibilidad si llega objeto
+                const name = (r?.team ?? r?.team_name ?? r?.name ?? '').toString().trim();
+                const id = r?.id_team ?? r?.team_id ?? name;
+                if (!name) return;
+                const key = `${id}`;
+                if (!teamMap.has(key)) {
+                    teamMap.set(key, { id, name });
+                }
+            });
+
+            this.equipos = Array.from(teamMap.values());
+
+            if (restore && saved?.equipoId) {
+                const savedTeam = this.equipos.find(
+                    t => String(t.id) === String(saved.equipoId) || String(t.name) === String(saved.equipoId)
+                );
+                if (savedTeam) {
+                    this.selectedEquipo = savedTeam.name;
+                    await this.onEquipoChange(true, saved);
+                    return;
+                }
+            }
+
+            this.persistDashboardFilters();
+        } catch (err) {
+            console.error('Error cargando equipos por entidad en OPSP:', err);
+            this.equipos = [];
+            this.persistDashboardFilters();
+        }
+    }
+
+    async onEquipoChange(restore = false, saved?: OpspDashboardFiltersState): Promise<void> {
+        this.usuarios = [];
+        this.userData = [];
+        this.showUserDropdown = false;
+
+        if (
+            this.selectedEntidad == null || this.selectedEntidad === '' ||
+            this.selectedEquipo == null || this.selectedEquipo === ''
+        ) {
+            this.persistDashboardFilters();
+            return;
+        }
+
+        try {
+            const resp = await this.followupService.getTeamMembersByTeamDashboard(
+                this.selectedEquipo,
+                this.selectedEntidad,
+                this.id_company
+            );
+            const rows = Array.isArray(resp?.data) ? resp.data : [];
+
+            this.usuarios = rows
+                .map((u: any) => {
+                    const id = u?.id_user ?? u?.user_id ?? u?.id;
+                    const first = (u?.firstname ?? '').toString().trim();
+                    const last = (u?.lastname ?? '').toString().trim();
+                    const fullName = `${first} ${last}`.trim();
+                    const name = (
+                        fullName ||
+                        u?.name ||
+                        u?.full_name ||
+                        u?.user_name ||
+                        u?.username ||
+                        ''
+                    ).toString().trim();
+                    return {
+                        id,
+                        name,
+                        checked: false,
+                        color: (u?.color ?? '#f8fafc').toString().trim() || '#f8fafc',
+                        status_dashboard: Number(u?.status_dashboard ?? 1),
+                    };
+                })
+                .filter((u: any) => u.id != null && !!u.name);
+
+            this.usuarios = this.usuarios.filter((u) => Number(u.status_dashboard ?? 1) === 1);
+
+            if (restore && saved?.userIds?.length) {
+                const selectedIds = new Set(saved.userIds.map(x => String(x)));
+                this.usuarios.forEach(u => {
+                    u.checked = selectedIds.has(String(u.id));
+                });
+            }
+
+            this.onUserSelectionChange();
+            this.persistDashboardFilters();
+        } catch (err) {
+            console.error('Error cargando usuarios por equipo en OPSP:', err);
+            this.usuarios = [];
+            this.userData = [];
+            this.onUserSelectionChange();
+            this.persistDashboardFilters();
+        }
+    }
+
+    private gameColorToHex(color?: string): string {
+        const c = (color || '').toString().trim().toLowerCase();
+        if (c === 'green') return '#006600';
+        if (c === 'lemon') return '#66CC66';
+        if (c === 'yellow') return '#FFCC00';
+        if (c === 'red') return '#CC0000';
+        return '#9CA3AF';
+    }
+
+    async loadMultiUsersDashboardData(): Promise<void> {
+        const userIds = this.selectedUsers.map(u => u.id);
+        if (
+            this.selectedEntidad == null || this.selectedEntidad === '' ||
+            userIds.length === 0
+        ) {
+            this.userData = [];
+            return;
+        }
+
+        try {
+            const resp = await this.followupService.getPriorityWeeksMultiUsers(
+                this.id_company,
+                this.selectedEntidad,
+                userIds
+            );
+            const rows = Array.isArray(resp?.data) ? resp.data : [];
+
+            this.userData = rows.map((item: any) => ({
+                userId: item?.id_user,
+                kpis: (Array.isArray(item?.kpi_list) ? item.kpi_list : []).map((k: any) => ({
+                    description: (k?.description ?? '').toString().trim(),
+                    sv: (k?.sv ?? '').toString().trim(),
+                    v: (k?.v ?? '').toString().trim(),
+                    r: (k?.r ?? '').toString().trim(),
+                })),
+                priorities: [
+                    ...(Array.isArray(item?.quarter_priority_list) ? item.quarter_priority_list : []).map((p: any) => ({
+                        name: (p?.name ?? '').toString().trim(),
+                        when: (p?.when ?? '').toString().trim(),
+                    })),
+                    ...(Array.isArray(item?.vision_priorities) ? item.vision_priorities : []).map((p: any) => ({
+                        name: (p?.name ?? '').toString().trim(),
+                        when: (p?.plazo ?? p?.when ?? '').toString().trim(),
+                    })),
+                ].filter((p: any) => p.name || p.when),
+                ganarJuego: {
+                    kpis: {
+                        critical: (item?.kpi_game?.game_critical_number_kpi ?? '').toString().trim(),
+                        sv: (item?.kpi_game?.game_green_kpi ?? '').toString().trim(),
+                        v: (item?.kpi_game?.game_lemon_kpi ?? '').toString().trim(),
+                        a: (item?.kpi_game?.game_yellow_kpi ?? '').toString().trim(),
+                        r: (item?.kpi_game?.game_red_kpi ?? '').toString().trim(),
+                        result: (item?.kpi_game?.game_result_kpi ?? '').toString().trim(),
+                        color: this.gameColorToHex(item?.kpi_game?.game_color_kpi),
+                    },
+                    priorities: {
+                        critical: (item?.priority_game?.game_critical_number_priority ?? '').toString().trim(),
+                        sv: (item?.priority_game?.game_green_priority ?? '').toString().trim(),
+                        v: (item?.priority_game?.game_lemon_priority ?? '').toString().trim(),
+                        a: (item?.priority_game?.game_yellow_priority ?? '').toString().trim(),
+                        r: (item?.priority_game?.game_red_priority ?? '').toString().trim(),
+                        result: (item?.priority_game?.game_result_priority ?? '').toString().trim(),
+                        color: this.gameColorToHex(item?.priority_game?.game_color_priority),
+                    }
+                }
+            }));
+        } catch (err) {
+            console.error('Error cargando data multi-usuarios en OPSP dashboard:', err);
+            this.userData = [];
+        }
+    }
+
+    persistDashboardFilters(): void {
+        try {
+            const state: OpspDashboardFiltersState = {
+                entidadId: this.selectedEntidad != null && this.selectedEntidad !== '' ? String(this.selectedEntidad) : null,
+                equipoId: this.selectedEquipo != null && this.selectedEquipo !== '' ? String(this.selectedEquipo) : null,
+                userIds: this.usuarios.filter(u => u.checked).map(u => String(u.id)),
+            };
+            localStorage.setItem(this.filtersStorageKey, JSON.stringify(state));
+        } catch {
+            // ignore localStorage errors
+        }
+    }
+
+    private getSavedFilters(): OpspDashboardFiltersState | null {
+        try {
+            const raw = localStorage.getItem(this.filtersStorageKey);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== 'object') return null;
+            return {
+                entidadId: parsed.entidadId != null ? String(parsed.entidadId) : null,
+                equipoId: parsed.equipoId != null ? String(parsed.equipoId) : null,
+                userIds: Array.isArray(parsed.userIds) ? parsed.userIds.map((x: any) => String(x)) : []
+            };
+        } catch {
+            return null;
+        }
     }
 
     // KPIS DE BALANCE
@@ -290,6 +905,19 @@ export class OpspComponent {
         }
     }
 
+    async loadCentralClientByCompany(): Promise<void> {
+        try {
+            const resp = await this.opsp.getCentralClientByCompany(this.id_company);
+            const rows = Array.isArray(resp?.data) ? resp.data : [];
+            this.centralClientSummary = rows.length > 0
+                ? (rows[0]?.core_client_summary ?? '').toString().trim()
+                : '';
+        } catch (err) {
+            console.error('Error cargando Cliente Central:', err);
+            this.centralClientSummary = '';
+        }
+    }
+
     // ACCIONES CONSISTENTES
 
     async loadAccionesConsistentes(): Promise<void> {
@@ -330,7 +958,7 @@ export class OpspComponent {
                     kpi: ''
                 })),
             status: 1,
-            created_by: environment.defaultCreatedBy,
+            created_by: getSessionUserId(),
         };
 
         try {
@@ -338,7 +966,7 @@ export class OpspComponent {
                 await this.opsp.updateConsistentActions(this.consistentActionsId, {
                     action: payload.action,
                     status: 1,
-                    created_by: environment.defaultCreatedBy,
+                    created_by: getSessionUserId(),
                 });
             } else {
                 const res = await this.opsp.createConsistentActions(payload);
@@ -468,7 +1096,13 @@ export class OpspComponent {
             this.prioridadesTrimestrales = Array.isArray(data.priority_list)
                 ? data.priority_list.map((p: any) => ({
                     descripcion: (p?.prioridad ?? '').toString().trim(),
-                    quien: (p?.who ?? '').toString().trim(),
+                    quien: this.resolvePriorityWho(p?.who_name),
+                    plazo: (p?.plazo ?? '').toString().trim(),
+                    esOKR: Boolean(p?.esOKR),
+                    esIndividual: typeof p?.esIndividual === 'boolean' ? p.esIndividual : null,
+                    subprioridades: Array.isArray(p?.subprioridades)
+                        ? p.subprioridades.map((s: any) => (s ?? '').toString().trim()).filter(Boolean)
+                        : [],
                 })).filter(p => p.descripcion)
                 : [];
 
@@ -492,6 +1126,13 @@ export class OpspComponent {
             this.prioridadesAnuales = [];
             this.prioridadesTrimestrales = [];
         }
+    }
+
+    private resolvePriorityWho(who: any): string {
+        const id = (who ?? '').toString().trim();
+        if (!id) return '';
+        const found = this.usuarios.find((u) => String(u.id) === id);
+        return found?.name || id;
     }
 
     // GANAR EL JUEGO
@@ -693,7 +1334,7 @@ export class OpspComponent {
                 await this.opsp.updatePlayerA(this.jugadoresAId, {
                     reward: this.jugadoresA,
                     status: 1,
-                    created_by: environment.defaultCreatedBy,
+                    created_by: getSessionUserId(),
                 });
                 Swal.fire('Éxito', 'Jugadores A actualizado correctamente', 'success');
             } else {
@@ -702,7 +1343,7 @@ export class OpspComponent {
                     id_company: this.id_company,
                     reward: this.jugadoresA,
                     status: 1,
-                    created_by: environment.defaultCreatedBy,
+                    created_by: getSessionUserId(),
                 });
                 this.jugadoresAId = resp?.data?.id ?? null;
                 Swal.fire('Éxito', 'Jugadores A creado correctamente', 'success');
@@ -787,7 +1428,7 @@ export class OpspComponent {
             celebration_plan: this.juego.celebracion,
             reward: this.juego.premio,
             status: 1,
-            created_by: environment.defaultCreatedBy,
+            created_by: getSessionUserId(),
         };
 
         this.savingJuego = true;
@@ -812,5 +1453,8 @@ export class OpspComponent {
         }
     }
 }
+
+
+
 
 

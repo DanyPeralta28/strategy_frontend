@@ -1,0 +1,59 @@
+<div class="w-full max-w-7xl mx-auto p-6 sm:p-10 space-y-8" [appPermissionEditLock]="24">
+    <div class="text-center">
+        <h2 class="text-3xl font-extrabold text-[#003660]">Usuarios</h2>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+        <div *ngIf="loading" class="text-sm text-slate-500">Cargando usuarios...</div>
+
+        <div *ngIf="!loading" class="overflow-x-auto">
+            <table class="min-w-full text-sm border border-gray-300 rounded-lg overflow-hidden">
+                <thead class="bg-[#003660] text-white">
+                    <tr>
+                        <th class="text-left px-4 py-3">Nombre</th>
+                        <th class="text-left px-4 py-3">Equipo</th>
+                        <th class="text-left px-4 py-3">Username</th>
+                        <th class="text-left px-4 py-3">Email</th>
+                        <th class="text-center px-4 py-3">Color dashboard</th>
+                        <th class="text-left px-4 py-3">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let user of users" class="border-t border-gray-200">
+                        <td class="px-4 py-3">{{ user.nombre }}</td>
+                        <td class="px-4 py-3">{{ user.equipo || '-' }}</td>
+                        <td class="px-4 py-3">{{ user.username || '-' }}</td>
+                        <td class="px-4 py-3">{{ user.email || '-' }}</td>
+                        <td class="px-4 py-3 text-center">
+                            <div class="flex items-center justify-center">
+                                <input type="color" [value]="user.color"
+                                    (change)="onColorChange(user.id, $any($event.target).value)" />
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <button *ngIf="user.status_dashboard === 1; else activateButton"
+                                type="button" (click)="deleteFromDashboard(user.id)"
+                                class="text-red-600 hover:text-red-800 font-semibold">
+                                Eliminar
+                            </button>
+                            <ng-template #activateButton>
+                                <button type="button" (click)="activateOnDashboard(user.id)"
+                                    class="text-emerald-600 hover:text-emerald-800 font-semibold">
+                                    Activar
+                                </button>
+                            </ng-template>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div *ngIf="users.length === 0" class="text-sm text-slate-500 mt-4">
+                No hay usuarios disponibles para el dashboard.
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

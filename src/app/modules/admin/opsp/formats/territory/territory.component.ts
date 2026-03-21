@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
-import { environment } from 'environments/environment';
+import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
+import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
 
 interface Channel {
   name: string;
@@ -24,22 +26,85 @@ interface Territory {
   segments: Segment[];
 }
 
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
+
 @Component({
   selector: 'app-territory',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
   templateUrl: './territory.component.html',
 })
 export class TerritoryComponent implements OnInit {
+  @ViewChild('pdfReportContent') pdfReportContent?: ElementRef<HTMLElement>;
   newTerritory = '';
   territories: Territory[] = [];
   territoryId: number | null = null;
 
   // Estos deberían venir del contexto real (por ahora hardcodeados)
-  id_company = environment.defaultCompanyId;
-  created_by = environment.defaultCreatedBy;
+  id_company = getSessionCompanyId();
+  created_by = getSessionUserId();
 
   constructor(private opspService: OpspService) { }
+
+  get canExportPdf(): boolean {
+    return Number(getSessionLevelUser()) === 2;
+  }
+
+  exportPdf(): void {
+    void exportElementToPdf(this.pdfReportContent?.nativeElement, 'opsp_territory');
+  }
+
+  exportExcel(): void {
+    const rows = this.territories.flatMap((territory) => {
+      if (!territory.segments.length) {
+        return [{
+          Territorio: territory.name,
+          Segmento: '',
+          Producto: '',
+          Canal: '',
+        }];
+      }
+
+      return territory.segments.flatMap((segment) => {
+        if (!segment.products.length) {
+          return [{
+            Territorio: territory.name,
+            Segmento: segment.name,
+            Producto: '',
+            Canal: '',
+          }];
+        }
+
+        return segment.products.flatMap((product) => {
+          if (!product.channels.length) {
+            return [{
+              Territorio: territory.name,
+              Segmento: segment.name,
+              Producto: product.name,
+              Canal: '',
+            }];
+          }
+
+          return product.channels.map((channel) => ({
+            Territorio: territory.name,
+            Segmento: segment.name,
+            Producto: product.name,
+            Canal: channel.name,
+          }));
+        });
+      });
+    });
+
+    void exportSheetsToExcel('opsp_territory', [
+      {
+        name: 'Territorios',
+        rows,
+        widths: [28, 28, 28, 28],
+      },
+    ]);
+  }
 
   ngOnInit(): void {
     this.loadTerritories();
@@ -142,5 +207,8 @@ export class TerritoryComponent implements OnInit {
     }
   }
 }
+
+
+
 
 

@@ -1,1 +1,181 @@
-<p>rockefeller works!</p>
+<div class="w-full" [appPermissionEditLock]="23">
+  <section class="bg-[#F3F7FB] border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-6 md:px-10 py-8 text-center">
+      <h1 class="text-[32px] leading-tight font-extrabold text-[#0b2a45]">HABITOS DE ROCKEFELLER</h1>
+    </div>
+  </section>
+
+  <div class="max-w-7xl mx-auto px-6 md:px-10 py-8 space-y-6">
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 md:p-6">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p class="text-xs uppercase tracking-wider text-slate-500">Resumen del formato</p>
+          <p class="text-sm text-slate-700 mt-1">
+            {{ segmentCount }} segmentos, {{ habitCount }} habitos (4 por segmento)
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            *ngIf="!isSessionActive"
+            (click)="iniciarEncuesta()"
+            class="inline-flex items-center gap-2 bg-[#0b3b63] hover:bg-[#0d4674] text-white font-semibold px-4 py-2 rounded-lg transition">
+            Iniciar encuesta
+          </button>
+
+          <button
+            *ngIf="isSessionActive"
+            (click)="finalizarEncuesta()"
+            class="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold px-4 py-2 rounded-lg transition">
+            Finalizar sesion
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div class="xl:col-span-2 bg-white border border-slate-200 rounded-2xl shadow-sm p-4 md:p-6">
+        <div class="flex items-center justify-between gap-2 mb-4">
+          <h2 class="text-lg font-bold text-[#0b2a45]">Sesion activa</h2>
+          <span
+            class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold"
+            [ngClass]="isSessionActive ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'">
+            {{ isSessionActive ? 'Activa' : 'Sin iniciar' }}
+          </span>
+        </div>
+
+        <div *ngIf="!isSessionActive" class="border border-dashed border-slate-300 rounded-xl p-6 text-center text-slate-500">
+          Inicia una sesion para generar el QR y el enlace publico.
+        </div>
+
+        <div *ngIf="isSessionActive" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <p class="text-sm font-semibold text-slate-700 mb-2">Codigo QR</p>
+            <div class="border border-slate-200 rounded-xl p-3 bg-white">
+              <img
+                *ngIf="qrImageUrl"
+                [src]="qrImageUrl"
+                [alt]="'QR campaña ' + activeCampaignId"
+                class="w-full max-w-[320px] aspect-square object-contain mx-auto" />
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div *ngIf="campaignName">
+              <p class="text-xs uppercase tracking-wider text-slate-500">Campaña</p>
+              <p class="text-sm text-slate-700">{{ campaignName }}</p>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-500">Enlace publico</p>
+              <a [href]="sessionLink" target="_blank" class="text-sm text-[#0b3b63] break-all underline">
+                {{ sessionLink }}
+              </a>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-500">Inicio</p>
+              <p class="text-sm text-slate-700">{{ sessionStartedAt }}</p>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-wider text-slate-500">Actualizacion (cada 5s)</p>
+              <p class="text-sm text-slate-700">{{ lastRefreshAt }}</p>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                <p class="text-xs text-slate-500">Respuestas</p>
+                <p class="text-2xl font-bold text-[#0b2a45]">{{ responsesCount }}</p>
+              </div>
+              <div class="bg-slate-50 border border-slate-200 rounded-xl p-3">
+                <p class="text-xs text-slate-500">Promedio total</p>
+                <p class="text-2xl font-bold text-[#0b2a45]">{{ globalAverage }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="isSessionActive" class="mt-6 border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+          <div class="px-4 md:px-6 py-3 border-b border-slate-200 bg-[#08365A] text-white text-center">
+            <h3 class="text-base md:text-lg font-bold">Resultados de sesion en curso</h3>
+          </div>
+
+          <div class="bg-[#08365A] text-white text-sm md:text-base font-semibold px-4 md:px-6 py-3">
+            <div class="grid grid-cols-12 gap-3 items-center">
+              <div class="col-span-12 md:col-span-4">Segmento</div>
+              <div class="col-span-12 md:col-span-6">Detalle</div>
+              <div class="col-span-12 md:col-span-2 text-right">Promedio</div>
+            </div>
+          </div>
+
+          <div class="divide-y divide-slate-100">
+            <div *ngFor="let segment of segments; let i = index" class="px-4 md:px-6 py-4 bg-white">
+              <div class="grid grid-cols-12 gap-3 items-center">
+                <div class="col-span-12 md:col-span-4">
+                  <p class="font-bold text-[#0b2a45]">Segmento {{ segment.id }}</p>
+                  <p class="text-xs text-slate-500 mt-1" [title]="segment.name">{{ segment.name }}</p>
+                </div>
+                <div class="col-span-12 md:col-span-6">
+                  <div class="flex flex-wrap gap-2">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+                      4 habitos evaluados
+                    </span>
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-700">
+                      Escala 1 a 10
+                    </span>
+                  </div>
+                </div>
+                <div class="col-span-12 md:col-span-2">
+                  <div class="flex items-center justify-end gap-2">
+                    <div class="w-24 bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                      <div class="h-full bg-[#56B4DA]" [style.width.%]="segmentBar(segmentAverages[i])"></div>
+                    </div>
+                    <span class="text-sm font-bold text-[#0b2a45] w-10 text-right">{{ segmentAverages[i] }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 md:p-6">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-lg font-bold text-[#0b2a45]">Bitacora de sesiones</h2>
+        </div>
+
+        <div class="permission-ignore-edit space-y-2">
+          <label class="text-xs uppercase tracking-wider text-slate-500">Filtrar por fecha</label>
+          <div class="flex items-center gap-2">
+            <input
+              type="date"
+              [(ngModel)]="selectedLogDate"
+              (change)="filtrarBitacora()"
+              class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#56B4DA]" />
+            <button
+              *ngIf="selectedLogDate"
+              (click)="clearDateFilter()"
+              class="text-xs px-2 py-1 rounded bg-slate-200 hover:bg-slate-300 text-slate-700">
+              Limpiar
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-4 space-y-2 max-h-80 overflow-auto pr-1">
+          <div
+            *ngFor="let log of (selectedLogDate ? logsForSelectedDate : allLogs)"
+            class="border border-slate-200 rounded-xl p-3 bg-slate-50">
+            <p class="font-semibold text-[#0b2a45]">{{ log.displayLabel }}</p>
+            <p *ngIf="log.campaignName" class="text-xs text-slate-600 mt-1">{{ log.campaignName }}</p>
+            <p class="text-xs text-slate-600 mt-1">Respuestas: {{ log.responses }}</p>
+            <p class="text-xs text-slate-600">Promedio total: {{ log.globalAverage }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+

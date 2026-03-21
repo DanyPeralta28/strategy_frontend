@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -10,25 +10,66 @@ import {
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
-import { environment } from 'environments/environment';
+import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
+import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
 
 @Component({
   selector: 'app-fdt',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
   templateUrl: './fdt.component.html',
   styleUrl: './fdt.component.scss',
 })
 export class FdtComponent implements OnInit {
+  @ViewChild('pdfReportContent') pdfReportContent?: ElementRef<HTMLElement>;
   fdtForm!: FormGroup;
 
   // contexto: reemplaza según tu flujo real (ruta / sesión)
-  id_company: string = environment.defaultCompanyId;
+  id_company = getSessionCompanyId();
   existingFdtId: number | null = null;
   status = 1;
-  created_by = environment.defaultCreatedBy;
+  created_by = getSessionUserId();
 
   constructor(private fb: FormBuilder, public opspService: OpspService) { }
+
+  get canExportPdf(): boolean {
+    return Number(getSessionLevelUser()) === 2;
+  }
+
+  exportPdf(): void {
+    void exportElementToPdf(this.pdfReportContent?.nativeElement, 'opsp_fdt');
+  }
+
+  exportExcel(): void {
+    const trends = this.tendencias.controls.map((group, index) => ({
+      Numero: index + 1,
+      Tendencia: (group.get('trend')?.value || '').toString().trim(),
+      Impacto: (group.get('impact')?.value || '').toString().trim(),
+    }));
+
+    const strengths = this.fortalezas.controls.map((group, index) => ({
+      Numero: index + 1,
+      Fortaleza: (group.get('strength')?.value || '').toString().trim(),
+      Importancia: (group.get('importance')?.value || '').toString().trim(),
+    }));
+
+    const weaknesses = this.debilidades.controls.map((group, index) => ({
+      Numero: index + 1,
+      Debilidad: (group.get('weakness')?.value || '').toString().trim(),
+      Severidad: (group.get('severity')?.value || '').toString().trim(),
+    }));
+
+    void exportSheetsToExcel('opsp_fdt', [
+      { name: 'Tendencias', rows: trends, widths: [10, 52, 70] },
+      { name: 'Fortalezas', rows: strengths, widths: [10, 52, 24] },
+      { name: 'Debilidades', rows: weaknesses, widths: [10, 52, 24] },
+    ]);
+  }
 
   ngOnInit(): void {
     this.fdtForm = this.fb.group({
@@ -221,5 +262,8 @@ export class FdtComponent implements OnInit {
       });
   }
 }
+
+
+
 
 

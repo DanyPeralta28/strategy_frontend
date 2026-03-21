@@ -1,27 +1,58 @@
-# Fuse - Admin template and Starter project for Angular
+# Despliegue en S3
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli)
+Estas son las instrucciones para desplegar el frontend en un bucket S3.
 
-## Development server
+## Prerrequisitos
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
-
-## Code scaffolding
-
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- Node.js y npm instalados.
+- AWS CLI configurado con credenciales y región (`aws configure`).
+- Bucket S3 creado.
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Genera el build de producción (salida en `dist/fuse`):
 
-## Running unit tests
+```bash
+npm ci
+npm run build:prod
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Si necesitas QA (salida en `dist/qa`):
 
-## Running end-to-end tests
+```bash
+npm run build:qa
+```
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+## Configuración del bucket
 
-## Further help
+Habilita **Static website hosting** y configura:
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+- Index document: `index.html`
+- Error document: `index.html` (para rutas SPA)
+
+## Subida a S3
+
+# PROD:
+
+```bash
+aws s3 sync dist/fuse/browser s3://strategy-angular-prod --delete
+```
+
+# QA:
+
+```bash
+aws s3 sync dist/qa/browser s3://strategy-angular-qa --delete
+```
+
+## Cache recomendado (opcional)
+
+Si usas cache agresivo, actualiza `index.html` con no-cache y deja los assets con cache largo:
+
+# PROD:
+```bash
+aws s3 cp dist/fuse/browser/index.html s3://strategy-angular-prod/index.html --cache-control "no-cache, no-store, must-revalidate" --content-type "text/html"
+```
+# QA:
+```bash
+aws s3 cp dist/qa/browser/index.html s3://strategy-angular-qa/index.html --cache-control "no-cache, no-store, must-revalidate" --content-type "text/html"
+```

@@ -1,5 +1,5 @@
 <!-- CONTENEDOR GENERAL -->
-<div class="w-full">
+<div class="w-full" [appPermissionEditLock]="20">
   <!-- Hero / Encabezado -->
   <section class="bg-[#F3F7FB] border-b border-slate-200">
     <div class="max-w-7xl mx-auto px-6 md:px-10 py-8 text-center">
@@ -115,7 +115,7 @@
 
 <!-- Boton flotante de guardado -->
 <div class="fixed bottom-6 right-6 z-50">
-  <button (click)="guardarNuevos()"
+  <button (click)="guardarNuevos()" [appPermissionHideIfNoEdit]="20"
           class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-3 rounded-full shadow-lg transition">
     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
@@ -123,4 +123,9 @@
     Guardar FACE
   </button>
 </div>
+
+
+
+
+
 

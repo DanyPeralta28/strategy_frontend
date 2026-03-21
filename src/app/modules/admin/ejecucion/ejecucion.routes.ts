@@ -4,31 +4,44 @@ import { FaceComponent } from './formats/face/face.component';
 import { PaceComponent } from './formats/pace/pace.component';
 import { RockefellerComponent } from './formats/rockefeller/rockefeller.component';
 import { WwwComponent } from './formats/www/www.component';
+import { permissionGuard } from 'app/modules/admin/guards/permission.guard';
 
 export default [
     {
         path: '',
         pathMatch: 'full',
         component: FormatsComponent,
+        canActivate: [permissionGuard],
+        data: { permissionId: 19 },
     },
     {
         path: 'formats',
-        component: FormatsComponent
+        component: FormatsComponent,
+        canActivate: [permissionGuard],
+        data: { permissionId: 19 },
     },
     {
         path: 'formats/face',
-        component: FaceComponent
+        component: FaceComponent,
+        canActivate: [permissionGuard],
+        data: { permissionId: 20 },
     },
     {
         path: 'formats/pace',
-        component: PaceComponent
+        component: PaceComponent,
+        canActivate: [permissionGuard],
+        data: { permissionId: 21 },
     },
     {
         path: 'formats/rockefeller',
-        component: RockefellerComponent
+        component: RockefellerComponent,
+        canActivate: [permissionGuard],
+        data: { permissionId: 23 },
     },
     {
         path: 'formats/www',
-        component: WwwComponent
+        component: WwwComponent,
+        canActivate: [permissionGuard],
+        data: { permissionId: 22 },
     },
 ] as Routes;

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { CashService } from '../../../services/cash.service'; // ajusta la ruta
-import { environment } from 'environments/environment';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
 
 interface ValueArea {
   label: string;
@@ -16,16 +16,20 @@ interface Priority {
   improve: string;
 }
 
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
+
 @Component({
   selector: 'app-value',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
   templateUrl: './value.component.html',
   styleUrl: './value.component.scss'
 })
 export class ValueComponent implements OnInit {
   // contexto (ajusta según tu app)
-  id_company = environment.defaultCompanyId;
-  created_by = environment.defaultCreatedBy;
+  id_company = getSessionCompanyId();
+  created_by = getSessionUserId();
 
   areas: ValueArea[] = [
     { label: 'Contratos a Largo plazo', rating: null },
@@ -159,6 +163,9 @@ export class ValueComponent implements OnInit {
     }
   }
 }
+
+
+
 
 
 

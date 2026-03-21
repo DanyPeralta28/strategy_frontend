@@ -1,8 +1,40 @@
-<div class="max-w-7xl mx-auto p-6 sm:p-10 space-y-10">
-    <!-- Título -->
+<div #pdfContent class="opsp-format-page relative max-w-7xl mx-auto p-6 sm:p-10 space-y-10" [appPermissionEditLock]="4">
+    <div *ngIf="canExportPdf" class="print-hide absolute top-6 right-6 sm:top-10 sm:right-10 z-10 flex items-center gap-2">
+        <button type="button" (click)="exportExcel()"
+            class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
+            Excel
+        </button>
+        <button type="button" (click)="exportPdf()"
+            class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
+            PDF
+        </button>
+    </div>
+    <!-- Titulo -->
     <div class="text-center">
         <h2 class="text-3xl font-extrabold text-[#003660]">Cliente Central</h2>
         <p class="mt-1 text-sm text-gray-500">Describe a detalle el perfil de tu cliente ideal</p>
+    </div>
+
+    <!-- Controles slide -->
+    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+            <button type="button" (click)="prevSlide()" [disabled]="!canGoPrev"
+                class="w-9 h-9 rounded-full border border-gray-300 text-[#003660] disabled:opacity-40 disabled:cursor-not-allowed">
+                &#8249;
+            </button>
+            <span class="text-sm text-slate-600 min-w-[140px] text-center">
+                {{ totalSlides > 0 ? (currentSlideIndex + 1) : 0 }} / {{ totalSlides }}
+            </span>
+            <button type="button" (click)="nextSlide()" [disabled]="!canGoNext"
+                class="w-9 h-9 rounded-full border border-gray-300 text-[#003660] disabled:opacity-40 disabled:cursor-not-allowed">
+                &#8250;
+            </button>
+        </div>
+
+        <button type="button" (click)="addNewCentralClient()"
+            class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-4 rounded-xl shadow">
+            + Nuevo cliente central
+        </button>
     </div>
 
     <!-- Grid de preguntas -->
@@ -12,29 +44,64 @@
                 <label class="block text-sm font-semibold text-[#003660] mb-2">{{ campo.pregunta }}</label>
                 <textarea [(ngModel)]="campo.respuesta" rows="4"
                     class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#56B4DA]"
-                    placeholder="Escribe aquí..."></textarea>
+                    placeholder="Escribe aqui..."></textarea>
             </div>
         </ng-container>
     </div>
 
-    <!-- Sección: Resumen del Cliente Central -->
+    <!-- Seccion: Resumen del Cliente Central -->
     <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4 mt-10">
         <h3 class="text-lg font-semibold text-[#003660]">Resumen del Cliente Central <span
                 class="text-sm text-gray-500">(25 palabras)</span></h3>
 
         <div>
-            <label class="block text-sm font-medium text-[#003660] mb-1">Descripción</label>
+            <label class="block text-sm font-medium text-[#003660] mb-1">Descripcion</label>
             <textarea rows="4" [(ngModel)]="descripcionResumen"
                 class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#56B4DA]"
                 placeholder="Describe a tu cliente central en aproximadamente 25 palabras..."></textarea>
         </div>
     </div>
 
-    <!-- Botón Guardar -->
+    <!-- Boton Guardar -->
     <div class="text-right">
-        <button (click)="save()"
+        <button (click)="save()" [appPermissionHideIfNoEdit]="4"
             class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
             Guardar
         </button>
     </div>
 </div>
+
+<div #pdfReportContent class="w-[1100px] bg-white text-slate-900 p-10 space-y-8" style="position:absolute;left:-99999px;top:0;">
+    <div class="border-b border-slate-200 pb-4">
+        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">OPSP</p>
+        <h1 class="mt-2 text-3xl font-bold text-[#003660]">Cliente Central</h1>
+        <p class="mt-2 text-sm text-slate-600">Reporte consolidado de todos los perfiles de cliente central registrados.</p>
+    </div>
+
+    <section *ngFor="let record of getExportCentralClients(); let i = index" class="rounded-2xl border border-slate-200 p-6 space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Cliente Central {{ i + 1 }}</p>
+                <h2 class="mt-1 text-lg font-semibold text-[#003660]">Resumen</h2>
+            </div>
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">ID {{ record.id || 'Nuevo' }}</span>
+        </div>
+
+        <div class="rounded-xl bg-slate-50 p-4">
+            <p class="text-sm font-semibold text-slate-600">Descripcion resumen</p>
+            <p class="mt-2 whitespace-pre-wrap text-base leading-7 text-slate-700">{{ record.core_client_summary || ' ' }}</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div *ngFor="let campo of preguntas" class="rounded-xl border border-slate-200 p-4">
+                <p class="text-sm font-semibold text-[#003660]">{{ campo.pregunta }}</p>
+                <p class="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-700">{{ record[campo.key] || ' ' }}</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+
+
+

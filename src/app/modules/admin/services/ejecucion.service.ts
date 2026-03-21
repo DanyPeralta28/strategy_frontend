@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { getSessionEntityId } from 'app/core/auth/auth-session';
 import { firstValueFrom } from 'rxjs';
 import { environment } from 'environments/environment';
 
@@ -27,6 +28,11 @@ export class EjecucionService {
 
   constructor(private http: HttpClient) {}
 
+  private withEntityQuery(url: string): string {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}id_entity=${getSessionEntityId()}`;
+  }
+
   // ---------------- Face ----------------
   createFace(data: any): Promise<any> {
     return firstValueFrom(
@@ -35,9 +41,9 @@ export class EjecucionService {
   }
 
   getFaceVisible(params: {
-    id_company: string;
+    id_company: any;
     requester_user_id: string;
-    id_entity?: string;
+    id_entity?: any;
   }): Promise<any> {
     return firstValueFrom(
       this.http.get(`${this.baseUrl}${ApiRoutes.formatFaceVisible}`, {
@@ -72,9 +78,9 @@ export class EjecucionService {
   }
 
   getPaceVisible(params: {
-    id_company: string;
+    id_company: any;
     requester_user_id: string;
-    id_entity?: string;
+    id_entity?: any;
   }): Promise<any> {
     return firstValueFrom(
       this.http.get(`${this.baseUrl}${ApiRoutes.formatPace}`, { params })
@@ -152,10 +158,13 @@ export class EjecucionService {
     );
   }
 
-  getSurveyAnswersByCompany(idCompany: number | string): Promise<any> {
+  getSurveyAnswersByCompany(
+    idCompany: number | string,
+    idCampaign: number | string
+  ): Promise<any> {
     return firstValueFrom(
       this.http.get(
-        `${this.baseUrl}${ApiRoutes.surveyAnswers}?id_company=${idCompany}`
+        `${this.baseUrl}${ApiRoutes.surveyAnswers}?id_company=${idCompany}&id_campaign=${idCampaign}`
       )
     );
   }
@@ -173,10 +182,14 @@ export class EjecucionService {
     );
   }
 
-  getSurveyCampaignsByCompany(idCompany: number | string): Promise<any> {
+  getSurveyCampaignsByCompany(
+    idCompany: number | string,
+    idUser: string,
+    createdAt: string
+  ): Promise<any> {
     return firstValueFrom(
       this.http.get(
-        `${this.baseUrl}${ApiRoutes.surveyCampaign}?id_company=${idCompany}`
+        `${this.baseUrl}${ApiRoutes.surveyCampaign}?id_company=${idCompany}&id_user=${idUser}&created_at=${createdAt}`
       )
     );
   }
@@ -193,10 +206,14 @@ export class EjecucionService {
     );
   }
 
-  getActiveSurveyCampaignByUser(userId: number | string): Promise<any> {
+  getActiveSurveyCampaignByUser(
+    userId: number | string,
+    idCompany: number | string,
+    idEntity: number | string
+  ): Promise<any> {
     return firstValueFrom(
       this.http.get(
-        `${this.baseUrl}${ApiRoutes.surveyCampaignActiveByUser}?user_id=${userId}`
+        `${this.baseUrl}${ApiRoutes.surveyCampaignActiveByUser}?user_id=${userId}&id_company=${idCompany}&id_entity=${idEntity}`
       )
     );
   }

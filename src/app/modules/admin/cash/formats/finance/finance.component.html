@@ -1,4 +1,4 @@
-<div class="w-full max-w-7xl mx-auto p-6 sm:p-10 space-y-6">
+<div class="w-full max-w-7xl mx-auto p-6 sm:p-10 space-y-6" [appPermissionEditLock]="15">
     <!-- Encabezado -->
     <div class="text-center mb-10">
         <h2 class="text-3xl font-extrabold text-[#003660]">
@@ -92,9 +92,13 @@
     <!-- Botón para guardar todo el formato -->
     <!-- Botón Guardar -->
     <div class="text-right">
-        <button (click)="save()"
+        <button (click)="save()" [appPermissionHideIfNoEdit]="15"
             class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
             Guardar
         </button>
     </div>
 </div>
+
+
+
+

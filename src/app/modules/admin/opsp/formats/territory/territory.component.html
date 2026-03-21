@@ -1,4 +1,14 @@
-<div class="w-full max-w-7xl mx-auto p-6 sm:p-10 space-y-10">
+<div #pdfContent class="opsp-format-page relative w-full max-w-7xl mx-auto p-6 sm:p-10 space-y-10" [appPermissionEditLock]="2">
+    <div *ngIf="canExportPdf" class="print-hide absolute top-6 right-6 sm:top-10 sm:right-10 z-10 flex items-center gap-2">
+        <button type="button" (click)="exportExcel()"
+            class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
+            Excel
+        </button>
+        <button type="button" (click)="exportPdf()"
+            class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
+            PDF
+        </button>
+    </div>
     <!-- Título -->
     <div class="text-center">
         <h2 class="text-3xl font-extrabold text-[#003660]">Territorios</h2>
@@ -83,8 +93,72 @@
 
     <!-- Botón para guardar todo -->
     <div class="text-right">
-        <button (click)="saveAll()" class="mt-6 bg-[#003660] hover:bg-[#005f8c] text-white px-6 py-2 rounded-xl shadow">
+        <button (click)="saveAll()" [appPermissionHideIfNoEdit]="2" class="mt-6 bg-[#003660] hover:bg-[#005f8c] text-white px-6 py-2 rounded-xl shadow">
             Guardar todo
         </button>
     </div>
 </div>
+
+<div #pdfReportContent class="w-[1100px] bg-white text-slate-900 p-10 space-y-8" style="position:absolute;left:-99999px;top:0;">
+    <div class="border-b border-slate-200 pb-4">
+        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">OPSP</p>
+        <h1 class="mt-2 text-3xl font-bold text-[#003660]">Territorios</h1>
+        <p class="mt-2 text-sm text-slate-600">Estructura geografica con segmentos, productos y canales de venta.</p>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 overflow-hidden">
+        <table class="min-w-full text-sm">
+            <thead class="bg-slate-100 text-slate-700">
+                <tr>
+                    <th class="px-4 py-3 text-left font-semibold">Territorio</th>
+                    <th class="px-4 py-3 text-left font-semibold">Segmento</th>
+                    <th class="px-4 py-3 text-left font-semibold">Producto</th>
+                    <th class="px-4 py-3 text-left font-semibold">Canal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let territory of territories">
+                    <ng-container *ngIf="!territory.segments.length">
+                        <tr class="border-t border-slate-200">
+                            <td class="px-4 py-3 font-medium text-slate-800">{{ territory.name || ' ' }}</td>
+                            <td class="px-4 py-3"></td>
+                            <td class="px-4 py-3"></td>
+                            <td class="px-4 py-3"></td>
+                        </tr>
+                    </ng-container>
+                    <ng-container *ngFor="let segment of territory.segments">
+                        <ng-container *ngIf="!segment.products.length">
+                            <tr class="border-t border-slate-200">
+                                <td class="px-4 py-3 font-medium text-slate-800">{{ territory.name || ' ' }}</td>
+                                <td class="px-4 py-3">{{ segment.name || ' ' }}</td>
+                                <td class="px-4 py-3"></td>
+                                <td class="px-4 py-3"></td>
+                            </tr>
+                        </ng-container>
+                        <ng-container *ngFor="let product of segment.products">
+                            <ng-container *ngIf="!product.channels.length">
+                                <tr class="border-t border-slate-200">
+                                    <td class="px-4 py-3 font-medium text-slate-800">{{ territory.name || ' ' }}</td>
+                                    <td class="px-4 py-3">{{ segment.name || ' ' }}</td>
+                                    <td class="px-4 py-3">{{ product.name || ' ' }}</td>
+                                    <td class="px-4 py-3"></td>
+                                </tr>
+                            </ng-container>
+                            <tr *ngFor="let channel of product.channels" class="border-t border-slate-200">
+                                <td class="px-4 py-3 font-medium text-slate-800">{{ territory.name || ' ' }}</td>
+                                <td class="px-4 py-3">{{ segment.name || ' ' }}</td>
+                                <td class="px-4 py-3">{{ product.name || ' ' }}</td>
+                                <td class="px-4 py-3">{{ channel.name || ' ' }}</td>
+                            </tr>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+

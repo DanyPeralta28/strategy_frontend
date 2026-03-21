@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
-import { environment } from 'environments/environment';
+import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
+import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
 
 interface CoreValueItem {
   id?: number;
@@ -15,22 +17,53 @@ interface CoreValueItem {
   // metadata que vino originalmente (para snapshot)
 }
 
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
+
 @Component({
   selector: 'app-corevalues',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
   templateUrl: './corevalues.component.html',
   styleUrl: './corevalues.component.scss'
 })
 export class CorevaluesComponent implements OnInit {
+  @ViewChild('pdfReportContent') pdfReportContent?: ElementRef<HTMLElement>;
   coreValues: CoreValueItem[] = [];
   originalCoreValues: CoreValueItem[] = [];
 
   // contexto fijo por ahora; puedes inyectar / obtener de ruta
-  id_company: string = environment.defaultCompanyId;
-  created_by: string = environment.defaultCreatedBy;
+  id_company = getSessionCompanyId();
+  created_by = getSessionUserId();
 
   constructor(public opspService: OpspService) { }
+
+  get canExportPdf(): boolean {
+    return Number(getSessionLevelUser()) === 2;
+  }
+
+  exportPdf(): void {
+    void exportElementToPdf(this.pdfReportContent?.nativeElement, 'opsp_corevalues');
+  }
+
+  exportExcel(): void {
+    const rows = this.coreValues
+      .map((item, index) => ({
+        Numero: index + 1,
+        ValorCentral: item.value_title.trim(),
+        DescripcionCorta: item.short_description.trim(),
+        DescripcionLarga: item.long_description.trim(),
+      }));
+
+    void exportSheetsToExcel('opsp_corevalues', [
+      {
+        name: 'Valores Centrales',
+        rows,
+        widths: [10, 32, 50, 80],
+      },
+    ]);
+  }
 
   ngOnInit(): void {
     this.loadCoreValues();
@@ -208,7 +241,7 @@ export class CorevaluesComponent implements OnInit {
       Swal.fire({
         icon,
         title,
-        text: `${successes} éxitos, ${failures} errores.`.trim(),
+        text: 'Los valores han sido guardados con exito.',
         confirmButtonColor: '#003660'
       });
 
@@ -219,6 +252,10 @@ export class CorevaluesComponent implements OnInit {
     });
   }
 }
+
+
+
+
 
 
 

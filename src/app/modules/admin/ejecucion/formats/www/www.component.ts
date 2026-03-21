@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
-import { environment } from 'environments/environment';
 import { EjecucionService } from '../../../services/ejecucion.service';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
 
 type EstadoWWW = 'En proceso' | 'Ejecutado' | 'Atrasado' | 'Pendiente' | '';
 
@@ -17,9 +17,13 @@ interface WWWRow {
   nuevoCuando: string;  // ISO yyyy-mm-dd
 }
 
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
+
 @Component({
   selector: 'app-www',
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
   templateUrl: './www.component.html',
   styleUrl: './www.component.scss'
 })
@@ -33,10 +37,10 @@ export class WwwComponent implements OnInit {
     { label: 'Equipo que lidero', value: 'led' },
   ];
   targetSeleccionado: 'my' | 'led' = 'my';
-  readonly id_company = environment.defaultCompanyId;
-  readonly id_entity = environment.defaultEntityId;
-  readonly created_by = environment.defaultCreatedBy;
-  readonly requester_user_id = String(environment.defaultCreatedBy);
+  readonly id_company = getSessionCompanyId();
+  readonly id_entity = getSessionEntityId();
+  readonly created_by = getSessionUserId();
+  readonly requester_user_id = String(getSessionUserId());
 
   toggleEstadoFiltro(estado: EstadoWWW) {
     if (this.estadosSeleccionados.includes(estado)) {
@@ -83,12 +87,12 @@ export class WwwComponent implements OnInit {
 
   private buildWwwParams() {
     const params: {
-      id_company: string;
+      id_company: any;
       requester_user_id: string;
       preset?: string;
       statuses?: string;
       team_scope?: string;
-      id_entity?: string;
+      id_entity?: any;
     } = {
       id_company: this.id_company,
       requester_user_id: this.requester_user_id,
@@ -102,7 +106,7 @@ export class WwwComponent implements OnInit {
       params.preset = 'meeting';
     }
 
-    if (this.estadosSeleccionados.length) {
+    if (!this.modoReunion && this.estadosSeleccionados.length) {
       params.statuses = this.estadosSeleccionados.join(',');
     }
 
@@ -114,6 +118,9 @@ export class WwwComponent implements OnInit {
   }
 
   onModoChange() {
+    if (this.modoReunion) {
+      this.showEstadosDropdown = false;
+    }
     this.loadWww();
   }
 
@@ -192,4 +199,6 @@ export class WwwComponent implements OnInit {
     return `${this.estadoBadgeClass(estado)} text-white border-transparent`;
   }
 }
+
+
 

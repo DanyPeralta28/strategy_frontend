@@ -1,6 +1,7 @@
 // followup.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { getSessionEntityId } from 'app/core/auth/auth-session';
 import { firstValueFrom } from 'rxjs';
 import { environment } from 'environments/environment';
 
@@ -10,6 +11,11 @@ export class FollowupService {
 
   constructor(private http: HttpClient) {}
 
+  private withEntityQuery(url: string): string {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}id_entity=${getSessionEntityId()}`;
+  }
+
   // ----------- Priority Weeks -----------
   createPriorityWeek(data: any): Promise<any> {
     return firstValueFrom(this.http.post(`${this.baseUrl}${ApiRoutes.priorityWeeks}`, data));
@@ -17,8 +23,11 @@ export class FollowupService {
   getAllPriorityWeeks(): Promise<any> {
     return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.priorityWeeks}`));
   }
-  getPriorityWeekById(id: number | string): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.priorityWeeks}?id_company=${id}`));
+  getPriorityWeekById(id: number | string, id_user: number | string): Promise<any> {
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.priorityWeeks}?id_company=${id}&id_user=${id_user}`)));
+  }
+  getPriorityWeekByGroupView(id: number | string, id_user: number | string): Promise<any> {
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.priorityWeeks}/group-view?id_company=${id}&id_user=${id_user}`)));
   }
   updatePriorityWeek(id: number | string, data: any): Promise<any> {
     return firstValueFrom(this.http.put(`${this.baseUrl}${ApiRoutes.priorityWeeks}/${id}`, data));
@@ -30,11 +39,38 @@ export class FollowupService {
     idCompany: number | string,
     idEntity: number | string,
     team: string,
+    week: number | string,
+    createdBy: number | string
+  ): Promise<any> {
+    return firstValueFrom(
+      this.http.get(
+        `${this.baseUrl}${ApiRoutes.priorityWeeks}/group/${idCompany}/${idEntity}/${team}/${week}/${createdBy}`
+      )
+    );
+  }
+
+  getPriorityWeeksFilteredAdmin(
+    idCompany: number | string,
+    idEntity: number | string,
+    team: string,
     week: number | string
   ): Promise<any> {
     return firstValueFrom(
       this.http.get(
-        `${this.baseUrl}${ApiRoutes.priorityWeeks}/group/${idCompany}/${idEntity}/${team}/${week}`
+        `${this.baseUrl}${ApiRoutes.priorityWeeks}/group-admin/${idCompany}/${idEntity}/${team}/${week}`
+      )
+    );
+  }
+
+  getPriorityWeeksMultiUsers(
+    idCompany: number | string,
+    idEntity: number | string,
+    userIds: Array<number | string>
+  ): Promise<any> {
+    const ids = userIds.map(x => String(x)).filter(Boolean).join(',');
+    return firstValueFrom(
+      this.http.get(
+        `${this.baseUrl}${ApiRoutes.priorityWeeksMultiUsers}?id_company=${idCompany}&id_entity=${idEntity}&id_users=${encodeURIComponent(ids)}`
       )
     );
   }
@@ -46,8 +82,8 @@ export class FollowupService {
   getAllStartWeeks(): Promise<any> {
     return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.startWeeks}`));
   }
-  getStartWeekById(id: number | string): Promise<any> {
-    return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.startWeeks}?id_company=${id}`));
+  getStartWeekById(id: number | string, id_entity: number | string, team: string): Promise<any> {
+    return firstValueFrom(this.http.get(this.withEntityQuery(`${this.baseUrl}${ApiRoutes.startWeeks}?id_company=${id}&team=${team}`)));
   }
   updateStartWeek(id: number | string, data: any): Promise<any> {
     return firstValueFrom(this.http.put(`${this.baseUrl}${ApiRoutes.startWeeks}/${id}`, data));
@@ -87,6 +123,11 @@ export class FollowupService {
       this.http.get(`${this.baseUrl}${ApiRoutes.teamViewerTeamMembersByTeam}/${teamId}/${entityId}/${companyId}`)
     );
   }
+  getTeamMembersByTeamDashboard(teamId: number | string, entityId: number | string, companyId: number | string): Promise<any> {
+    return firstValueFrom(
+      this.http.get(`${this.baseUrl}${ApiRoutes.teamViewerTeamMembersByTeamDashboard}/${teamId}/${entityId}/${companyId}`)
+    );
+  }
   getUserById(userId: number | string): Promise<any> {
     return firstValueFrom(this.http.get(`${this.baseUrl}${ApiRoutes.teamViewerUser}/${userId}`));
   }
@@ -111,11 +152,14 @@ export class FollowupService {
 
 export const ApiRoutes = {
   priorityWeeks: '/api/priority-weeks',
+  priorityWeeksMultiUsers: '/api/priority-weeks/multi-users',
   startWeeks: '/api/start-weeks',
   groupControl: '/api/group-control',
   teamViewerEntities: '/api/team-viewer/entities',
   teamViewerTeamMembersByEntity: '/api/team-viewer/team-members-by-entity',
   teamViewerTeamMembersByTeam: '/api/team-viewer/team-members-by-team',
+  teamViewerTeamMembersByTeamDashboard: '/api/team-viewer/team-members-by-team-dashboard',
   teamViewerUser: '/api/team-viewer/user',
   consistentActions: '/api/consistent-actions',
 };
+

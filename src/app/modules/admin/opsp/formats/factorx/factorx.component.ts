@@ -1,21 +1,28 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service'; // ajusta la ruta si es diferente
-import { environment } from 'environments/environment';
+import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
+import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
 
 @Component({
   selector: 'app-factorx',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
   templateUrl: './factorx.component.html',
   styleUrl: './factorx.component.scss',
 })
 export class FactorxComponent implements OnInit {
+  @ViewChild('pdfReportContent') pdfReportContent?: ElementRef<HTMLElement>;
   // Ajusta esto si obtienes la compañía dinámicamente
-  id_company = environment.defaultCompanyId;
+  id_company = getSessionCompanyId();
   factorXId: number | null = null;
 
   stepGrid: any[] = [
@@ -40,8 +47,48 @@ export class FactorxComponent implements OnInit {
   ferias: Array<{ descripcion: string; lider: string; fecha: string }> = [
     { descripcion: '', lider: '', fecha: '' }
   ];
+  minFutureDate = this.getTomorrowIso();
 
   constructor(private opspService: OpspService) { }
+
+  get canExportPdf(): boolean {
+    return Number(getSessionLevelUser()) === 2;
+  }
+
+  exportPdf(): void {
+    void exportElementToPdf(this.pdfReportContent?.nativeElement, 'opsp_factorx');
+  }
+
+  exportExcel(): void {
+    const processRows = this.stepGrid
+      .filter(step => step.type === 'step')
+      .map(step => ({
+        Paso: step.step_order,
+        Descripcion: (step.step_label || '').toString().trim(),
+        TieneIneficiencia: step.has_inefficiency ? 'Si' : 'No',
+        Simbolo: (step.symbol || '').toString().trim(),
+      }));
+
+    const bottleneckRows = this.bottlenecks.map((item, index) => ({
+      Numero: index + 1,
+      Descripcion: item.descripcion.trim(),
+      Lider: item.lider.trim(),
+      Fecha: item.fecha,
+    }));
+
+    const tradeRows = this.ferias.map((item, index) => ({
+      Numero: index + 1,
+      Descripcion: item.descripcion.trim(),
+      Lider: item.lider.trim(),
+      Fecha: item.fecha,
+    }));
+
+    void exportSheetsToExcel('opsp_factorx', [
+      { name: 'Proceso', rows: processRows, widths: [10, 52, 16, 16] },
+      { name: 'Cuellos de Botella', rows: bottleneckRows, widths: [10, 60, 28, 18] },
+      { name: 'Ferias', rows: tradeRows, widths: [10, 60, 28, 18] },
+    ]);
+  }
 
   ngOnInit(): void {
     this.loadFactorX();
@@ -119,7 +166,38 @@ export class FactorxComponent implements OnInit {
     }
   }
 
+  private getTomorrowIso(): string {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private isStrictFutureDate(isoDate?: string): boolean {
+    if (!isoDate) return true;
+    const selected = new Date(`${isoDate}T00:00:00`);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return selected.getTime() > today.getTime();
+  }
+
   save(): void {
+    const hasInvalidBottleneckDate = this.bottlenecks.some(
+      b => !!b.fecha && !this.isStrictFutureDate(b.fecha)
+    );
+
+    if (hasInvalidBottleneckDate) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Fecha no permitida',
+        text: 'En cuellos de botella la fecha debe ser mayor a la fecha actual.',
+        confirmButtonColor: '#003660'
+      });
+      return;
+    }
+
     const process_flow_steps = this.stepGrid
       .filter(step => step.type === 'step')
       .map(step => ({
@@ -149,7 +227,7 @@ export class FactorxComponent implements OnInit {
       process_flow_steps,
       bottleneck_list,
       trade_action_list,
-      created_by: environment.defaultCreatedBy
+      created_by: getSessionUserId()
     };
 
     if (!this.factorXId) {
@@ -185,5 +263,8 @@ export class FactorxComponent implements OnInit {
       });
   }
 }
+
+
+
 
 

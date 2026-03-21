@@ -1,26 +1,56 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service'
-import { environment } from 'environments/environment';
+import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
+import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
 
 @Component({
   selector: 'app-bhag',
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
   templateUrl: './bhag.component.html',
   styleUrl: './bhag.component.scss'
 })
 export class BhagComponent {
+  @ViewChild('pdfReportContent') pdfReportContent?: ElementRef<HTMLElement>;
   form = {
     description: '',
     id: '',
-    created_by: environment.defaultCreatedBy
+    created_by: getSessionUserId()
   };
-  id_company: string = environment.defaultCompanyId;
+  id_company = getSessionCompanyId();
 
   constructor(public opspService: OpspService) { }
+
+  get canExportPdf(): boolean {
+    return Number(getSessionLevelUser()) === 2;
+  }
+
+  exportPdf(): void {
+    void exportElementToPdf(this.pdfReportContent?.nativeElement, 'opsp_bhag');
+  }
+
+  exportExcel(): void {
+    void exportSheetsToExcel('opsp_bhag', [
+      {
+        name: 'BHAG',
+        rows: [
+          {
+            Campo: 'BHAG',
+            Valor: this.form.description.trim(),
+          },
+        ],
+        widths: [24, 90],
+      },
+    ]);
+  }
 
   ngOnInit() {
     this.loadBhag();
@@ -87,4 +117,7 @@ export class BhagComponent {
       });
   }
 }
+
+
+
 

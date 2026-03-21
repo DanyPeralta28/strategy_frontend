@@ -1,28 +1,56 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
-import { environment } from 'environments/environment';
+import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
+import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
 
 @Component({
   selector: 'app-culture',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
   templateUrl: './culture.component.html',
   styleUrl: './culture.component.scss'
 })
 export class CultureComponent implements OnInit {
+  @ViewChild('pdfReportContent') pdfReportContent?: ElementRef<HTMLElement>;
   form = {
     nombre: '',
     descripcion: '',
   };
 
   // contexto / constantes (ajústalas si vienen dinámicas)
-  id_company: string = environment.defaultCompanyId;
-  created_by: string = environment.defaultCreatedBy;
+  id_company = getSessionCompanyId();
+  created_by = getSessionUserId();
 
   cultureId?: number;
+
+  get canExportPdf(): boolean {
+    return Number(getSessionLevelUser()) === 2;
+  }
+
+  exportPdf(): void {
+    void exportElementToPdf(this.pdfReportContent?.nativeElement, 'opsp_culture');
+  }
+
+  exportExcel(): void {
+    void exportSheetsToExcel('opsp_culture', [
+      {
+        name: 'Cultura',
+        rows: [
+          { Campo: 'Nombre', Valor: this.form.nombre.trim() },
+          { Campo: 'Descripcion', Valor: this.form.descripcion.trim() },
+        ],
+        widths: [24, 90],
+      },
+    ]);
+  }
   private originalSnapshot = {
     nombre: '',
     descripcion: ''
@@ -123,6 +151,9 @@ export class CultureComponent implements OnInit {
     }
   }
 }
+
+
+
 
 
 

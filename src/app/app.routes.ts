@@ -61,6 +61,7 @@ export const appRoutes: Route[] = [
         },
         children: [
             { path: 'home', loadChildren: () => import('app/modules/landing/home/home.routes') },
+            { path: 'encuesta/:hash', loadChildren: () => import('app/modules/public/encuesta-rockefeller/encuesta-rockefeller.routes') },
         ]
     },
 
@@ -78,6 +79,7 @@ export const appRoutes: Route[] = [
             { path: 'followup', loadChildren: () => import('app/modules/admin/followup/followup.routes') },
             { path: 'cash', loadChildren: () => import('app/modules/admin/cash/cash.routes') },
             { path: 'ejecucion', loadChildren: () => import('app/modules/admin/ejecucion/ejecucion.routes') },
+            { path: 'configuracion', loadChildren: () => import('app/modules/admin/configuracion/configuracion.routes') },
         ]
     }
 ];

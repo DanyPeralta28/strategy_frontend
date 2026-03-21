@@ -1,17 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
-import { environment } from 'environments/environment';
+import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
+import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
 
 @Component({
   selector: 'app-balancekpis',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
   templateUrl: './balancekpis.component.html',
   styleUrl: './balancekpis.component.scss',
 })
 export class BalancekpisComponent implements OnInit {
+  @ViewChild('pdfReportContent') pdfReportContent?: ElementRef<HTMLElement>;
   categorias = [
     { key: 'empleados', label: 'Empleados' },
     { key: 'clientes', label: 'Clientes' },
@@ -21,6 +28,49 @@ export class BalancekpisComponent implements OnInit {
     { key: 'administracion', label: 'Administración' },
   ];
   fechaCumplimiento: string = '';
+  minTodayDate = this.getTodayIso();
+
+  get canExportPdf(): boolean {
+    return Number(getSessionLevelUser()) === 2;
+  }
+
+  exportPdf(): void {
+    void exportElementToPdf(this.pdfReportContent?.nativeElement, 'opsp_balancekpis');
+  }
+
+  exportExcel(): void {
+    const rows = this.categorias.flatMap((categoria) =>
+      (this.kpisBalance[categoria.key] || []).map((item: any, index: number) => ({
+        Categoria: categoria.label,
+        Numero: index + 1,
+        KPI: (item.kpi || '').toString().trim(),
+        Resultado: (item.resultado || '').toString().trim(),
+        Color: this.getColorLabel(item.color),
+        FechaCumplimiento: this.fechaCumplimiento,
+      }))
+    );
+
+    void exportSheetsToExcel('opsp_balancekpis', [
+      {
+        name: 'Balance KPIs',
+        rows,
+        widths: [24, 10, 48, 20, 18, 18],
+      },
+    ]);
+  }
+
+  private getColorLabel(color: string): string {
+    switch (color) {
+      case 'dark-green':
+        return 'Super Verde';
+      case 'light-green':
+        return 'Verde';
+      case 'red':
+        return 'Rojo';
+      default:
+        return '';
+    }
+  }
 
   kpisBalance: any = {
     empleados: [this.createKpi()],
@@ -32,14 +82,22 @@ export class BalancekpisComponent implements OnInit {
   };
 
   // contexto
-  id_company: string = environment.defaultCompanyId; // reemplaza según flujo real
+  id_company = getSessionCompanyId(); // reemplaza según flujo real
   existingKpiBalanceId: number | null = null;
-  created_by: string = environment.defaultCreatedBy;
+  created_by = getSessionUserId();
 
   constructor(public opspService: OpspService) {}
 
   ngOnInit(): void {
     this.loadKpisBalance();
+  }
+
+  private getTodayIso(): string {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
   }
 
   createKpi() {
@@ -57,6 +115,19 @@ export class BalancekpisComponent implements OnInit {
   eliminarKPI(key: string, index: number): void {
     if (this.kpisBalance[key].length > 1) {
       this.kpisBalance[key].splice(index, 1);
+    }
+  }
+
+  getColorSelectClass(color: string): string {
+    switch (color) {
+      case 'dark-green':
+        return 'bg-[#006600] text-white border-[#006600]';
+      case 'light-green':
+        return 'bg-[#66CC66] text-slate-900 border-[#66CC66]';
+      case 'red':
+        return 'bg-[#CC0000] text-white border-[#CC0000]';
+      default:
+        return 'bg-white text-slate-700 border-gray-300';
     }
   }
 
@@ -82,14 +153,13 @@ export class BalancekpisComponent implements OnInit {
   private apiToUiColor: Record<string, string> = {
     'dark-green': 'dark-green', // ya usamos directamente los valores API en UI
     'light-green': 'light-green',
-    yellow: 'yellow',
+    yellow: 'red', // compatibilidad con datos antiguos
     red: 'red',
   };
 
   private uiToApiColor: Record<string, string> = {
     'dark-green': 'dark-green',
     'light-green': 'light-green',
-    yellow: 'yellow',
     red: 'red',
   };
 
@@ -180,6 +250,16 @@ export class BalancekpisComponent implements OnInit {
       return;
     }
 
+    if (this.fechaCumplimiento < this.minTodayDate) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Fecha no permitida',
+        text: 'La fecha de cumplimiento no puede ser anterior a la fecha actual.',
+        confirmButtonColor: '#003660',
+      });
+      return;
+    }
+
     const isCreate = !this.existingKpiBalanceId;
     const payload = this.buildPayload(isCreate);
 
@@ -218,6 +298,9 @@ export class BalancekpisComponent implements OnInit {
       });
   }
 }
+
+
+
 
 
 

@@ -14,23 +14,23 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 type: 'basic',
                 icon: 'heroicons_outline:presentation-chart-line',
                 link: '/opsp',
-                exactMatch: true
+                exactMatch: true,
             },
             {
                 id: 'opsp.formatos',
                 title: 'Formatos',
                 type: 'basic',
                 icon: 'heroicons_outline:document-text',
-                link: '/opsp/formats'
-            }
-        ]
+                link: '/opsp/formats',
+            },
+        ],
     },
     {
         id: 'followup',
         title: 'Follow up',
         type: 'basic',
         icon: 'heroicons_outline:arrow-path',
-        link: '/followup'
+        link: '/followup',
     },
     {
         id: 'cash',
@@ -43,26 +43,56 @@ export const defaultNavigation: FuseNavigationItem[] = [
                 title: 'Formatos',
                 type: 'basic',
                 icon: 'heroicons_outline:document-text',
-                link: '/cash/formats'
-            }
-        ]
+                link: '/cash/formats',
+            },
+        ],
     },
-        {
+    {
         id: 'ejecucion',
-        title: 'Ejecución',
+        title: 'Ejecucion',
         type: 'collapsable',
         icon: 'heroicons_outline:play-circle',
         children: [
             {
-                id: 'cash.formatos',
+                id: 'ejecucion.formatos',
                 title: 'Formatos',
                 type: 'basic',
                 icon: 'heroicons_outline:document-text',
-                link: '/ejecucion/formats'
-            }
-        ]
-    }
+                link: '/ejecucion/formats',
+            },
+        ],
+    },
+    {
+        id: 'configuracion',
+        title: 'Configuracion',
+        type: 'collapsable',
+        icon: 'heroicons_outline:cog-6-tooth',
+        children: [
+            {
+                id: 'configuracion.usuarios',
+                title: 'Usuarios',
+                type: 'basic',
+                icon: 'heroicons_outline:users',
+                link: '/configuracion/usuarios',
+            },
+            {
+                id: 'configuracion.permisos',
+                title: 'Permisos',
+                type: 'basic',
+                icon: 'heroicons_outline:key',
+                link: '/configuracion/permisos',
+            },
+        ],
+    },
+    {
+        id: 'signout',
+        title: 'Cerrar sesion',
+        type: 'basic',
+        icon: 'heroicons_outline:arrow-left-on-rectangle',
+        link: '/sign-out',
+    },
 ];
+
 export const compactNavigation: FuseNavigationItem[] = [
     {
         id: 'opsp',
@@ -75,23 +105,23 @@ export const compactNavigation: FuseNavigationItem[] = [
                 title: 'Dashboard',
                 type: 'basic',
                 icon: 'heroicons_outline:presentation-chart-line',
-                link: '/opsp'
+                link: '/opsp',
             },
             {
                 id: 'opsp.formatos',
                 title: 'Formatos',
                 type: 'basic',
                 icon: 'heroicons_outline:document-text',
-                link: '/opsp/formats'
-            }
-        ]
+                link: '/opsp/formats',
+            },
+        ],
     },
     {
         id: 'followup',
         title: 'Follow up',
         type: 'basic',
         icon: 'heroicons_outline:arrow-path',
-        link: '/followup'
+        link: '/followup',
     },
     {
         id: 'cash',
@@ -104,18 +134,48 @@ export const compactNavigation: FuseNavigationItem[] = [
                 title: 'Formatos',
                 type: 'basic',
                 icon: 'heroicons_outline:document-text',
-                link: '/cash/formats'
-            }
-        ]
+                link: '/cash/formats',
+            },
+        ],
     },
     {
         id: 'ejecucion',
-        title: 'Ejecución',
+        title: 'Ejecucion',
         type: 'basic',
         icon: 'heroicons_outline:play-circle',
-        link: '/ejecucion'
+        link: '/ejecucion',
+    },
+    {
+        id: 'configuracion',
+        title: 'Configuracion',
+        type: 'collapsable',
+        icon: 'heroicons_outline:cog-6-tooth',
+        children: [
+            {
+                id: 'configuracion.usuarios',
+                title: 'Usuarios',
+                type: 'basic',
+                icon: 'heroicons_outline:users',
+                link: '/configuracion/usuarios',
+            },
+            {
+                id: 'configuracion.permisos',
+                title: 'Permisos',
+                type: 'basic',
+                icon: 'heroicons_outline:key',
+                link: '/configuracion/permisos',
+            },
+        ],
+    },
+    {
+        id: 'signout',
+        title: 'Cerrar sesion',
+        type: 'basic',
+        icon: 'heroicons_outline:arrow-left-on-rectangle',
+        link: '/sign-out',
     },
 ];
+
 export const futuristicNavigation: FuseNavigationItem[] = [
     {
         id: 'opsp',
@@ -128,23 +188,23 @@ export const futuristicNavigation: FuseNavigationItem[] = [
                 title: 'Dashboard',
                 type: 'basic',
                 icon: 'heroicons_outline:presentation-chart-line',
-                link: '/opsp'
+                link: '/opsp',
             },
             {
                 id: 'opsp.formatos',
                 title: 'Formatos',
                 type: 'basic',
                 icon: 'heroicons_outline:document-text',
-                link: '/opsp/formats'
-            }
-        ]
+                link: '/opsp/formats',
+            },
+        ],
     },
     {
         id: 'followup',
         title: 'Follow up',
         type: 'basic',
         icon: 'heroicons_outline:arrow-path',
-        link: '/followup'
+        link: '/followup',
     },
     {
         id: 'cash',
@@ -157,18 +217,48 @@ export const futuristicNavigation: FuseNavigationItem[] = [
                 title: 'Formatos',
                 type: 'basic',
                 icon: 'heroicons_outline:document-text',
-                link: '/cash/formats'
-            }
-        ]
+                link: '/cash/formats',
+            },
+        ],
     },
     {
         id: 'ejecucion',
-        title: 'Ejecución',
+        title: 'Ejecucion',
         type: 'basic',
         icon: 'heroicons_outline:play-circle',
-        link: '/ejecucion'
+        link: '/ejecucion',
+    },
+    {
+        id: 'configuracion',
+        title: 'Configuracion',
+        type: 'collapsable',
+        icon: 'heroicons_outline:cog-6-tooth',
+        children: [
+            {
+                id: 'configuracion.usuarios',
+                title: 'Usuarios',
+                type: 'basic',
+                icon: 'heroicons_outline:users',
+                link: '/configuracion/usuarios',
+            },
+            {
+                id: 'configuracion.permisos',
+                title: 'Permisos',
+                type: 'basic',
+                icon: 'heroicons_outline:key',
+                link: '/configuracion/permisos',
+            },
+        ],
+    },
+    {
+        id: 'signout',
+        title: 'Cerrar sesion',
+        type: 'basic',
+        icon: 'heroicons_outline:arrow-left-on-rectangle',
+        link: '/sign-out',
     },
 ];
+
 export const horizontalNavigation: FuseNavigationItem[] = [
     {
         id: 'opsp',
@@ -181,36 +271,65 @@ export const horizontalNavigation: FuseNavigationItem[] = [
                 title: 'Dashboard',
                 type: 'basic',
                 icon: 'heroicons_outline:presentation-chart-line',
-                link: '/opsp'
+                link: '/opsp',
             },
             {
                 id: 'opsp.formatos',
                 title: 'Formatos',
                 type: 'basic',
                 icon: 'heroicons_outline:document-text',
-                link: '/opsp/formats'
-            }
-        ]
+                link: '/opsp/formats',
+            },
+        ],
     },
     {
         id: 'followup',
         title: 'Follow up',
         type: 'basic',
         icon: 'heroicons_outline:arrow-path',
-        link: '/followup'
+        link: '/followup',
     },
     {
         id: 'cash',
         title: 'Cash',
         type: 'basic',
         icon: 'heroicons_outline:banknotes',
-        link: '/cash'
+        link: '/cash',
     },
     {
         id: 'ejecucion',
-        title: 'Ejecución',
+        title: 'Ejecucion',
         type: 'basic',
         icon: 'heroicons_outline:play-circle',
-        link: '/ejecucion'
+        link: '/ejecucion',
+    },
+    {
+        id: 'configuracion',
+        title: 'Configuracion',
+        type: 'collapsable',
+        icon: 'heroicons_outline:cog-6-tooth',
+        children: [
+            {
+                id: 'configuracion.usuarios',
+                title: 'Usuarios',
+                type: 'basic',
+                icon: 'heroicons_outline:users',
+                link: '/configuracion/usuarios',
+            },
+            {
+                id: 'configuracion.permisos',
+                title: 'Permisos',
+                type: 'basic',
+                icon: 'heroicons_outline:key',
+                link: '/configuracion/permisos',
+            },
+        ],
+    },
+    {
+        id: 'signout',
+        title: 'Cerrar sesion',
+        type: 'basic',
+        icon: 'heroicons_outline:arrow-left-on-rectangle',
+        link: '/sign-out',
     },
 ];

@@ -1,19 +1,25 @@
-import { Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
+import { Component, ElementRef, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service'
-import { environment } from 'environments/environment';
+import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
 
 @Component({
   selector: 'app-vision',
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
   templateUrl: './vision.component.html',
   styleUrl: './vision.component.scss'
 })
 export class VisionComponent {
+  @ViewChild('pdfReportContent') pdfReportContent?: ElementRef<HTMLElement>;
   @ViewChildren('autosizeArea') textareas!: QueryList<ElementRef<HTMLTextAreaElement>>;
   visionForm!: FormGroup;
 
@@ -23,10 +29,14 @@ export class VisionComponent {
   existingPurposeId: number | null = null;
   originalPurposeDescription: string = '';
   user_name: string = 'jdoe';
-  created_by: string = environment.defaultCreatedBy;
+  created_by = getSessionUserId();
   status = 1;
+  private coreValuesBackup = '';
+  isEditingGameTitle1 = false;
+  isEditingGameTitle2 = false;
 
-  id_company: string = environment.defaultCompanyId;
+  id_company = getSessionCompanyId();
+  id_entity = getSessionEntityId();
   bhag: any;
 
   estados = [
@@ -36,13 +46,115 @@ export class VisionComponent {
     { color: '#CC0000', placeholder: 'En problemas (rojo)', key: 'red' }
   ];
 
-  usuarios = [
-    { id: '1', nombre: 'Juan Pérez' },
-    { id: '2', nombre: 'María García' },
-    { id: '3', nombre: 'Carlos Rodríguez' }
-  ];
+  usuarios: Array<{ id: string | number; nombre: string }> = [];
 
   constructor(public opspService: OpspService, private fb: FormBuilder) { }
+
+  get canExportPdf(): boolean {
+    return Number(getSessionLevelUser()) === 2;
+  }
+
+  exportPdf(): void {
+    void exportElementToPdf(this.pdfReportContent?.nativeElement, 'opsp_vision');
+  }
+
+  async exportExcel(): Promise<void> {
+    void Swal.fire({
+      title: 'Generando Excel',
+      text: 'Preparando descarga...',
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
+
+    try {
+      const XLSX = await import('xlsx');
+      const workbook = XLSX.utils.book_new();
+      const fileName = `opsp_vision_${this.getExcelTimestamp()}.xlsx`;
+
+      const fundamentos = [
+        { Seccion: 'Fundamentos', Campo: 'Valores Centrales', Valor: this.getStringValue('valores') },
+        { Seccion: 'Fundamentos', Campo: 'Proposito', Valor: this.getStringValue('proposito') },
+        { Seccion: 'Fundamentos', Campo: 'Promesas de Marca', Valor: this.getStringValue('promesas') },
+        { Seccion: 'Fundamentos', Campo: 'BHAG', Valor: this.getStringValue('bhag') },
+        { Seccion: 'Ganar el Juego', Campo: 'Titulo 1', Valor: this.resolveGameTitle('game_title_1', 'Ganar el Juego Anual') },
+        { Seccion: 'Ganar el Juego', Campo: 'Titulo 2', Valor: this.resolveGameTitle('game_title_2', 'Ganar el Juego Trimestre') },
+      ];
+
+      this.appendSheet(XLSX, workbook, 'Fundamentos', fundamentos, [22, 28, 80]);
+
+      const prioridadesEstrategicas = [
+        ...this.strategic3to5.controls.map((group, index) => ({
+          Horizonte: '3-5 anos',
+          Numero: index + 1,
+          Prioridad: (group.get('value')?.value || '').toString().trim(),
+          Quien: (group.get('titulo')?.value || '').toString().trim(),
+        })),
+        ...this.strategic1Year.controls.map((group, index) => ({
+          Horizonte: '1 ano',
+          Numero: index + 1,
+          Prioridad: (group.get('value')?.value || '').toString().trim(),
+          Quien: (group.get('titulo')?.value || '').toString().trim(),
+        })),
+      ];
+
+      this.appendSheet(XLSX, workbook, 'Prioridades Estrategicas', prioridadesEstrategicas, [16, 10, 70, 28]);
+
+      const prioridadesTrimestrales = this.priority_list.controls.map((group, index) => {
+        const subprioridades = this.getSubprioridades(index).controls
+          .map((control) => (control.value || '').toString().trim())
+          .filter(Boolean)
+          .join(' | ');
+
+        const quienId = group.get('quien')?.value;
+        const usuario = this.usuarios.find((item) => String(item.id) === String(quienId));
+
+        return {
+          Numero: index + 1,
+          Prioridad: (group.get('prioridad')?.value || '').toString().trim(),
+          Plazo: (group.get('plazo')?.value || '').toString().trim(),
+          Quien: usuario?.nombre || (quienId ?? '').toString().trim(),
+          EsIndividual: group.get('esIndividual')?.value ? 'Si' : 'No',
+          EsOKR: group.get('esOKR')?.value ? 'Si' : 'No',
+          Subprioridades: subprioridades,
+        };
+      });
+
+      this.appendSheet(XLSX, workbook, 'Prioridades Trimestrales', prioridadesTrimestrales, [10, 44, 16, 28, 16, 12, 70]);
+
+      const kpis = this.kpis.controls.map((group, index) => ({
+        Numero: index + 1,
+        KPI: (group.get('kpi')?.value || '').toString().trim(),
+        Meta: (group.get('meta')?.value || '').toString().trim(),
+      }));
+
+      this.appendSheet(XLSX, workbook, 'KPIs', kpis, [10, 52, 24]);
+
+      const juego1 = this.ganarJuego1.controls.map((group, index) => ({
+        Color: this.getEstadoNombre(index),
+        Descripcion: (group.get('descripcion')?.value || '').toString().trim(),
+      }));
+
+      const juego2 = this.ganarJuego2.controls.map((group, index) => ({
+        Color: this.getEstadoNombre(index),
+        Descripcion: (group.get('descripcion')?.value || '').toString().trim(),
+      }));
+
+      this.appendSheet(XLSX, workbook, this.resolveGameTitle('game_title_1', 'Ganar el Juego Anual'), juego1, [18, 80]);
+      this.appendSheet(XLSX, workbook, this.resolveGameTitle('game_title_2', 'Ganar el Juego Trimestre'), juego2, [18, 80]);
+
+      XLSX.writeFile(workbook, fileName);
+    } catch (error) {
+      console.error('Error al exportar Excel de Vision:', error);
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo generar el Excel.',
+        confirmButtonColor: '#003660'
+      });
+    } finally {
+      Swal.close();
+    }
+  }
 
 
   ngOnInit(): void {
@@ -51,6 +163,8 @@ export class VisionComponent {
       proposito: [''],
       promesas: [''],
       bhag: [''],
+      game_title_1: ['Ganar el Juego Anual'],
+      game_title_2: ['Ganar el Juego Trimestre'],
       strategic_priorities_3_to_5_years: this.fb.array([]),
       strategic_priorities_1_year: this.fb.array([]),
       priority_list: this.fb.array([]),
@@ -62,8 +176,38 @@ export class VisionComponent {
 
     this.loadBhag();
     this.loadPurpose();
+    this.loadCollaborators();
   }
 
+  private loadCollaborators(): void {
+    this.opspService
+      .getTeamViewerCollaborators(this.id_company, this.id_entity)
+      .then((resp: any) => {
+        const rows = Array.isArray(resp?.data) ? resp.data : [];
+        this.usuarios = rows
+          .map((u: any) => {
+            const id = u?.id_user ?? u?.user_id ?? u?.id ?? u?.collaborator_id;
+            const first = (u?.firstname ?? '').toString().trim();
+            const last = (u?.lastname ?? '').toString().trim();
+            const fullName = `${first} ${last}`.trim();
+            const nombre = (
+              fullName ||
+              u?.name ||
+              u?.full_name ||
+              u?.user_name ||
+              u?.username ||
+              u?.collaborator_name ||
+              ''
+            ).toString().trim();
+            return { id, nombre };
+          })
+          .filter((u: any) => u.id != null && !!u.nombre);
+      })
+      .catch((err: any) => {
+        console.error('Error cargando colaboradores para Vision:', err);
+        this.usuarios = [];
+      });
+  }
   loadBhag() {
     this.opspService
       .getBhagByCompany(this.id_company)
@@ -209,11 +353,14 @@ export class VisionComponent {
         }
 
         this.visionForm.patchValue({
-          // valores: data.core_values,
+          valores: data.core_values || '',
           // proposito: data.proposito,
           promesas: data.brand_promises,
-          bhag: this.bhag
+          bhag: this.bhag,
+          game_title_1: data.game_title_1 || this.visionForm.get('game_title_1')?.value || 'Ganar el Juego Anual',
+          game_title_2: data.game_title_2 || this.visionForm.get('game_title_2')?.value || 'Ganar el Juego Trimestre'
         });
+        this.coreValuesBackup = data.core_values || this.coreValuesBackup;
         this.loadCoreValuesForVision();
 
         // 3-5 years
@@ -287,15 +434,31 @@ export class VisionComponent {
       const resp = await this.opspService.getCoreValuesByCompany(this.id_company);
       const items = resp.data || [];
       const csv = items
-        .map((v: any) => v.value_title?.trim())
+        .map((v: any) => (
+          v?.value_title ??
+          v?.core_value ??
+          v?.value ??
+          v?.title ??
+          v?.name ??
+          ''
+        ).toString().trim())
         .filter((t: string) => t)
         .join(', ');
-      // Sobrescribe el campo de valores con los valores centrales formateados
-      this.visionForm.patchValue({ valores: csv });
+      // Solo sobrescribe si realmente obtuvo valores para no perder lo que ya esta en Vision.
+      if (csv) {
+        this.visionForm.patchValue({ valores: csv });
+        this.coreValuesBackup = csv;
+      }
     } catch (err) {
       console.error('Error cargando valores centrales para visión:', err);
       // no fallar duro; deja lo que venga de data.core_values
     }
+  }
+
+  private resolveCoreValuesForPayload(): string {
+    const fromForm = (this.visionForm.get('valores')?.value || '').toString().trim();
+    if (fromForm) return fromForm;
+    return (this.coreValuesBackup || '').toString().trim();
   }
 
   // prioridades estrategicas
@@ -479,14 +642,18 @@ export class VisionComponent {
   }
 
   private buildPriorityList(): any[] {
-    return this.priority_list.value.map((p: any) => ({
-      prioridad: p.prioridad,
-      plazo: p.plazo,
-      esOKR: p.esOKR,
-      esIndividual: p.esIndividual,
-      who: p.quien,
-      subprioridades: p.subprioridades || []
-    }));
+    return this.priority_list.value.map((p: any) => {
+      const parsedWho = Number(p.quien);
+      return {
+        prioridad: p.prioridad,
+        plazo: p.plazo,
+        esOKR: p.esOKR,
+        esIndividual: p.esIndividual,
+        // Enviamos solo id_user seleccionado (sin nombre)
+        who: p.quien === '' || p.quien == null || !Number.isFinite(parsedWho) ? null : parsedWho,
+        subprioridades: p.subprioridades || []
+      };
+    });
   }
 
   private buildKpiList(): any[] {
@@ -498,10 +665,13 @@ export class VisionComponent {
 
   private buildVisionPayload(isCreate: boolean): any {
     const form = this.visionForm.value;
+    const coreValues = this.resolveCoreValuesForPayload();
 
     const base: any = {
-      core_values: form.valores,
+      core_values: coreValues,
       brand_promises: form.promesas,
+      game_title_1: this.resolveGameTitle('game_title_1', 'Ganar el Juego Anual'),
+      game_title_2: this.resolveGameTitle('game_title_2', 'Ganar el Juego Trimestre'),
       user_name: this.user_name,
       kpi_list: this.buildKpiList(),
       priority_list: this.buildPriorityList(),
@@ -518,6 +688,124 @@ export class VisionComponent {
     return base;
   }
 
+  resolveGameTitle(controlName: 'game_title_1' | 'game_title_2', fallback: string): string {
+    const raw = this.visionForm.get(controlName)?.value;
+    const text = (raw ?? '').toString().trim();
+    return text || fallback;
+  }
+
+  enableGameTitleEdit(type: 1 | 2): void {
+    if (type === 1) {
+      this.isEditingGameTitle1 = true;
+      return;
+    }
+    this.isEditingGameTitle2 = true;
+  }
+
+  confirmGameTitle(type: 1 | 2): void {
+    if (type === 1) {
+      const title = this.resolveGameTitle('game_title_1', 'Ganar el Juego Anual');
+      this.visionForm.patchValue({ game_title_1: title });
+      this.isEditingGameTitle1 = false;
+      return;
+    }
+    const title = this.resolveGameTitle('game_title_2', 'Ganar el Juego Trimestre');
+    this.visionForm.patchValue({ game_title_2: title });
+    this.isEditingGameTitle2 = false;
+  }
+
+  private getStringValue(controlName: string): string {
+    return (this.visionForm.get(controlName)?.value || '').toString().trim();
+  }
+
+  private getEstadoNombre(index: number): string {
+    const key = this.estados[index]?.key;
+    switch (key) {
+      case 'green':
+        return 'Super Verde';
+      case 'lemon':
+        return 'Verde';
+      case 'yellow':
+        return 'Amarillo';
+      case 'red':
+        return 'Rojo';
+      default:
+        return '';
+    }
+  }
+
+  private appendSheet(
+    XLSX: typeof import('xlsx'),
+    workbook: import('xlsx').WorkBook,
+    sheetName: string,
+    rows: Record<string, string | number>[],
+    widths: number[]
+  ): void {
+    if (!rows.length) {
+      return;
+    }
+
+    const safeName = this.sanitizeSheetName(sheetName);
+    const sheet = XLSX.utils.json_to_sheet(rows);
+    (sheet as { ['!cols']?: Array<{ wch: number }> })['!cols'] = widths.map((width) => ({ wch: width }));
+    XLSX.utils.book_append_sheet(workbook, sheet, this.makeUniqueSheetName(workbook, safeName));
+  }
+
+  private sanitizeSheetName(name: string): string {
+    return name.replace(/[\\/*?:[\]]/g, '').slice(0, 31) || 'Hoja';
+  }
+
+  private makeUniqueSheetName(workbook: import('xlsx').WorkBook, baseName: string): string {
+    let candidate = baseName;
+    let suffix = 2;
+
+    while (workbook.SheetNames.includes(candidate)) {
+      const suffixText = ` ${suffix}`;
+      candidate = `${baseName.slice(0, Math.max(1, 31 - suffixText.length))}${suffixText}`;
+      suffix++;
+    }
+
+    return candidate;
+  }
+
+  private getExcelTimestamp(): string {
+    const now = new Date();
+    const pad = (value: number) => String(value).padStart(2, '0');
+    return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
+  }
+
+  private async resolveExistingVisionId(): Promise<void> {
+    if (this.existingVisionId) return;
+    const resp = await this.opspService.getVisionByCompany(this.id_company);
+    const data = Array.isArray(resp?.data) ? resp.data[0] : null;
+    if (data?.id) {
+      this.existingVisionId = data.id;
+    }
+  }
+
+  private async persistVisionPayload(payload: any): Promise<any> {
+    if (this.existingVisionId) {
+      return this.opspService.updateVision(this.existingVisionId, payload);
+    }
+
+    try {
+      const createRes = await this.opspService.createVision(payload);
+      if (createRes?.data?.[0]?.id) {
+        this.existingVisionId = createRes.data[0].id;
+      }
+      return createRes;
+    } catch (error: any) {
+      // Fallback: if backend rejects create because record exists, refresh id and retry as update.
+      if (error?.status === 400) {
+        await this.resolveExistingVisionId();
+        if (this.existingVisionId) {
+          return this.opspService.updateVision(this.existingVisionId, this.buildVisionPayload(false));
+        }
+      }
+      throw error;
+    }
+  }
+
   save(): void {
     if (this.visionForm.invalid) {
       Swal.fire({
@@ -529,9 +817,6 @@ export class VisionComponent {
       return;
     }
 
-    const isCreateVision = !this.existingVisionId;
-    const visionPayload = this.buildVisionPayload(isCreateVision);
-
     Swal.fire({
       title: 'Guardando...',
       didOpen: () => {
@@ -540,62 +825,72 @@ export class VisionComponent {
       allowOutsideClick: false
     });
 
-    const visionPromise: Promise<any> = isCreateVision
-      ? this.opspService.createVision(visionPayload)
-      : this.opspService.updateVision(this.existingVisionId!, visionPayload);
+    this.resolveExistingVisionId()
+      .then(() => {
+        const wasCreate = !this.existingVisionId;
+        const visionPayload = this.buildVisionPayload(wasCreate);
+        const visionPromise = this.persistVisionPayload(visionPayload);
+        const bhagPromise = this.saveBhagIfNeeded();
+        const purposePromise = this.savePurposeIfNeeded();
 
-    const bhagPromise = this.saveBhagIfNeeded();
-    const purposePromise = this.savePurposeIfNeeded();
+        return Promise.allSettled([visionPromise, bhagPromise, purposePromise]);
+      })
+      .then(results => {
+        const [visionRes, bhagRes, purposeRes] = results;
+        const successMsgs: string[] = [];
+        const errorMsgs: string[] = [];
 
-    Promise.allSettled([visionPromise, bhagPromise, purposePromise]).then(results => {
-      const [visionRes, bhagRes, purposeRes] = results;
-      const successMsgs: string[] = [];
-      const errorMsgs: string[] = [];
-
-      // Visión
-      if (visionRes.status === 'fulfilled') {
-        successMsgs.push(isCreateVision ? 'Visión creada' : 'Visión actualizada');
-        if (isCreateVision && visionRes.value?.data && visionRes.value.data[0]?.id) {
-          this.existingVisionId = visionRes.value.data[0].id;
+        if (visionRes.status === 'fulfilled') {
+          successMsgs.push('Visión guardada');
+        } else {
+          console.error('Error guardando visión:', visionRes.reason);
+          errorMsgs.push('Visión: ' + (visionRes.reason?.message || 'Error al guardar'));
         }
-      } else {
-        console.error('Error guardando visión:', visionRes.reason);
-        errorMsgs.push('Visión: ' + (visionRes.reason?.message || 'Error al guardar'));
-      }
 
-      // BHAG
-      if (bhagRes.status === 'fulfilled') {
-        if (bhagRes.value) {
-          successMsgs.push(this.existingBhagId ? 'BHAG actualizado' : 'BHAG creado');
+        if (bhagRes.status === 'fulfilled') {
+          if (bhagRes.value) {
+            successMsgs.push(this.existingBhagId ? 'BHAG actualizado' : 'BHAG creado');
+          }
+        } else {
+          console.error('Error guardando BHAG:', bhagRes.reason);
+          errorMsgs.push('BHAG: ' + (bhagRes.reason?.message || 'Error al guardar'));
         }
-      } else {
-        console.error('Error guardando BHAG:', bhagRes.reason);
-        errorMsgs.push('BHAG: ' + (bhagRes.reason?.message || 'Error al guardar'));
-      }
 
-      // Propósito
-      if (purposeRes.status === 'fulfilled') {
-        if (purposeRes.value) {
-          successMsgs.push(this.existingPurposeId ? 'Propósito actualizado' : 'Propósito creado');
+        if (purposeRes.status === 'fulfilled') {
+          if (purposeRes.value) {
+            successMsgs.push(this.existingPurposeId ? 'Propósito actualizado' : 'Propósito creado');
+          }
+        } else {
+          console.error('Error guardando propósito:', purposeRes.reason);
+          errorMsgs.push('Propósito: ' + (purposeRes.reason?.message || 'Error al guardar'));
         }
-      } else {
-        console.error('Error guardando propósito:', purposeRes.reason);
-        errorMsgs.push('Propósito: ' + (purposeRes.reason?.message || 'Error al guardar'));
-      }
 
-      // Mensaje final
-      const title = errorMsgs.length ? 'Resultado mixto' : '¡Guardado!';
-      const textParts = [...successMsgs, ...errorMsgs].filter(Boolean).join('. ');
+        const title = errorMsgs.length ? 'Resultado mixto' : '¡Guardado!';
+        const textParts = [...successMsgs, ...errorMsgs].filter(Boolean).join('. ');
 
-      Swal.fire({
-        icon: errorMsgs.length ? 'warning' : 'success',
-        title,
-        text: textParts,
-        confirmButtonColor: '#003660'
+        Swal.fire({
+          icon: errorMsgs.length ? 'warning' : 'success',
+          title,
+          text: textParts,
+          confirmButtonColor: '#003660'
+        });
+      })
+      .catch(err => {
+        console.error('Error preparando guardado de visión:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo preparar el guardado de visión.',
+          confirmButtonColor: '#003660'
+        });
       });
-    });
   }
 }
+
+
+
+
+
 
 
 

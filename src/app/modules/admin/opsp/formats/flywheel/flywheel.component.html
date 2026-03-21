@@ -1,12 +1,21 @@
-<div class="max-w-5xl mx-auto p-6 space-y-6">
-  <!-- Título -->
+<div #pdfContent class="opsp-format-page relative max-w-5xl mx-auto p-6 space-y-6" [appPermissionEditLock]="10">
+  <div *ngIf="canExportPdf" class="print-hide absolute top-6 right-6 z-10 flex items-center gap-2">
+    <button type="button" (click)="exportExcel()"
+      class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
+      Excel
+    </button>
+    <button type="button" (click)="exportPdf()"
+      class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
+      PDF
+    </button>
+  </div>
+
   <div class="text-center">
     <h2 class="text-3xl font-extrabold text-[#003660]">Flywheel</h2>
     <p class="mt-1 text-sm text-gray-500">Organiza tus elementos clave en el orden del ciclo</p>
-    <p class="mt-2 text-xs text-gray-400 italic">💡 Arrastra los bloques para reordenar el ciclo</p>
+    <p class="mt-2 text-xs text-gray-400 italic">Arrastra los bloques para reordenar el ciclo</p>
   </div>
 
-  <!-- SWITCH de vista -->
   <div class="flex justify-center items-center gap-4 my-6">
     <span class="text-sm font-medium" [class.text-[#003660]]="viewMode === 'editor'"
       [class.font-semibold]="viewMode === 'editor'">
@@ -15,7 +24,7 @@
 
     <label class="relative inline-flex items-center cursor-pointer select-none">
       <input type="checkbox" class="sr-only" [checked]="viewMode === 'circular'"
-        (change)="viewMode = $event.target.checked ? 'circular' : 'editor'">
+        (change)="viewMode = $any($event.target).checked ? 'circular' : 'editor'">
 
       <div class="w-14 h-8 bg-gray-300 rounded-full peer-focus:outline-none transition-colors duration-200"
         [ngClass]="viewMode === 'circular' ? 'bg-[#56B4DA]' : 'bg-gray-300'">
@@ -31,15 +40,12 @@
     </span>
   </div>
 
-  <!-- EDITOR -->
   <div *ngIf="viewMode === 'editor'" class="space-y-6">
     <div cdkDropList (cdkDropListDropped)="reordenar($event)" class="space-y-10 relative">
       <ng-container *ngFor="let item of flywheelItems; let i = index; trackBy: trackByItem">
-        <!-- Card -->
         <div cdkDrag class="bg-white border border-gray-200 shadow-md rounded-xl p-6 relative">
-          <!-- Drag Handle Visual -->
           <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 text-gray-300 text-sm select-none">
-            ⠿ Arrastra aquí
+            Arrastra aqui
           </div>
 
           <div class="flex justify-between items-center mb-3">
@@ -47,18 +53,59 @@
             <button (click)="eliminarItem(i)" class="text-red-500 hover:underline text-sm">Eliminar</button>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label class="text-sm font-medium text-[#003660]">Descripción</label>
-              <textarea [(ngModel)]="item.descripcion" rows="3"
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+            <div class="md:col-span-4">
+              <label class="text-sm font-medium text-[#003660]">Descripcion</label>
+              <textarea [(ngModel)]="item.descripcion" rows="4"
                 class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#56B4DA]"></textarea>
             </div>
-            <div>
-              <label class="text-sm font-medium text-[#003660]">KPI</label>
-              <input [(ngModel)]="item.kpi" type="text"
-                class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+
+            <div class="md:col-span-5 space-y-3">
+              <div>
+                <label class="text-sm font-medium text-[#003660]">Descripcion KPI</label>
+                <input [(ngModel)]="item.kpi" type="text"
+                  class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="text-sm font-medium text-[#003660]">Tipo</label>
+                  <select [(ngModel)]="item.kpi_type"
+                    class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]">
+                    <option value="">Selecciona</option>
+                    <option *ngFor="let option of kpiTypeOptions" [value]="option">{{ option }}</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="text-sm font-medium text-[#003660]">Tipo numerico</label>
+                  <select [(ngModel)]="item.kpi_type_number"
+                    class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]">
+                    <option value="">Selecciona</option>
+                    <option *ngFor="let option of kpiNumberTypeOptions" [value]="option">{{ option }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label class="text-sm font-medium text-emerald-700">Super Verde</label>
+                  <input [(ngModel)]="item.kpi_super_green" type="number"
+                    class="w-full p-2 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-300" />
+                </div>
+                <div>
+                  <label class="text-sm font-medium text-lime-700">Verde</label>
+                  <input [(ngModel)]="item.kpi_green" type="number"
+                    class="w-full p-2 border border-lime-200 rounded-lg focus:ring-2 focus:ring-lime-300" />
+                </div>
+                <div>
+                  <label class="text-sm font-medium text-rose-700">Rojo</label>
+                  <input [(ngModel)]="item.kpi_red" type="number"
+                    class="w-full p-2 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-300" />
+                </div>
+              </div>
             </div>
-            <div>
+
+            <div class="md:col-span-3">
               <label class="text-sm font-medium text-[#003660]">Accountable</label>
               <input [(ngModel)]="item.responsable" type="text"
                 class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
@@ -66,7 +113,6 @@
           </div>
         </div>
 
-        <!-- Flecha -->
         <svg *ngIf="i < flywheelItems.length - 1" height="40" class="mx-auto block">
           <defs>
             <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
@@ -78,23 +124,20 @@
       </ng-container>
     </div>
 
-    <!-- Botones -->
     <div class="flex justify-between pt-6">
       <button (click)="agregarItem()"
         class="bg-[#56B4DA] hover:bg-[#3ba7d2] text-white font-medium py-2 px-6 rounded-xl shadow">
         + Agregar Item
       </button>
-      <button (click)="guardar()"
+      <button (click)="guardar()" [appPermissionHideIfNoEdit]="10"
         class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
         Guardar
       </button>
     </div>
   </div>
 
-  <!-- CIRCULAR VIEW -->
   <ng-container *ngIf="viewMode === 'circular'">
     <div class="relative mx-auto" style="width: 600px; height: 600px;">
-      <!-- Líneas + flechas -->
       <svg viewBox="0 0 600 600" class="absolute inset-0">
         <defs>
           <marker id="arrowCirc" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
@@ -110,18 +153,23 @@
         </ng-container>
       </svg>
 
-      <!-- BLOQUES -->
       <ng-container *ngFor="let item of flywheelItems; let i = index">
         <div class="absolute select-none" [ngStyle]="getBlockStyle(i)">
           <div
-            class="bg-[#003660] text-white rounded-lg p-3 w-44 h-28 flex flex-col items-center justify-center text-center gap-1">
-            <span class="text-[11px] font-semibold truncate">
+            class="bg-[#003660] text-white rounded-lg p-3 w-48 h-32 overflow-hidden flex flex-col items-center justify-center text-center gap-1">
+            <span class="block w-full text-[11px] font-semibold leading-tight break-words overflow-hidden">
               {{ item.responsable || 'Agrega un responsable' }}
             </span>
-            <span class="text-[11px] truncate">
-              {{ item.kpi || 'Agrea un KPI' }}
+            <span class="block w-full text-[11px] leading-tight break-words overflow-hidden">
+              {{ item.kpi || 'Agrega un KPI' }}
             </span>
-            <span class="text-[10px] italic leading-snug truncate">
+            <span class="block w-full text-[10px] leading-tight break-words overflow-hidden opacity-90">
+              {{ item.kpi_type || 'Tipo' }} · {{ item.kpi_type_number || 'Numerico' }}
+            </span>
+            <span class="block w-full text-[10px] leading-tight break-words overflow-hidden opacity-90">
+              SV {{ item.kpi_super_green ?? '-' }} | V {{ item.kpi_green ?? '-' }} | R {{ item.kpi_red ?? '-' }}
+            </span>
+            <span class="block w-full text-[10px] italic leading-snug break-words overflow-hidden">
               {{ item.descripcion || 'Agrega una descripcion' }}
             </span>
           </div>
@@ -129,4 +177,43 @@
       </ng-container>
     </div>
   </ng-container>
+</div>
+
+<div #pdfReportContent class="w-[1100px] bg-white text-slate-900 p-10 space-y-8" style="position:absolute;left:-99999px;top:0;">
+  <div class="border-b border-slate-200 pb-4">
+    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">OPSP</p>
+    <h1 class="mt-2 text-3xl font-bold text-[#003660]">Flywheel</h1>
+    <p class="mt-2 text-sm text-slate-600">Secuencia del flywheel con responsable, KPI y umbrales configurados.</p>
+  </div>
+
+  <div class="rounded-2xl border border-slate-200 overflow-hidden">
+    <table class="min-w-full text-sm">
+      <thead class="bg-slate-100 text-slate-700">
+        <tr>
+          <th class="px-4 py-3 text-left font-semibold">Orden</th>
+          <th class="px-4 py-3 text-left font-semibold">Descripcion</th>
+          <th class="px-4 py-3 text-left font-semibold">KPI</th>
+          <th class="px-4 py-3 text-left font-semibold">Tipo</th>
+          <th class="px-4 py-3 text-left font-semibold">Tipo numerico</th>
+          <th class="px-4 py-3 text-left font-semibold">Super Verde</th>
+          <th class="px-4 py-3 text-left font-semibold">Verde</th>
+          <th class="px-4 py-3 text-left font-semibold">Rojo</th>
+          <th class="px-4 py-3 text-left font-semibold">Responsable</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of flywheelItems" class="border-t border-slate-200 align-top">
+          <td class="px-4 py-3 font-medium text-slate-800">{{ item.order_item }}</td>
+          <td class="px-4 py-3 whitespace-pre-wrap">{{ item.descripcion || ' ' }}</td>
+          <td class="px-4 py-3 whitespace-pre-wrap">{{ item.kpi || ' ' }}</td>
+          <td class="px-4 py-3">{{ item.kpi_type || ' ' }}</td>
+          <td class="px-4 py-3">{{ item.kpi_type_number || ' ' }}</td>
+          <td class="px-4 py-3">{{ item.kpi_super_green ?? '' }}</td>
+          <td class="px-4 py-3">{{ item.kpi_green ?? '' }}</td>
+          <td class="px-4 py-3">{{ item.kpi_red ?? '' }}</td>
+          <td class="px-4 py-3">{{ item.responsable || ' ' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>

@@ -1,4 +1,14 @@
-<div class="w-full max-w-7xl mx-auto p-6 sm:p-10 space-y-10">
+<div #pdfContent class="opsp-format-page relative w-full max-w-7xl mx-auto p-6 sm:p-10 space-y-10" [appPermissionEditLock]="7">
+  <div *ngIf="canExportPdf" class="print-hide absolute top-6 right-6 sm:top-10 sm:right-10 z-10 flex items-center gap-2">
+    <button type="button" (click)="exportExcel()"
+      class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
+      Excel
+    </button>
+    <button type="button" (click)="exportPdf()"
+      class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
+      PDF
+    </button>
+  </div>
   <!-- Título e instrucciones -->
   <div class="text-center">
     <h2 class="text-3xl font-extrabold text-[#003660]">Promesa de Marca</h2>
@@ -26,11 +36,45 @@
     </div>
 
     <!-- Promesa Líder -->
-    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-      <label class="block text-sm font-semibold text-[#003660] mb-2">Promesa Líder</label>
-      <textarea [(ngModel)]="promesaLider" rows="5"
+    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-4">
+      <label class="block text-sm font-semibold text-[#003660]">Promesa Líder</label>
+      <textarea [(ngModel)]="promesaLider" rows="4"
         class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#56B4DA]"
         placeholder="Describe la promesa líder..."></textarea>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Tipo</label>
+          <select [(ngModel)]="primaryKpiType" class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-[#56B4DA]">
+            <option value="">Seleccione</option>
+            <option value="Directo">Directo</option>
+            <option value="Inverso">Inverso</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Tipo numérico</label>
+          <select [(ngModel)]="primaryKpiTypeNumber" class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-[#56B4DA]">
+            <option value="">Seleccione</option>
+            <option value="Porcentaje">Porcentaje</option>
+            <option value="Entero">Entero</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-emerald-700 mb-1">Super Verde</label>
+          <input [(ngModel)]="primaryKpiSuperGreen" type="number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-lime-700 mb-1">Verde</label>
+          <input [(ngModel)]="primaryKpiGreen" type="number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-rose-700 mb-1">Rojo</label>
+          <input [(ngModel)]="primaryKpiRed" type="number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+        </div>
+      </div>
     </div>
   </div>
 
@@ -70,26 +114,167 @@
   <!-- Promesas 2 y 3 -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- Promesa #2 -->
-    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-      <label class="block text-sm font-semibold text-[#003660] mb-2">Promesa #2</label>
-      <textarea [(ngModel)]="promesa2" rows="5"
+    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-4">
+      <label class="block text-sm font-semibold text-[#003660]">Promesa #2</label>
+      <textarea [(ngModel)]="promesa2" rows="4"
         class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#56B4DA]"
         placeholder="Describe la promesa 2..."></textarea>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Tipo</label>
+          <select [(ngModel)]="secondaryKpiType" class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-[#56B4DA]">
+            <option value="">Seleccione</option>
+            <option value="Directo">Directo</option>
+            <option value="Inverso">Inverso</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Tipo numérico</label>
+          <select [(ngModel)]="secondaryKpiTypeNumber" class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-[#56B4DA]">
+            <option value="">Seleccione</option>
+            <option value="Porcentaje">Porcentaje</option>
+            <option value="Entero">Entero</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-emerald-700 mb-1">Super Verde</label>
+          <input [(ngModel)]="secondaryKpiSuperGreen" type="number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-lime-700 mb-1">Verde</label>
+          <input [(ngModel)]="secondaryKpiGreen" type="number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-rose-700 mb-1">Rojo</label>
+          <input [(ngModel)]="secondaryKpiRed" type="number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+        </div>
+      </div>
     </div>
 
     <!-- Promesa #3 -->
-    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-      <label class="block text-sm font-semibold text-[#003660] mb-2">Promesa #3</label>
-      <textarea [(ngModel)]="promesa3" rows="5"
+    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm space-y-4">
+      <label class="block text-sm font-semibold text-[#003660]">Promesa #3</label>
+      <textarea [(ngModel)]="promesa3" rows="4"
         class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-[#56B4DA]"
         placeholder="Describe la promesa 3..."></textarea>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Tipo</label>
+          <select [(ngModel)]="tertiaryKpiType" class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-[#56B4DA]">
+            <option value="">Seleccione</option>
+            <option value="Directo">Directo</option>
+            <option value="Inverso">Inverso</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Tipo numérico</label>
+          <select [(ngModel)]="tertiaryKpiTypeNumber" class="w-full p-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-[#56B4DA]">
+            <option value="">Seleccione</option>
+            <option value="Porcentaje">Porcentaje</option>
+            <option value="Entero">Entero</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-emerald-700 mb-1">Super Verde</label>
+          <input [(ngModel)]="tertiaryKpiSuperGreen" type="number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-lime-700 mb-1">Verde</label>
+          <input [(ngModel)]="tertiaryKpiGreen" type="number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-rose-700 mb-1">Rojo</label>
+          <input [(ngModel)]="tertiaryKpiRed" type="number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#56B4DA]" />
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- Botón Guardar -->
   <div class="text-right pt-6">
-    <button (click)="save()" class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
+    <button (click)="save()" [appPermissionHideIfNoEdit]="7" class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
       Guardar
     </button>
   </div>
 </div>
+
+<div #pdfReportContent class="w-[1100px] bg-white text-slate-900 p-10 space-y-8" style="position:absolute;left:-99999px;top:0;">
+  <div class="border-b border-slate-200 pb-4">
+    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">OPSP</p>
+    <h1 class="mt-2 text-3xl font-bold text-[#003660]">Promesas de Marca</h1>
+    <p class="mt-2 text-sm text-slate-600">Reporte de cliente central y promesas con configuracion KPI asociada.</p>
+  </div>
+
+  <section class="rounded-2xl border border-slate-200 p-6">
+    <h2 class="text-lg font-semibold text-[#003660]">Cliente central</h2>
+    <p class="mt-4 whitespace-pre-wrap text-base leading-7 text-slate-700">{{ clienteCentral || ' ' }}</p>
+  </section>
+
+  <div class="grid grid-cols-1 gap-6">
+    <section class="rounded-2xl border border-slate-200 p-6">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+        <h2 class="text-lg font-semibold text-[#003660]">Promesa lider</h2>
+        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">Principal</span>
+      </div>
+      <p class="mt-4 whitespace-pre-wrap text-base leading-7 text-slate-700">{{ promesaLider || ' ' }}</p>
+      <div class="mt-5 rounded-2xl border border-slate-200 overflow-hidden">
+        <table class="min-w-full text-sm">
+          <tbody>
+            <tr class="border-t border-slate-200"><td class="px-4 py-3 font-medium text-slate-800">Tipo KPI</td><td class="px-4 py-3">{{ primaryKpiType || ' ' }}</td></tr>
+            <tr class="border-t border-slate-200"><td class="px-4 py-3 font-medium text-slate-800">Tipo numerico</td><td class="px-4 py-3">{{ primaryKpiTypeNumber || ' ' }}</td></tr>
+            <tr class="border-t border-slate-200"><td class="px-4 py-3 font-medium text-emerald-700">Super Verde</td><td class="px-4 py-3">{{ primaryKpiSuperGreen ?? '' }}</td></tr>
+            <tr class="border-t border-slate-200"><td class="px-4 py-3 font-medium text-lime-700">Verde</td><td class="px-4 py-3">{{ primaryKpiGreen ?? '' }}</td></tr>
+            <tr class="border-t border-slate-200"><td class="px-4 py-3 font-medium text-rose-700">Rojo</td><td class="px-4 py-3">{{ primaryKpiRed ?? '' }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="grid grid-cols-2 gap-6">
+      <section class="rounded-2xl border border-slate-200 p-6">
+        <h2 class="text-lg font-semibold text-[#003660]">Promesa 2</h2>
+        <p class="mt-4 whitespace-pre-wrap text-base leading-7 text-slate-700">{{ promesa2 || ' ' }}</p>
+        <div class="mt-5 rounded-2xl border border-slate-200 overflow-hidden">
+          <table class="min-w-full text-sm">
+            <tbody>
+              <tr class="border-t border-slate-200"><td class="px-4 py-3 font-medium text-slate-800">Tipo KPI</td><td class="px-4 py-3">{{ secondaryKpiType || ' ' }}</td></tr>
+              <tr class="border-t border-slate-200"><td class="px-4 py-3 font-medium text-slate-800">Tipo numerico</td><td class="px-4 py-3">{{ secondaryKpiTypeNumber || ' ' }}</td></tr>
+              <tr class="border-t border-slate-200"><td class="px-4 py-3 font-medium text-emerald-700">Super Verde</td><td class="px-4 py-3">{{ secondaryKpiSuperGreen ?? '' }}</td></tr>
+              <tr class="border-t border-slate-200"><td class="px-4 py-3 font-medium text-lime-700">Verde</td><td class="px-4 py-3">{{ secondaryKpiGreen ?? '' }}</td></tr>
+              <tr class="border-t border-slate-200"><td class="px-4 py-3 font-medium text-rose-700">Rojo</td><td class="px-4 py-3">{{ secondaryKpiRed ?? '' }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="rounded-2xl border border-slate-200 p-6">
+        <h2 class="text-lg font-semibold text-[#003660]">Promesa 3</h2>
+        <p class="mt-4 whitespace-pre-wrap text-base leading-7 text-slate-700">{{ promesa3 || ' ' }}</p>
+        <div class="mt-5 rounded-2xl border border-slate-200 overflow-hidden">
+          <table class="min-w-full text-sm">
+            <tbody>
+              <tr class="border-t border-slate-200"><td class="px-4 py-3 font-medium text-slate-800">Tipo KPI</td><td class="px-4 py-3">{{ tertiaryKpiType || ' ' }}</td></tr>
+              <tr class="border-t border-slate-200"><td class="px-4 py-3 font-medium text-slate-800">Tipo numerico</td><td class="px-4 py-3">{{ tertiaryKpiTypeNumber || ' ' }}</td></tr>
+              <tr class="border-t border-slate-200"><td class="px-4 py-3 font-medium text-emerald-700">Super Verde</td><td class="px-4 py-3">{{ tertiaryKpiSuperGreen ?? '' }}</td></tr>
+              <tr class="border-t border-slate-200"><td class="px-4 py-3 font-medium text-lime-700">Verde</td><td class="px-4 py-3">{{ tertiaryKpiGreen ?? '' }}</td></tr>
+              <tr class="border-t border-slate-200"><td class="px-4 py-3 font-medium text-rose-700">Rojo</td><td class="px-4 py-3">{{ tertiaryKpiRed ?? '' }}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+
+
+
+

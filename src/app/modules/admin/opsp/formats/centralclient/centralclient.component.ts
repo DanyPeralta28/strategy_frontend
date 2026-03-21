@@ -1,47 +1,131 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
-import { environment } from 'environments/environment';
+import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
+import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
 
 @Component({
   selector: 'app-central-client',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './centralclient.component.html', // ajusta si tu archivo se llama distinto
+  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
+  templateUrl: './centralclient.component.html',
   styleUrl: './centralclient.component.scss'
 })
 export class CentralClientComponent implements OnInit {
-  // contexto (ajústalo si lo pasas dinámicamente)
-  id_company: string = environment.defaultCompanyId;
-  created_by: string = environment.defaultCreatedBy;
+  @ViewChild('pdfReportContent') pdfReportContent?: ElementRef<HTMLElement>;
+  id_company = getSessionCompanyId();
+  created_by = getSessionUserId();
 
   centralClientId?: number;
-  descripcionResumen: string = '';
+  descripcionResumen = '';
 
-  // snapshot para detectar cambios
+  centralClients: any[] = [];
+  currentSlideIndex = 0;
+  creatingNew = false;
+
+  get canExportPdf(): boolean {
+    return Number(getSessionLevelUser()) === 2;
+  }
+
+  exportPdf(): void {
+    void exportElementToPdf(this.pdfReportContent?.nativeElement, 'opsp_centralclient');
+  }
+
+  exportExcel(): void {
+    const records = this.getExportCentralClients();
+    const summaryRows = records.map((record, index) => ({
+      Numero: index + 1,
+      Id: record.id ?? '',
+      Resumen: (record.core_client_summary || '').toString().trim(),
+    }));
+
+    const detailRows = records.flatMap((record, index) =>
+      this.preguntas.map((pregunta) => ({
+        Cliente: index + 1,
+        Pregunta: pregunta.pregunta,
+        Respuesta: (record[pregunta.key] || '').toString().trim(),
+      }))
+    );
+
+    void exportSheetsToExcel('opsp_centralclient', [
+      {
+        name: 'Resumen',
+        rows: summaryRows,
+        widths: [10, 12, 90],
+      },
+      {
+        name: 'Detalle',
+        rows: detailRows,
+        widths: [10, 48, 90],
+      },
+    ]);
+  }
+
   private originalSnapshot: Record<string, string> = {};
 
   preguntas: Array<{ key: string; pregunta: string; respuesta: string }> = [
-    { key: 'age_gender_education', pregunta: 'Edad, género y educación', respuesta: '' },
+    { key: 'age_gender_education', pregunta: 'Edad, genero y educacion', respuesta: '' },
     { key: 'appearance_description', pregunta: 'Apariencia', respuesta: '' },
-    { key: 'typical_day_description', pregunta: 'Día típico', respuesta: '' },
+    { key: 'typical_day_description', pregunta: 'Dia tipico', respuesta: '' },
     { key: 'fears_or_concerns', pregunta: 'Miedos o preocupaciones', respuesta: '' },
     { key: 'client_goals', pregunta: 'Metas del cliente', respuesta: '' },
     { key: 'client_challenges', pregunta: 'Retos del cliente', respuesta: '' },
     { key: 'life_priorities', pregunta: 'Prioridades de vida', respuesta: '' },
     { key: 'motivations_or_rewards', pregunta: 'Motivaciones o recompensas', respuesta: '' },
     { key: 'feelings_of_attractiveness', pregunta: 'Sentirse atractivo cuando...', respuesta: '' },
-    { key: 'feelings_of_discomfort', pregunta: 'Sensación de incomodidad', respuesta: '' },
-    { key: 'success_metrics', pregunta: 'Métricas de éxito', respuesta: '' },
+    { key: 'feelings_of_discomfort', pregunta: 'Sensacion de incomodidad', respuesta: '' },
+    { key: 'success_metrics', pregunta: 'Metricas de exito', respuesta: '' },
     { key: 'key_needs_from_us', pregunta: 'Necesidades clave de nosotros', respuesta: '' },
   ];
 
   constructor(public opspService: OpspService) {}
 
   ngOnInit(): void {
-    this.loadCentralClient();
+    this.loadCentralClients();
+  }
+
+  get totalSlides(): number {
+    return this.centralClients.length + (this.creatingNew ? 1 : 0);
+  }
+
+  get canGoPrev(): boolean {
+    return this.currentSlideIndex > 0;
+  }
+
+  get canGoNext(): boolean {
+    return this.currentSlideIndex < this.totalSlides - 1;
+  }
+
+  prevSlide(): void {
+    if (!this.canGoPrev) return;
+    this.currentSlideIndex--;
+    this.loadSlideByIndex();
+  }
+
+  nextSlide(): void {
+    if (!this.canGoNext) return;
+    this.currentSlideIndex++;
+    this.loadSlideByIndex();
+  }
+
+  addNewCentralClient(): void {
+    this.creatingNew = true;
+    this.currentSlideIndex = this.totalSlides - 1;
+    this.centralClientId = undefined;
+    this.resetForm();
+    this.originalSnapshot = this.buildSnapshot();
+  }
+
+  private resetForm(): void {
+    this.preguntas.forEach(p => (p.respuesta = ''));
+    this.descripcionResumen = '';
   }
 
   private buildSnapshot(): Record<string, string> {
@@ -63,22 +147,72 @@ export class CentralClientComponent implements OnInit {
     return false;
   }
 
-  private async loadCentralClient(): Promise<void> {
+  private applyRecord(existing: any): void {
+    this.centralClientId = existing?.id;
+
+    this.preguntas.forEach(p => {
+      p.respuesta = existing?.[p.key] || '';
+    });
+
+    this.descripcionResumen = existing?.core_client_summary || '';
+    this.originalSnapshot = this.buildSnapshot();
+  }
+
+  getExportCentralClients(): any[] {
+    const currentRecord = {
+      id: this.centralClientId ?? '',
+      core_client_summary: this.descripcionResumen,
+      ...Object.fromEntries(this.preguntas.map((pregunta) => [pregunta.key, pregunta.respuesta])),
+    };
+
+    if (this.creatingNew) {
+      return [...this.centralClients, currentRecord];
+    }
+
+    if (this.centralClientId != null) {
+      return this.centralClients.map((record) =>
+        Number(record?.id) === Number(this.centralClientId) ? { ...record, ...currentRecord } : record
+      );
+    }
+
+    return this.centralClients.length ? this.centralClients : [currentRecord];
+  }
+
+  private loadSlideByIndex(): void {
+    if (this.creatingNew && this.currentSlideIndex === this.totalSlides - 1) {
+      this.centralClientId = undefined;
+      this.resetForm();
+      this.originalSnapshot = this.buildSnapshot();
+      return;
+    }
+
+    const record = this.centralClients[this.currentSlideIndex];
+    if (record) this.applyRecord(record);
+  }
+
+  private async loadCentralClients(selectId?: number): Promise<void> {
     try {
       const resp = await this.opspService.getCentralClientByCompany(this.id_company);
-      if (resp?.data && resp.data.length > 0) {
-        const existing = resp.data[0];
-        this.centralClientId = existing.id;
+      this.centralClients = Array.isArray(resp?.data) ? resp.data : [];
 
-        this.preguntas.forEach(p => {
-          if (existing[p.key] !== undefined) {
-            p.respuesta = existing[p.key] || '';
-          }
-        });
+      this.creatingNew = false;
 
-        this.descripcionResumen = existing.core_client_summary || '';
+      if (!this.centralClients.length) {
+        this.currentSlideIndex = 0;
+        this.centralClientId = undefined;
+        this.resetForm();
         this.originalSnapshot = this.buildSnapshot();
+        return;
       }
+
+      if (selectId != null) {
+        const idx = this.centralClients.findIndex(x => Number(x?.id) === Number(selectId));
+        this.currentSlideIndex = idx >= 0 ? idx : 0;
+      } else if (this.currentSlideIndex >= this.centralClients.length) {
+        this.currentSlideIndex = this.centralClients.length - 1;
+      }
+
+      this.applyRecord(this.centralClients[this.currentSlideIndex]);
     } catch (err) {
       console.error('Error cargando Cliente Central:', err);
     }
@@ -87,6 +221,7 @@ export class CentralClientComponent implements OnInit {
   async save(): Promise<void> {
     const anyFieldFilled =
       this.preguntas.some(p => p.respuesta.trim() !== '') || this.descripcionResumen.trim() !== '';
+
     if (!anyFieldFilled) {
       Swal.fire({
         icon: 'warning',
@@ -116,22 +251,26 @@ export class CentralClientComponent implements OnInit {
 
     try {
       if (this.centralClientId) {
-        // update (no lleva id_company según el contrato de ejemplo)
         await this.opspService.updateCentralClient(this.centralClientId, payload);
       } else {
-        // create
         payload.id_company = this.id_company;
         const resp = await this.opspService.createCentralClient(payload);
-        if (resp?.data && resp.data[0]?.id) {
-          this.centralClientId = resp.data[0].id;
+        const newId = resp?.data?.[0]?.id ?? resp?.data?.id;
+        if (newId != null) {
+          await this.loadCentralClients(Number(newId));
+        } else {
+          await this.loadCentralClients();
         }
       }
 
-      this.originalSnapshot = this.buildSnapshot();
+      if (this.centralClientId) {
+        await this.loadCentralClients(this.centralClientId);
+      }
+
       Swal.fire({
         icon: 'success',
-        title: this.centralClientId ? '¡Actualizado!' : '¡Creado!',
-        text: 'La información de Cliente Central se ha guardado correctamente.',
+        title: this.centralClientId ? 'Actualizado' : 'Creado',
+        text: 'La informacion de Cliente Central se ha guardado correctamente.',
         confirmButtonColor: '#003660'
       });
     } catch (err) {

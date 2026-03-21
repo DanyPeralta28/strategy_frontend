@@ -1,0 +1,152 @@
+<div class="w-full max-w-7xl mx-auto p-6 sm:p-10 space-y-8" [appPermissionEditLock]="25">
+    <div class="text-center">
+        <h2 class="text-3xl font-extrabold text-[#003660]">Permisos</h2>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+        <div class="mb-6 flex justify-center">
+            <div class="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1">
+                <button type="button" (click)="setMode('single')"
+                    class="px-4 py-2 rounded-lg text-sm font-semibold transition"
+                    [class.bg-[#003660]]="mode === 'single'"
+                    [class.text-white]="mode === 'single'"
+                    [class.text-slate-700]="mode !== 'single'">
+                    Usuario individual
+                </button>
+                <button type="button" (click)="setMode('bulk')"
+                    class="px-4 py-2 rounded-lg text-sm font-semibold transition"
+                    [class.bg-[#003660]]="mode === 'bulk'"
+                    [class.text-white]="mode === 'bulk'"
+                    [class.text-slate-700]="mode !== 'bulk'">
+                    Varios usuarios
+                </button>
+            </div>
+        </div>
+
+        <h3 class="text-lg font-semibold text-[#003660] mb-6">Segmentacion de usuarios</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Entidad</label>
+                <select [(ngModel)]="selectedEntidad" (ngModelChange)="onEntidadChange()"
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2 bg-white text-slate-700">
+                    <option [ngValue]="null">Seleccionar entidad</option>
+                    <option *ngFor="let e of entidades" [ngValue]="e.id">{{ e.name }}</option>
+                </select>
+                <p *ngIf="loadingEntidades" class="text-xs text-slate-500 mt-1">Cargando entidades...</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Equipo</label>
+                <select [(ngModel)]="selectedEquipo" (ngModelChange)="onEquipoChange()"
+                    [disabled]="!selectedEntidad || loadingEquipos"
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2 bg-white text-slate-700 disabled:bg-slate-100">
+                    <option [ngValue]="null">Seleccionar equipo</option>
+                    <option *ngFor="let team of equipos" [ngValue]="team">{{ team }}</option>
+                </select>
+                <p *ngIf="loadingEquipos" class="text-xs text-slate-500 mt-1">Cargando equipos...</p>
+            </div>
+
+            <div class="relative" *ngIf="mode === 'bulk'; else singleUserSelector">
+                <label class="block text-sm font-semibold text-slate-700 mb-2">Usuarios</label>
+                <button type="button" (click)="showUserDropdown = !showUserDropdown"
+                    [disabled]="!selectedEquipo || loadingUsuarios"
+                    class="w-full text-left rounded-lg border border-slate-300 px-3 py-2 bg-white text-slate-700 disabled:bg-slate-100 truncate">
+                    {{ selectedUserNames }}
+                </button>
+                <div *ngIf="showUserDropdown" class="absolute z-20 mt-1 w-full bg-white border border-slate-300 rounded-lg shadow max-h-56 overflow-auto">
+                    <label *ngFor="let user of usuarios" class="flex items-center gap-2 px-3 py-2 hover:bg-slate-50 cursor-pointer">
+                        <input type="checkbox" [(ngModel)]="user.checked" (ngModelChange)="onUserSelectionChange()" />
+                        <span class="text-sm text-slate-700">{{ user.name }}</span>
+                    </label>
+                    <div *ngIf="!usuarios.length" class="px-3 py-2 text-sm text-slate-500">No hay usuarios.</div>
+                </div>
+                <p *ngIf="loadingUsuarios" class="text-xs text-slate-500 mt-1">Cargando usuarios...</p>
+            </div>
+
+            <ng-template #singleUserSelector>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Usuario</label>
+                    <select [(ngModel)]="selectedSingleUserId" (ngModelChange)="onSingleUserChange()"
+                        [disabled]="!selectedEquipo || loadingUsuarios"
+                        class="w-full rounded-lg border border-slate-300 px-3 py-2 bg-white text-slate-700 disabled:bg-slate-100">
+                        <option [ngValue]="null">Seleccionar usuario</option>
+                        <option *ngFor="let user of usuarios" [ngValue]="user.id">{{ user.name }}</option>
+                    </select>
+                    <p *ngIf="loadingUsuarios" class="text-xs text-slate-500 mt-1">Cargando usuarios...</p>
+                </div>
+            </ng-template>
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-semibold text-slate-700 mb-2">
+                {{ mode === 'single' ? 'Usuario seleccionado' : 'Usuarios seleccionados' }}
+            </label>
+            <div *ngIf="activeUsers.length; else noSelectedUsers" class="flex flex-wrap gap-2">
+                <span *ngFor="let user of activeUsers"
+                    class="inline-flex items-center rounded-full bg-slate-100 border border-slate-200 px-3 py-1 text-sm text-slate-700">
+                    {{ user.name }}
+                </span>
+            </div>
+            <ng-template #noSelectedUsers>
+                <p class="text-sm text-slate-500">
+                    {{ mode === 'single' ? 'No hay usuario seleccionado.' : 'No hay usuarios seleccionados.' }}
+                </p>
+            </ng-template>
+        </div>
+
+        <div class="border border-gray-200 rounded-xl overflow-hidden">
+            <table class="min-w-full text-sm">
+                <thead class="bg-[#003660] text-white">
+                    <tr>
+                        <th class="text-center px-4 py-3">Id submodulo</th>
+                        <th class="text-center px-4 py-3">Id modulo</th>
+                        <th class="text-center px-4 py-3">Permiso</th>
+                        <th class="text-left px-4 py-3">Modulo</th>
+                        <th class="text-left px-4 py-3">Submodulo</th>
+                        <th class="text-center px-4 py-3">Visualizacion</th>
+                        <th class="text-center px-4 py-3">Edicion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let row of permissionRows" class="border-t border-gray-200">
+                        <td class="px-4 py-3 text-center text-slate-700">{{ row.idSubmodulo }}</td>
+                        <td class="px-4 py-3 text-center text-slate-700">{{ row.idModulo }}</td>
+                        <td class="px-4 py-3 text-center text-slate-700">{{ row.permiso }}</td>
+                        <td class="px-4 py-3 font-semibold text-slate-800">{{ row.modulo }}</td>
+                        <td class="px-4 py-3 text-slate-700">{{ row.submodulo }}</td>
+                        <td class="px-4 py-3 text-center">
+                            <input type="checkbox"
+                                [checked]="isPermissionChecked(row.key, 'view')"
+                                [disabled]="activeUsers.length === 0"
+                                (change)="setPermissionForSelected(row.key, 'view', $any($event.target).checked)" />
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <input type="checkbox"
+                                [checked]="isPermissionChecked(row.key, 'edit')"
+                                [disabled]="activeUsers.length === 0"
+                                (change)="setPermissionForSelected(row.key, 'edit', $any($event.target).checked)" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="flex justify-between items-center mt-4">
+            <p class="text-sm text-slate-500">
+                Cambios simulados para:
+                <span class="font-semibold text-slate-700">{{ activeUsers.length }}</span>
+                {{ mode === 'single' ? 'usuario' : 'usuario(s)' }}
+            </p>
+            <button type="button" (click)="saveSimulation()" [appPermissionHideIfNoEdit]="25"
+                class="bg-[#003660] hover:bg-[#005f8c] text-white font-semibold px-5 py-2 rounded-lg shadow-md transition">
+                {{ mode === 'single' ? 'Guardar permisos individuales' : 'Guardar permisos masivos' }}
+            </button>
+        </div>
+    </div>
+</div>
+
+
+
+
+

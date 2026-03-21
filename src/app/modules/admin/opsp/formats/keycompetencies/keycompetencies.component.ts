@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
-import { environment } from 'environments/environment';
+import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
+import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
 
 interface CompetencyItem {
   name: string;
@@ -18,14 +20,19 @@ interface KeyCompetenciesForm {
   id?: number;
 }
 
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
+
 @Component({
   selector: 'app-keycompetencies',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
   templateUrl: './keycompetencies.component.html',
   styleUrl: './keycompetencies.component.scss'
 })
 export class KeycompetenciesComponent implements OnInit {
+  @ViewChild('pdfReportContent') pdfReportContent?: ElementRef<HTMLElement>;
   form: KeyCompetenciesForm = {
     central: '',
     centralExplanation: '',
@@ -33,12 +40,44 @@ export class KeycompetenciesComponent implements OnInit {
   };
 
   // contexto
-  id_company: string = environment.defaultCompanyId;
-  created_by: string = environment.defaultCreatedBy;
+  id_company = getSessionCompanyId();
+  created_by = getSessionUserId();
 
   originalSnapshot: KeyCompetenciesForm = { ...this.form };
 
   constructor(public opspService: OpspService) { }
+
+  get canExportPdf(): boolean {
+    return Number(getSessionLevelUser()) === 2;
+  }
+
+  exportPdf(): void {
+    void exportElementToPdf(this.pdfReportContent?.nativeElement, 'opsp_keycompetencies');
+  }
+
+  exportExcel(): void {
+    const competencias = this.form.claveCompetencias.map((item, index) => ({
+      Numero: index + 1,
+      Nombre: item.nombre.trim(),
+      Descripcion: item.descripcion.trim(),
+    }));
+
+    void exportSheetsToExcel('opsp_keycompetencies', [
+      {
+        name: 'Resumen',
+        rows: [
+          { Campo: 'Competencia Central', Valor: this.form.central.trim() },
+          { Campo: 'Explicacion', Valor: this.form.centralExplanation.trim() },
+        ],
+        widths: [28, 90],
+      },
+      {
+        name: 'Competencias',
+        rows: competencias,
+        widths: [10, 34, 90],
+      },
+    ]);
+  }
 
   ngOnInit(): void {
     this.loadCompetencies();
@@ -185,6 +224,9 @@ export class KeycompetenciesComponent implements OnInit {
       });
   }
 }
+
+
+
 
 
 

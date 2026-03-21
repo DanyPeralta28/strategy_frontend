@@ -3,8 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
-import { environment } from 'environments/environment';
 import { EjecucionService } from '../../../services/ejecucion.service';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
 
 interface FaceKpi {
     kpi: string;
@@ -24,19 +24,23 @@ interface FaceItem {
     created_by?: string;
 }
 
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
+
 @Component({
     selector: 'app-face',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule],
+    imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
     templateUrl: './face.component.html',
     styleUrl: './face.component.scss',
 })
 export class FaceComponent implements OnInit {
     funciones: FaceItem[] = [];
-    readonly id_company = environment.defaultCompanyId || 'Scalingsoft';
-    readonly id_entity = environment.defaultEntityId;
-    readonly requester_user_id = '13474';
-    readonly default_created_by = environment.defaultCreatedBy;
+    readonly id_company = getSessionCompanyId();
+    readonly id_entity = getSessionEntityId();
+    readonly requester_user_id = String(getSessionUserId());
+    readonly default_created_by = getSessionUserId();
     loading = false;
     savingId: number | null = null;
 
@@ -271,3 +275,6 @@ export class FaceComponent implements OnInit {
         }
     }
 }
+
+
+

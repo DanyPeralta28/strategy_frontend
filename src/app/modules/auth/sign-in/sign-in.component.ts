@@ -13,7 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { fuseAnimations } from '@fuse/animations';
 import { FuseAlertComponent, FuseAlertType } from '@fuse/components/alert';
 import { AuthService } from 'app/core/auth/auth.service';
@@ -24,7 +24,6 @@ import { AuthService } from 'app/core/auth/auth.service';
     encapsulation: ViewEncapsulation.None,
     animations: fuseAnimations,
     imports: [
-        RouterLink,
         FuseAlertComponent,
         FormsModule,
         ReactiveFormsModule,
@@ -66,11 +65,8 @@ export class AuthSignInComponent implements OnInit {
     ngOnInit(): void {
         // Create the form
         this.signInForm = this._formBuilder.group({
-            email: [
-                'hughes.brian@company.com',
-                [Validators.required, Validators.email],
-            ],
-            password: ['admin', Validators.required],
+            username: ['', [Validators.required]],
+            password: ['', Validators.required],
             rememberMe: [''],
         });
     }
@@ -119,7 +115,7 @@ export class AuthSignInComponent implements OnInit {
                 // Set the alert
                 this.alert = {
                     type: 'error',
-                    message: 'Wrong email or password',
+                    message: 'Wrong username or password',
                 };
 
                 // Show the alert

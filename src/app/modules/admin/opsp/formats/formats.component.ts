@@ -18,7 +18,7 @@ export class FormatsComponent {
     { nombre: '7 Estratos', descripcion: 'Estrategia organizacional distribuida', link: 'strata' },
     { nombre: 'FDT', descripcion: 'Fortalezas, Debilidades y Tendencias', link: 'fdt' },
     { nombre: 'Factor X', descripcion: 'Descubriendo su ventaja 10X', link: 'factorx' },
-    { nombre: 'KPIs de Balance', descripcion: 'Indicadores clave de rendimiento', link: 'balancekpis' },
+    { nombre: 'Balance de KPIs', descripcion: 'Indicadores clave de rendimiento', link: 'balancekpis' },
     { nombre: 'Utilidad por X', descripcion: 'Relación de ganancias por unidad clave', link: 'utilidadx' },
     { nombre: 'Metas', descripcion: 'Objetivos específicos y medibles', link: 'goals' },
     { nombre: 'Flywheel', descripcion: 'Modelo de impulso organizacional', link: 'flywheel' },

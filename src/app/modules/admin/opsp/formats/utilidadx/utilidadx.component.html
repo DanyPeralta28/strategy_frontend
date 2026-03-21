@@ -1,34 +1,123 @@
-<div class="w-full max-w-7xl mx-auto p-6 sm:p-10 space-y-10">
-  <!-- Título -->
+<div #pdfContent class="opsp-format-page relative w-full max-w-7xl mx-auto p-6 sm:p-10 space-y-10" [appPermissionEditLock]="2">
+  <div *ngIf="canExportPdf" class="print-hide absolute top-6 right-6 sm:top-10 sm:right-10 z-10 flex items-center gap-2">
+    <button type="button" (click)="exportExcel()"
+      class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
+      Excel
+    </button>
+    <button type="button" (click)="exportPdf()"
+      class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
+      PDF
+    </button>
+  </div>
+
   <div class="text-center">
     <h2 class="text-3xl font-extrabold text-[#003660]">Utilidad por X</h2>
-    <p class="mt-1 text-sm text-gray-500">El Indicador Clave Único de la Empresa para Crecer</p>
+    <p class="mt-1 text-sm text-gray-500">Define el motor economico fundamental del negocio.</p>
   </div>
 
-  <!-- Atributos -->
-  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-    <h3 class="font-semibold text-[#003660] mb-2">Atributos del Beneficio (Utilidad/ganancia) por X:</h3>
-    <ul class="list-disc list-inside text-sm text-gray-700 space-y-1">
-      <li>KPI general individual para hacer crecer el negocio</li>
-      <li>Motor económico fundamental para el negocio</li>
-      <li>Capaz de impactar y optimizar ingresos y costos de “X”</li>
-      <li>Idealmente se alinea con el BHAG®</li>
-    </ul>
+  <div class="max-w-xl mx-auto bg-white border border-gray-200 rounded-2xl shadow-sm p-6 space-y-5">
+    <div class="space-y-2">
+      <h3 class="text-lg font-bold text-slate-800">PASO 1&nbsp; Definir que es ‘Utilidad’</h3>
+      <textarea
+        [(ngModel)]="form.definitionUtility"
+        rows="2"
+        class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#56B4DA] resize-none"
+        placeholder="Descripcion de la utilidad"></textarea>
+    </div>
+
+    <div class="space-y-2">
+      <h3 class="text-lg font-bold text-slate-800">PASO 2&nbsp; Definir que es ‘X’</h3>
+      <textarea
+        [(ngModel)]="form.definitionX"
+        rows="2"
+        class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-[#56B4DA] resize-none"
+        placeholder="Cual es tu unidad escalable del negocio"></textarea>
+    </div>
+
+    <div class="space-y-3">
+      <h3 class="text-lg font-bold text-slate-800">PASO 3&nbsp; Ingresar los valores</h3>
+
+      <div class="flex rounded-lg border border-gray-300 overflow-hidden">
+        <div class="px-4 bg-slate-50 border-r border-gray-300 flex items-center text-slate-600 font-semibold">$</div>
+        <input
+          type="number"
+          [(ngModel)]="form.valueUtility"
+          class="w-full p-3 text-sm focus:outline-none"
+          placeholder="Valor de Utilidad ($)" />
+      </div>
+
+      <div class="flex rounded-lg border border-gray-300 overflow-hidden">
+        <div class="px-4 bg-slate-50 border-r border-gray-300 flex items-center text-slate-600 font-semibold">#</div>
+        <input
+          type="number"
+          [(ngModel)]="form.valueX"
+          class="w-full p-3 text-sm focus:outline-none"
+          placeholder="Valor de X (cantidad)" />
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      <h3 class="text-lg font-bold text-slate-800">PASO 4&nbsp; Obtener el resultado</h3>
+
+      <div class="rounded-lg border border-gray-200 bg-slate-50 px-4 py-3 text-center">
+        <p class="text-xl font-extrabold text-[#243444]">{{ resultPreview }}</p>
+      </div>
+    </div>
   </div>
 
-  <!-- Caja de ingreso -->
-  <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm text-center">
-    <label class="block text-[#003660] font-semibold mb-2">Defina su “Utilidad por X”</label>
-    <textarea [(ngModel)]="utilidadPorX" rows="4"
-      class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-[#56B4DA] resize-none text-center text-sm"
-      placeholder="Ejemplo: Ganancia por cliente entregado, Utilidad por transacción..."></textarea>
-  </div>
-
-  <!-- Botón -->
-  <div class="text-right">
-    <button (click)="guardar()"
+  <div class="text-right max-w-xl mx-auto">
+    <button (click)="guardar()" [appPermissionHideIfNoEdit]="2"
       class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
       {{ existingId ? 'Actualizar' : 'Guardar' }}
     </button>
+  </div>
+</div>
+
+<div #pdfReportContent class="w-[1000px] bg-white text-slate-900 p-10 space-y-8" style="position:absolute;left:-99999px;top:0;">
+  <div class="border-b border-slate-200 pb-4">
+    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">OPSP</p>
+    <h1 class="mt-2 text-3xl font-bold text-[#003660]">Utilidad por X</h1>
+    <p class="mt-2 text-sm text-slate-600">Reporte del motor economico con definiciones, valores y resultado final.</p>
+  </div>
+
+  <div class="grid grid-cols-2 gap-6">
+    <section class="rounded-2xl border border-slate-200 p-6">
+      <h2 class="text-lg font-semibold text-[#003660]">Definicion de utilidad</h2>
+      <p class="mt-4 whitespace-pre-wrap text-base leading-7 text-slate-700">{{ form.definitionUtility || ' ' }}</p>
+    </section>
+    <section class="rounded-2xl border border-slate-200 p-6">
+      <h2 class="text-lg font-semibold text-[#003660]">Definicion de X</h2>
+      <p class="mt-4 whitespace-pre-wrap text-base leading-7 text-slate-700">{{ form.definitionX || ' ' }}</p>
+    </section>
+  </div>
+
+  <div class="rounded-2xl border border-slate-200 overflow-hidden">
+    <table class="min-w-full text-sm">
+      <thead class="bg-slate-100 text-slate-700">
+        <tr>
+          <th class="px-4 py-3 text-left font-semibold">Concepto</th>
+          <th class="px-4 py-3 text-left font-semibold">Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-t border-slate-200">
+          <td class="px-4 py-3 font-medium text-slate-800">Valor de utilidad</td>
+          <td class="px-4 py-3">{{ form.valueUtility ?? '' }}</td>
+        </tr>
+        <tr class="border-t border-slate-200">
+          <td class="px-4 py-3 font-medium text-slate-800">Valor de X</td>
+          <td class="px-4 py-3">{{ form.valueX ?? '' }}</td>
+        </tr>
+        <tr class="border-t border-slate-200 bg-slate-50">
+          <td class="px-4 py-3 font-semibold text-[#003660]">Resultado</td>
+          <td class="px-4 py-3 font-semibold text-[#003660]">{{ computedResult ?? '' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="rounded-2xl bg-[#003660] px-6 py-5 text-white">
+    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-sky-100">Resultado final</p>
+    <p class="mt-2 text-2xl font-bold">{{ resultPreview }}</p>
   </div>
 </div>

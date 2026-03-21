@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { getSessionEntityId } from 'app/core/auth/auth-session';
 import { firstValueFrom } from 'rxjs';
 import { environment } from 'environments/environment';
 
@@ -23,6 +24,7 @@ export const ApiRoutes = {
   winGame: '/api/win-game',
   playersA: '/api/players-a',
   consistentActions: '/api/consistent-actions',
+  teamViewerCollaborators: '/api/team-viewer/collaborators',
 };
 
 @Injectable({
@@ -30,23 +32,22 @@ export const ApiRoutes = {
 })
 export class OpspService {
   private readonly baseUrl = environment.apiBaseUrl;
-  private readonly entityId = environment.defaultEntityId;
 
   constructor(private http: HttpClient) { }
 
   private withEntityQuery(url: string): string {
     const separator = url.includes('?') ? '&' : '?';
-    return `${url}${separator}id_entity=${this.entityId}`;
+    return `${url}${separator}id_entity=${getSessionEntityId()}`;
   }
 
   private withEntityPayload(data: any): any {
     if (!data || typeof data !== 'object') {
-      return { id_entity: this.entityId };
+      return { id_entity: getSessionEntityId() };
     }
     if (Object.prototype.hasOwnProperty.call(data, 'id_entity')) {
       return data;
     }
-    return { ...data, id_entity: this.entityId };
+    return { ...data, id_entity: getSessionEntityId() };
   }
 
   // Format BHAG
@@ -446,6 +447,13 @@ export class OpspService {
 
   deleteConsistentActions(id: any): Promise<any> {
     return firstValueFrom(this.http.delete(`${this.baseUrl}${ApiRoutes.consistentActions}/${id}`));
+  }
+
+  // Team Viewer
+  getTeamViewerCollaborators(companyId: number | string, entityId: number | string): Promise<any> {
+    return firstValueFrom(
+      this.http.get(`${this.baseUrl}${ApiRoutes.teamViewerCollaborators}/${companyId}/${entityId}`)
+    );
   }
 }
 

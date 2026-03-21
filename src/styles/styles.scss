@@ -2,3 +2,34 @@
 /*  @ Import/write your custom styles here.
 /*  @ Styles from this file will override 'vendors.scss' and Fuse's base styles.
 /* ----------------------------------------------------------------------------------------------------- */
+
+.opsp-format-page button {
+    line-height: 1.25rem;
+}
+
+.opsp-format-page button:not(.mat-mdc-icon-button):not(.mat-icon-button) {
+    min-height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.opsp-format-page input,
+.opsp-format-page textarea,
+.opsp-format-page select {
+    line-height: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.opsp-format-page input,
+.opsp-format-page select {
+    min-height: 2.75rem;
+}
+
+.opsp-format-page textarea {
+    overflow: visible;
+}
+
+.opsp-format-page textarea[rows='1'] {
+    min-height: 2.75rem;
+}

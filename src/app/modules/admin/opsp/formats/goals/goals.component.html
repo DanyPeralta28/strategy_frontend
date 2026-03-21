@@ -1,4 +1,14 @@
-<div class="max-w-7xl mx-auto px-6 py-10 space-y-16">
+<div #pdfContent class="opsp-format-page relative max-w-7xl mx-auto px-6 py-10 space-y-16" [appPermissionEditLock]="2">
+  <div *ngIf="canExportPdf" class="print-hide absolute top-6 right-6 z-10 flex items-center gap-2">
+    <button type="button" (click)="exportExcel()"
+      class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
+      Excel
+    </button>
+    <button type="button" (click)="exportPdf()"
+      class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
+      PDF
+    </button>
+  </div>
   <!-- Encabezado -->
   <div class="text-center">
     <h2 class="text-3xl font-extrabold text-[#003660]">Metas</h2>
@@ -94,8 +104,41 @@
 
   <!-- Botón Guardar -->
   <div class="text-right pt-10">
-    <button (click)="save()" class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-3 px-8 rounded-xl shadow">
+    <button (click)="save()" [appPermissionHideIfNoEdit]="2" class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-3 px-8 rounded-xl shadow">
       Guardar
     </button>
   </div>
 </div>
+
+<div #pdfReportContent class="w-[1100px] bg-white text-slate-900 p-10 space-y-8" style="position:absolute;left:-99999px;top:0;">
+  <div class="border-b border-slate-200 pb-4">
+    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">OPSP</p>
+    <h1 class="mt-2 text-3xl font-bold text-[#003660]">Metas</h1>
+    <p class="mt-2 text-sm text-slate-600">Metas por horizonte de tiempo, listas para auditoria y seguimiento.</p>
+  </div>
+
+  <section *ngFor="let section of ['threeFiveYears','year','trimesterOne','trimesterTwo','trimesterThree','trimesterFour']" class="rounded-2xl border border-slate-200 overflow-hidden">
+    <div class="bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">{{ goalData[section].title }}</div>
+    <table class="min-w-full text-sm">
+      <thead class="bg-slate-50 text-slate-700">
+        <tr>
+          <th class="px-4 py-3 text-left font-semibold">#</th>
+          <th class="px-4 py-3 text-left font-semibold">Titulo</th>
+          <th class="px-4 py-3 text-left font-semibold">Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of goalData[section].values; let i = index" class="border-t border-slate-200 align-top">
+          <td class="px-4 py-3">{{ i + 1 }}</td>
+          <td class="px-4 py-3 font-medium text-slate-800">{{ item.title || ' ' }}</td>
+          <td class="px-4 py-3 whitespace-pre-wrap">{{ item.value || ' ' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+
+
+
+

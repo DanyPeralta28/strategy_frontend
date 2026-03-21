@@ -1,4 +1,14 @@
-<div class="max-w-7xl mx-auto p-6 sm:p-10 space-y-10">
+<div #pdfContent class="opsp-format-page relative max-w-7xl mx-auto p-6 sm:p-10 space-y-10" [appPermissionEditLock]="9">
+    <div *ngIf="canExportPdf" class="print-hide absolute top-6 right-6 sm:top-10 sm:right-10 z-10 flex items-center gap-2">
+        <button type="button" (click)="exportExcel()"
+            class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
+            Excel
+        </button>
+        <button type="button" (click)="exportPdf()"
+            class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
+            PDF
+        </button>
+    </div>
 
     <!-- Título -->
     <div class="text-center">
@@ -62,8 +72,13 @@
     <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-md max-w-5xl mx-auto">
         <h4 class="text-[#003660] font-semibold text-lg mb-2">Cuellos de botella</h4>
         <ul class="list-disc list-inside text-sm text-gray-700 mb-4">
-            <li>Hacer una lista de los 3 principales cuellos de botella</li>
-            <li>Asignar un líder responsable y fecha</li>
+            <li>Hacer una lista de los 3 principales cuellos de botella (ejemplo: 
+                costos, regulaciones, restricciones) que producirían una mejora de 
+                10x si pudieran ser resueltos
+            </li>
+            <li>Asignar un líder responsable quien dedicará tiempo y energía en cada
+                cuello de botella
+            </li>
         </ul>
 
         <ng-container *ngFor="let cuello of bottlenecks; let i = index">
@@ -87,7 +102,7 @@
                     </div>
                     <div class="md:col-span-1">
                         <h5 class="text-sm font-semibold text-[#003660] mb-1">Fecha</h5>
-                        <input [(ngModel)]="cuello.fecha" type="date"
+                        <input [(ngModel)]="cuello.fecha" type="date" [attr.min]="minFutureDate"
                             class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]" />
                     </div>
                 </div>
@@ -159,9 +174,85 @@
 
     <!-- Botón Guardar -->
     <div class="text-right max-w-5xl mx-auto pt-6">
-        <button (click)="save()"
+        <button (click)="save()" [appPermissionHideIfNoEdit]="9"
             class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow transition-all">
             Guardar
         </button>
     </div>
 </div>
+
+<div #pdfReportContent class="w-[1100px] bg-white text-slate-900 p-10 space-y-8" style="position:absolute;left:-99999px;top:0;">
+    <div class="border-b border-slate-200 pb-4">
+        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">OPSP</p>
+        <h1 class="mt-2 text-3xl font-bold text-[#003660]">Factor X</h1>
+        <p class="mt-2 text-sm text-slate-600">Mapa del proceso, cuellos de botella y ferias o acciones de intercambio.</p>
+    </div>
+
+    <div class="rounded-2xl border border-slate-200 overflow-hidden">
+        <table class="min-w-full text-sm">
+            <thead class="bg-slate-100 text-slate-700">
+                <tr>
+                    <th class="px-4 py-3 text-left font-semibold">Paso</th>
+                    <th class="px-4 py-3 text-left font-semibold">Descripcion</th>
+                    <th class="px-4 py-3 text-left font-semibold">Ineficiencia</th>
+                    <th class="px-4 py-3 text-left font-semibold">Simbolo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let step of stepGrid" class="border-t border-slate-200" [hidden]="step.type !== 'step'">
+                    <td class="px-4 py-3 font-medium text-slate-800">{{ step.step_order }}</td>
+                    <td class="px-4 py-3 whitespace-pre-wrap">{{ step.step_label || ' ' }}</td>
+                    <td class="px-4 py-3">{{ step.has_inefficiency ? 'Si' : 'No' }}</td>
+                    <td class="px-4 py-3">{{ step.symbol || ' ' }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6">
+        <section class="rounded-2xl border border-slate-200 overflow-hidden">
+            <div class="bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">Cuellos de botella</div>
+            <table class="min-w-full text-sm">
+                <thead class="bg-slate-50 text-slate-700">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold">Descripcion</th>
+                        <th class="px-4 py-3 text-left font-semibold">Lider</th>
+                        <th class="px-4 py-3 text-left font-semibold">Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of bottlenecks" class="border-t border-slate-200">
+                        <td class="px-4 py-3 whitespace-pre-wrap">{{ item.descripcion || ' ' }}</td>
+                        <td class="px-4 py-3">{{ item.lider || ' ' }}</td>
+                        <td class="px-4 py-3">{{ item.fecha || ' ' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="rounded-2xl border border-slate-200 overflow-hidden">
+            <div class="bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">Ferias</div>
+            <table class="min-w-full text-sm">
+                <thead class="bg-slate-50 text-slate-700">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold">Descripcion</th>
+                        <th class="px-4 py-3 text-left font-semibold">Lider</th>
+                        <th class="px-4 py-3 text-left font-semibold">Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of ferias" class="border-t border-slate-200">
+                        <td class="px-4 py-3 whitespace-pre-wrap">{{ item.descripcion || ' ' }}</td>
+                        <td class="px-4 py-3">{{ item.lider || ' ' }}</td>
+                        <td class="px-4 py-3">{{ item.fecha || ' ' }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+
+
+
+
+

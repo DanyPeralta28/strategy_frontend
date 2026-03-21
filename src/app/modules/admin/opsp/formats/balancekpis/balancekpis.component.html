@@ -1,14 +1,24 @@
-<div class="max-w-7xl mx-auto p-6 sm:p-10 space-y-10">
+<div #pdfContent class="opsp-format-page relative max-w-7xl mx-auto p-6 sm:p-10 space-y-10" [appPermissionEditLock]="12">
+  <div *ngIf="canExportPdf" class="print-hide absolute top-6 right-6 sm:top-10 sm:right-10 z-10 flex items-center gap-2">
+    <button type="button" (click)="exportExcel()"
+      class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
+      Excel
+    </button>
+    <button type="button" (click)="exportPdf()"
+      class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
+      PDF
+    </button>
+  </div>
   <!-- Título -->
   <div class="text-center">
-    <h2 class="text-3xl font-extrabold text-[#003660]">KPIs de Balance</h2>
+    <h2 class="text-3xl font-extrabold text-[#003660]">Balance de KPIs</h2>
     <p class="mt-1 text-sm text-gray-500">Indicadores clave de rendimiento</p>
   </div>
 
   <!-- Fecha de cumplimiento -->
   <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6 max-w-md mx-auto">
     <label class="block text-sm font-semibold text-[#003660] mb-2">Fecha de cumplimiento</label>
-    <input type="date" [(ngModel)]="fechaCumplimiento"
+    <input type="date" [(ngModel)]="fechaCumplimiento" [attr.min]="minTodayDate"
       class="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]" />
   </div>
 
@@ -19,7 +29,7 @@
       <div class="space-y-3">
         <div *ngFor="let kpi of kpisBalance[categoria.key]; let i = index" class="relative">
           <!-- Botón eliminar -->
-          <div class="text-right -mt-2 mb-2 pt-6" *ngIf="kpisBalance[categoria.key].length > 1">
+          <div class="text-right -mt-2 mb-2 pt-6" *ngIf="kpisBalance[categoria.key].length> 1">
             <button (click)="eliminarKPI(categoria.key, i)"
               class="text-red-600 text-sm font-medium hover:underline">
               🗑 Eliminar
@@ -40,12 +50,12 @@
             <div>
               <label class="text-sm font-medium text-gray-700">Color</label>
               <select [(ngModel)]="kpi.color"
-                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#56B4DA]">
+                class="w-full p-2 border rounded-md focus:ring-2 focus:ring-[#56B4DA]"
+                [ngClass]="getColorSelectClass(kpi.color)">
                 <option value="">Seleccione</option>
-                <option value="dark-green">🟢 Excelente</option>
-                <option value="light-green">🟢 Bien</option>
-                <option value="yellow">🟡 Advertencia</option>
-                <option value="red">🔴 En problemas</option>
+                <option value="dark-green" [ngStyle]="{ 'background-color': '#006600', color: '#ffffff' }">Super Verde</option>
+                <option value="light-green" [ngStyle]="{ 'background-color': '#66CC66', color: '#0f172a' }">Verde</option>
+                <option value="red" [ngStyle]="{ 'background-color': '#CC0000', color: '#ffffff' }">Rojo</option>
               </select>
             </div>
           </div>
@@ -64,9 +74,55 @@
 
   <!-- Guardar -->
   <div class="text-right pt-6">
-    <button (click)="guardarKPIs()"
+    <button (click)="guardarKPIs()" [appPermissionHideIfNoEdit]="12"
       class="bg-[#003660] hover:bg-[#005f8c] text-white font-medium py-2 px-6 rounded-xl shadow">
       Guardar
     </button>
   </div>
 </div>
+
+<div #pdfReportContent class="w-[1100px] bg-white text-slate-900 p-10 space-y-8" style="position:absolute;left:-99999px;top:0;">
+  <div class="border-b border-slate-200 pb-4">
+    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">OPSP</p>
+    <h1 class="mt-2 text-3xl font-bold text-[#003660]">Balance KPIs</h1>
+    <p class="mt-2 text-sm text-slate-600">Reporte consolidado por categoria con cumplimiento y color asignado.</p>
+  </div>
+
+  <div class="grid grid-cols-3 gap-4">
+    <div class="rounded-2xl bg-slate-50 p-4">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Fecha de cumplimiento</p>
+      <p class="mt-2 text-lg font-semibold text-slate-800">{{ fechaCumplimiento || ' ' }}</p>
+    </div>
+  </div>
+
+  <div class="rounded-2xl border border-slate-200 overflow-hidden">
+    <table class="min-w-full text-sm">
+      <thead class="bg-slate-100 text-slate-700">
+        <tr>
+          <th class="px-4 py-3 text-left font-semibold">Categoria</th>
+          <th class="px-4 py-3 text-left font-semibold">#</th>
+          <th class="px-4 py-3 text-left font-semibold">KPI</th>
+          <th class="px-4 py-3 text-left font-semibold">Resultado</th>
+          <th class="px-4 py-3 text-left font-semibold">Color</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let categoria of categorias">
+          <tr *ngFor="let item of kpisBalance[categoria.key]; let i = index" class="border-t border-slate-200">
+            <td class="px-4 py-3 font-medium text-slate-800">{{ categoria.label }}</td>
+            <td class="px-4 py-3">{{ i + 1 }}</td>
+            <td class="px-4 py-3 whitespace-pre-wrap">{{ item.kpi || ' ' }}</td>
+            <td class="px-4 py-3">{{ item.resultado || ' ' }}</td>
+            <td class="px-4 py-3">{{ getColorLabel(item.color) || ' ' }}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
+
+
+

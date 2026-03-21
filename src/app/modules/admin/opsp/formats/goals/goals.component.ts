@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service'; // ajusta la ruta si hace falta
-import { environment } from 'environments/environment';
+import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
+import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
 
 interface GoalField {
   title: string;
@@ -17,15 +19,20 @@ interface GoalSection {
   values: GoalField[];
 }
 
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
+
 @Component({
   selector: 'app-goals',
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
   templateUrl: './goals.component.html',
   styleUrl: './goals.component.scss'
 })
 export class GoalsComponent implements OnInit {
+  @ViewChild('pdfReportContent') pdfReportContent?: ElementRef<HTMLElement>;
   // compañía fija por ahora; podrías sacarla de contexto / ruta según tu flujo
-  id_company = environment.defaultCompanyId;
+  id_company = getSessionCompanyId();
   recordId: number | null = null; // si ya existe, se llena
 
   goalData: Record<string, GoalSection> = {
@@ -64,6 +71,33 @@ export class GoalsComponent implements OnInit {
   quarterKeys = ['trimesterOne', 'trimesterTwo', 'trimesterThree', 'trimesterFour'];
 
   constructor(private opspService: OpspService) {}
+
+  get canExportPdf(): boolean {
+    return Number(getSessionLevelUser()) === 2;
+  }
+
+  exportPdf(): void {
+    void exportElementToPdf(this.pdfReportContent?.nativeElement, 'opsp_goals');
+  }
+
+  exportExcel(): void {
+    const rows = Object.values(this.goalData).flatMap((section) =>
+      section.values.map((item, index) => ({
+        Horizonte: section.title,
+        Numero: index + 1,
+        Titulo: item.title.trim(),
+        Valor: item.value.trim(),
+      }))
+    );
+
+    void exportSheetsToExcel('opsp_goals', [
+      {
+        name: 'Metas',
+        rows,
+        widths: [18, 10, 32, 90],
+      },
+    ]);
+  }
 
   ngOnInit(): void {
     this.loadGoals();
@@ -121,7 +155,7 @@ export class GoalsComponent implements OnInit {
     }));
 
     const payload: any = {
-      created_by: environment.defaultCreatedBy, // idealmente lo tomas del contexto auténticado
+      created_by: getSessionUserId(), // idealmente lo tomas del contexto auténticado
       goal_sections: sections
     };
 
@@ -179,5 +213,8 @@ export class GoalsComponent implements OnInit {
     }
   }
 }
+
+
+
 
 

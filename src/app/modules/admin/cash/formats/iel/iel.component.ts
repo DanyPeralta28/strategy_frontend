@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CashService } from '../../../services/cash.service'; // <-- ajusta la ruta
 import Swal from 'sweetalert2';
-import { environment } from 'environments/environment';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
 
 interface Period {
   year: string;
@@ -19,17 +19,21 @@ interface ImpactItem {
   index: number;
 }
 
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
+
 @Component({
   selector: 'app-iel',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
   templateUrl: './iel.component.html',
   styleUrls: ['./iel.component.scss']
 })
 export class IelComponent implements OnInit {
   // ====== Config del contexto (ajusta según tu app) ======
-  id_company = environment.defaultCompanyId;
-  created_by = environment.defaultCreatedBy;
+  id_company = getSessionCompanyId();
+  created_by = getSessionUserId();
 
   // ====== Estado UI ======
   periods: Period[] = [
@@ -221,6 +225,9 @@ function numOrNull(v: any): number | null {
   const n = Number(v);
   return Number.isFinite(n) ? n : null;
 }
+
+
+
 
 
 

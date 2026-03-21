@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
@@ -9,20 +9,27 @@ import {
 import { RouterModule } from '@angular/router';
 import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service';
-import { environment } from 'environments/environment';
+import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
+import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
 
 @Component({
   selector: 'app-strata',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
   templateUrl: './strata.component.html',
   styleUrl: './strata.component.scss',
 })
 export class StrataComponent implements OnInit {
+  @ViewChild('pdfReportContent') pdfReportContent?: ElementRef<HTMLElement>;
   sevenForm!: FormGroup;
 
   // contexto / estado
-  id_company: string = environment.defaultCompanyId;
+  id_company = getSessionCompanyId();
   existingStrataId: number | null = null;
   existingBhagId: number | null = null;
   originalBhagDescription: string = '';
@@ -30,7 +37,7 @@ export class StrataComponent implements OnInit {
   originalProfitPerXDefinition: string = '';
   centralClientSummary: string = '';
   status = 1;
-  created_by = environment.defaultCreatedBy;
+  created_by = getSessionUserId();
   user_name = 'jdoe';
 
   brandPromiseId?: number;
@@ -41,6 +48,48 @@ export class StrataComponent implements OnInit {
   } | null = null;
 
   constructor(private fb: FormBuilder, public opspService: OpspService) { }
+
+  get canExportPdf(): boolean {
+    return Number(getSessionLevelUser()) === 2;
+  }
+
+  exportPdf(): void {
+    void exportElementToPdf(this.pdfReportContent?.nativeElement, 'opsp_strata');
+  }
+
+  exportExcel(): void {
+    const resumenRows = [
+      { Campo: 'Palabras propias', Valor: (this.sevenForm.get('uniqueWords')?.value || '').toString().trim() },
+      { Campo: 'Cliente central', Valor: (this.centralClientSummary || '').toString().trim() },
+      { Campo: 'Que', Valor: (this.sevenForm.get('brandTerritory.what')?.value || '').toString().trim() },
+      { Campo: 'Donde', Valor: (this.sevenForm.get('brandTerritory.where')?.value || '').toString().trim() },
+      { Campo: 'Promesa lider', Valor: (this.sevenForm.get('brandTerritory.promises')?.value || '').toString().trim() },
+      { Campo: 'Garantia de marca', Valor: (this.sevenForm.get('brandGuarantee')?.value || '').toString().trim() },
+      { Campo: 'Estrategia', Valor: (this.sevenForm.get('strategy')?.value || '').toString().trim() },
+      { Campo: 'Factor X', Valor: (this.sevenForm.get('factorX')?.value || '').toString().trim() },
+      { Campo: 'Utilidad por X', Valor: (this.sevenForm.get('profitPerX')?.value || '').toString().trim() },
+      { Campo: 'BHAG', Valor: (this.sevenForm.get('bhag')?.value || '').toString().trim() },
+    ];
+
+    const diferenciadores = this.differentiators.controls.map((group, index) => ({
+      Numero: index + 1,
+      Titulo: (group.get('title')?.value || '').toString().trim(),
+      Descripcion: (group.get('value')?.value || '').toString().trim(),
+    }));
+
+    void exportSheetsToExcel('opsp_strata', [
+      {
+        name: 'Resumen',
+        rows: resumenRows,
+        widths: [24, 90],
+      },
+      {
+        name: 'Diferenciadores',
+        rows: diferenciadores,
+        widths: [10, 34, 90],
+      },
+    ]);
+  }
 
   ngOnInit(): void {
     this.sevenForm = this.fb.group({
@@ -236,6 +285,38 @@ export class StrataComponent implements OnInit {
     return base;
   }
 
+  private async resolveExistingStrataId(): Promise<void> {
+    if (this.existingStrataId) return;
+    const resp = await this.opspService.getStrataByCompany(this.id_company);
+    const data = Array.isArray(resp?.data) ? resp.data[0] : null;
+    if (data?.id) {
+      this.existingStrataId = data.id;
+    }
+  }
+
+  private async persistStrataPayload(payload: any): Promise<any> {
+    if (this.existingStrataId) {
+      return this.opspService.updateStrata(this.existingStrataId, payload);
+    }
+
+    try {
+      const createRes = await this.opspService.createStrata(payload);
+      if (createRes?.data?.[0]?.id) {
+        this.existingStrataId = createRes.data[0].id;
+      }
+      return createRes;
+    } catch (error: any) {
+      // Fallback: if create fails because record exists, retry as update.
+      if (error?.status === 400) {
+        await this.resolveExistingStrataId();
+        if (this.existingStrataId) {
+          return this.opspService.updateStrata(this.existingStrataId, this.buildStrataPayload(false));
+        }
+      }
+      throw error;
+    }
+  }
+
   private saveBhagIfNeeded(): Promise<any> {
     const currentBhag = (this.sevenForm.get('bhag')?.value || '').trim();
     if (!currentBhag) return Promise.resolve(null);
@@ -308,15 +389,6 @@ export class StrataComponent implements OnInit {
       return;
     }
 
-    const isCreateStrata = !this.existingStrataId;
-    const strataPayload = this.buildStrataPayload(isCreateStrata);
-    const strataPromise: Promise<any> = isCreateStrata
-      ? this.opspService.createStrata(strataPayload)
-      : this.opspService.updateStrata(this.existingStrataId!, strataPayload);
-
-    const bhagPromise = this.saveBhagIfNeeded();
-    const profitPerXPromise = this.saveProfitPerXIfNeeded();
-
     Swal.fire({
       title: 'Guardando...',
       didOpen: () => {
@@ -325,16 +397,22 @@ export class StrataComponent implements OnInit {
       allowOutsideClick: false,
     });
 
-    Promise.allSettled([strataPromise, bhagPromise, profitPerXPromise]).then(results => {
+    this.resolveExistingStrataId()
+      .then(() => {
+        const wasCreate = !this.existingStrataId;
+        const strataPayload = this.buildStrataPayload(wasCreate);
+        const strataPromise = this.persistStrataPayload(strataPayload);
+        const bhagPromise = this.saveBhagIfNeeded();
+        const profitPerXPromise = this.saveProfitPerXIfNeeded();
+        return Promise.allSettled([strataPromise, bhagPromise, profitPerXPromise]);
+      })
+      .then(results => {
       const [strataRes, bhagRes, profitRes] = results;
       const successMsgs: string[] = [];
       const errorMsgs: string[] = [];
 
       if (strataRes.status === 'fulfilled') {
-        successMsgs.push(isCreateStrata ? '7 Estratos creado' : '7 Estratos actualizado');
-        if (isCreateStrata && strataRes.value?.data && strataRes.value.data[0]?.id) {
-          this.existingStrataId = strataRes.value.data[0].id;
-        }
+        successMsgs.push('7 Estratos guardado');
       } else {
         console.error('Error guardando 7 Estratos:', strataRes.reason);
         errorMsgs.push('7 Estratos: ' + (strataRes.reason?.message || 'Error al guardar'));
@@ -367,7 +445,19 @@ export class StrataComponent implements OnInit {
         text: textParts,
         confirmButtonColor: '#003660',
       });
-    });
+      })
+      .catch(err => {
+        console.error('Error preparando guardado de 7 Estratos:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo preparar el guardado de 7 Estratos.',
+          confirmButtonColor: '#003660',
+        });
+      });
   }
 }
+
+
+
 

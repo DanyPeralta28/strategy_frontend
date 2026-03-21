@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { CashService } from '../../../services/cash.service'; // ajusta ruta
-import { environment } from 'environments/environment';
+import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
 
 interface StageItem {
   idea: string;
@@ -19,16 +19,20 @@ interface Stage {
   items: StageItem[];
 }
 
+import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
+
+import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
+
 @Component({
   selector: 'app-optcash',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
   templateUrl: './optcash.component.html',
   styleUrl: './optcash.component.scss'
 })
 export class OptcashComponent implements OnInit {
   // contexto (ajusta según tu app)
-  id_company = environment.defaultCompanyId;
-  created_by = environment.defaultCreatedBy;
+  id_company = getSessionCompanyId();
+  created_by = getSessionUserId();
 
   stages: Stage[] = [
     {
@@ -217,6 +221,9 @@ export class OptcashComponent implements OnInit {
     }
   }
 }
+
+
+
 
 
 
