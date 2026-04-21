@@ -13,6 +13,8 @@ import { OpspService } from '../../../services/opsp.service';
 import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
 import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
 import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+import { OpspEntityContextService } from 'app/modules/admin/services/opsp-entity-context.service';
+import { OpspEntityFilterComponent } from '../../components/opsp-entity-filter/opsp-entity-filter.component';
 
 import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
 
@@ -21,7 +23,7 @@ import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/pe
 @Component({
   selector: 'app-fdt',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective, OpspEntityFilterComponent],
   templateUrl: './fdt.component.html',
   styleUrl: './fdt.component.scss',
 })
@@ -35,7 +37,11 @@ export class FdtComponent implements OnInit {
   status = 1;
   created_by = getSessionUserId();
 
-  constructor(private fb: FormBuilder, public opspService: OpspService) { }
+  constructor(
+    private fb: FormBuilder,
+    public opspService: OpspService,
+    private opspEntityContextService: OpspEntityContextService
+  ) { }
 
   get canExportPdf(): boolean {
     return Number(getSessionLevelUser()) === 2;
@@ -72,13 +78,10 @@ export class FdtComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.fdtForm = this.fb.group({
-      tendencias: this.fb.array([]), // global_trends_impact
-      fortalezas: this.fb.array([]), // core_strengths
-      debilidades: this.fb.array([]), // core_weaknesses
-    });
+    this.fdtForm = this.buildForm();
 
     this.loadFdt();
+    this.opspEntityContextService.entityChanges$.subscribe(() => this.loadFdt());
   }
 
   /** Getters */
@@ -114,6 +117,30 @@ export class FdtComponent implements OnInit {
     });
   }
 
+  private buildForm(
+    trends: Array<{ trend?: string; impact?: string }> = [],
+    strengths: Array<{ strength?: string; importance?: string }> = [],
+    weaknesses: Array<{ weakness?: string; severity?: string }> = []
+  ): FormGroup {
+    return this.fb.group({
+      tendencias: this.fb.array(
+        (trends.length ? trends : [{ trend: '', impact: '' }]).map((item) =>
+          this.createTrendGroup(item.trend || '', item.impact || '')
+        )
+      ),
+      fortalezas: this.fb.array(
+        (strengths.length ? strengths : [{ strength: '', importance: '' }]).map((item) =>
+          this.createStrengthGroup(item.strength || '', item.importance || '')
+        )
+      ),
+      debilidades: this.fb.array(
+        (weaknesses.length ? weaknesses : [{ weakness: '', severity: '' }]).map((item) =>
+          this.createWeaknessGroup(item.weakness || '', item.severity || '')
+        )
+      ),
+    });
+  }
+
   addTrend(): void {
     this.tendencias.push(this.createTrendGroup());
   }
@@ -141,6 +168,10 @@ export class FdtComponent implements OnInit {
 
   /** Carga existente */
   loadFdt(): void {
+    this.existingFdtId = null;
+    this.status = 1;
+    this.fdtForm = this.buildForm();
+
     this.opspService
       .getFdtByCompany(this.id_company)
       .then(resp => {
@@ -161,23 +192,11 @@ export class FdtComponent implements OnInit {
           this.created_by = data.created_by;
         }
 
-        // tendencias
-        this.tendencias.clear();
-        (data.global_trends_impact || []).forEach((t: any) => {
-          this.tendencias.push(this.createTrendGroup(t.trend || '', t.impact || ''));
-        });
-
-        // fortalezas
-        this.fortalezas.clear();
-        (data.core_strengths || []).forEach((s: any) => {
-          this.fortalezas.push(this.createStrengthGroup(s.strength || '', s.importance || ''));
-        });
-
-        // debilidades
-        this.debilidades.clear();
-        (data.core_weaknesses || []).forEach((w: any) => {
-          this.debilidades.push(this.createWeaknessGroup(w.weakness || '', w.severity || ''));
-        });
+        this.fdtForm = this.buildForm(
+          Array.isArray(data.global_trends_impact) ? data.global_trends_impact : [],
+          Array.isArray(data.core_strengths) ? data.core_strengths : [],
+          Array.isArray(data.core_weaknesses) ? data.core_weaknesses : []
+        );
       })
       .catch(err => {
         console.error('Error cargando FDT:', err);
@@ -262,8 +281,3 @@ export class FdtComponent implements OnInit {
       });
   }
 }
-
-
-
-
-

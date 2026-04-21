@@ -7,6 +7,8 @@ import { OpspService } from '../../../services/opsp.service';
 import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
 import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
 import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+import { OpspEntityContextService } from 'app/modules/admin/services/opsp-entity-context.service';
+import { OpspEntityFilterComponent } from '../../components/opsp-entity-filter/opsp-entity-filter.component';
 
 interface CoreValueItem {
   id?: number;
@@ -24,7 +26,7 @@ import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/pe
 @Component({
   selector: 'app-corevalues',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
+  imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective, OpspEntityFilterComponent],
   templateUrl: './corevalues.component.html',
   styleUrl: './corevalues.component.scss'
 })
@@ -37,7 +39,10 @@ export class CorevaluesComponent implements OnInit {
   id_company = getSessionCompanyId();
   created_by = getSessionUserId();
 
-  constructor(public opspService: OpspService) { }
+  constructor(
+    public opspService: OpspService,
+    private opspEntityContextService: OpspEntityContextService
+  ) { }
 
   get canExportPdf(): boolean {
     return Number(getSessionLevelUser()) === 2;
@@ -50,10 +55,10 @@ export class CorevaluesComponent implements OnInit {
   exportExcel(): void {
     const rows = this.coreValues
       .map((item, index) => ({
-        Numero: index + 1,
-        ValorCentral: item.value_title.trim(),
-        DescripcionCorta: item.short_description.trim(),
-        DescripcionLarga: item.long_description.trim(),
+        'Número': index + 1,
+        'Valor Central': item.value_title.trim(),
+        'Descripción Corta': item.short_description.trim(),
+        'Descripción Larga': item.long_description.trim(),
       }));
 
     void exportSheetsToExcel('opsp_corevalues', [
@@ -67,6 +72,7 @@ export class CorevaluesComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCoreValues();
+    this.opspEntityContextService.entityChanges$.subscribe(() => this.loadCoreValues());
   }
 
   private makeUid(): string {

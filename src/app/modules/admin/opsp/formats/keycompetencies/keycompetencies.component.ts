@@ -7,6 +7,8 @@ import { OpspService } from '../../../services/opsp.service';
 import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
 import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
 import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+import { OpspEntityContextService } from 'app/modules/admin/services/opsp-entity-context.service';
+import { OpspEntityFilterComponent } from '../../components/opsp-entity-filter/opsp-entity-filter.component';
 
 interface CompetencyItem {
   name: string;
@@ -27,7 +29,7 @@ import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/pe
 @Component({
   selector: 'app-keycompetencies',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
+  imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective, OpspEntityFilterComponent],
   templateUrl: './keycompetencies.component.html',
   styleUrl: './keycompetencies.component.scss'
 })
@@ -45,7 +47,10 @@ export class KeycompetenciesComponent implements OnInit {
 
   originalSnapshot: KeyCompetenciesForm = { ...this.form };
 
-  constructor(public opspService: OpspService) { }
+  constructor(
+    public opspService: OpspService,
+    private opspEntityContextService: OpspEntityContextService
+  ) { }
 
   get canExportPdf(): boolean {
     return Number(getSessionLevelUser()) === 2;
@@ -81,9 +86,17 @@ export class KeycompetenciesComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCompetencies();
+    this.opspEntityContextService.entityChanges$.subscribe(() => this.loadCompetencies());
   }
 
   loadCompetencies(): void {
+    this.form = {
+      central: '',
+      centralExplanation: '',
+      claveCompetencias: [{ nombre: '', descripcion: '' }]
+    };
+    this.originalSnapshot = { ...this.form };
+
     this.opspService
       .getCompetenciesByCompany(this.id_company)
       .then(resp => {

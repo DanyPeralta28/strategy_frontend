@@ -258,6 +258,62 @@ export class OpspComponent {
             }
         ];
 
+        const consistentActionsRows = (this.accionesConsistentes || []).map((accion, index) => ({
+            '#': index + 1,
+            Accion: accion || '',
+        }));
+
+        const longTermGoalsRows = (this.metasPlazoCampos || []).map((meta, index) => ({
+            '#': index + 1,
+            Titulo: meta.titulo || '',
+            Valor: meta.value || '',
+        }));
+
+        const annualGoalsRows = (this.metasAnualesCampos || []).map((meta, index) => ({
+            '#': index + 1,
+            Titulo: meta.titulo || '',
+            Valor: meta.value || '',
+        }));
+
+        const quarterGoalsRows = (this.metaTrimestreCampos || []).map((meta, index) => ({
+            '#': index + 1,
+            Trimestre: this.trimestreVigente || '',
+            Titulo: meta.titulo || '',
+            Valor: meta.value || '',
+        }));
+
+        const factorXRows = (this.factorX || []).map((item, index) => ({
+            '#': index + 1,
+            Accion: item || '',
+        }));
+
+        const strategyRows = [
+            { Campo: 'Estrategia en una frase', Valor: this.estrategiaFrase || '' },
+            { Campo: 'Palabras propias', Valor: this.palabrasPropias || '' },
+        ];
+
+        const fdtRows = [
+            ...(this.fdtFortalezas || []).map((item, index) => ({
+                Tipo: 'Fortaleza',
+                '#': index + 1,
+                Valor: item || '',
+            })),
+            ...(this.fdtDebilidades || []).map((item, index) => ({
+                Tipo: 'Debilidad',
+                '#': index + 1,
+                Valor: item || '',
+            })),
+            ...(this.fdtTendencias || []).map((item, index) => ({
+                Tipo: 'Tendencia',
+                '#': index + 1,
+                Valor: item || '',
+            })),
+        ];
+
+        const centralClientRows = [
+            { Campo: 'Cliente central', Valor: this.centralClientSummary || '' },
+        ];
+
         const balanceRows = this.balanceCategorias.flatMap(cat =>
             (cat.kpis || []).map(kpi => ({
                 Categoria: cat.nombre || '',
@@ -433,9 +489,17 @@ export class OpspComponent {
 
         void exportSheetsToExcel('opsp_dashboard', [
             { name: 'Resumen', rows: summaryRows },
+            { name: 'Cliente Central', rows: centralClientRows },
+            { name: 'Acciones', rows: consistentActionsRows },
+            { name: 'Metas Largo Plazo', rows: longTermGoalsRows },
+            { name: 'Metas Anuales', rows: annualGoalsRows },
+            { name: 'Metas Trimestrales', rows: quarterGoalsRows },
             { name: 'Balance KPIs', rows: balanceRows },
             { name: 'Prioridades', rows: prioritiesRows },
             { name: 'Ganar el Juego', rows: gameRows },
+            { name: 'Factor X', rows: factorXRows },
+            { name: 'Estrategia', rows: strategyRows },
+            { name: 'FDT', rows: fdtRows },
             { name: 'Usuarios KPIs', rows: usersKpiRows },
             { name: 'Usuarios Prioridades', rows: usersPriorityRows },
             { name: 'Usuarios Juegos', rows: usersGameRows },
@@ -1200,7 +1264,21 @@ export class OpspComponent {
                 return;
             }
 
-            this.utilidadX = (data.profit_per_x_definition ?? '').toString().trim();
+            const valueUtility = data.value_utility != null && data.value_utility !== ''
+                ? `$${data.value_utility}`
+                : '';
+            const valueX = data.value_x != null && data.value_x !== ''
+                ? `$${data.value_x}`
+                : '';
+            const valueResult = data.value_result != null && data.value_result !== ''
+                ? `$${data.value_result}`
+                : '';
+
+            this.utilidadX = [
+                `Valor utilidad: ${valueUtility || 'Sin valor'}`,
+                `Valor X: ${valueX || 'Sin valor'}`,
+                `Resultado: ${valueResult || 'Sin valor'}`,
+            ].join(' | ');
 
         } catch (err) {
             console.error('Error cargando Utilidad / X:', err);

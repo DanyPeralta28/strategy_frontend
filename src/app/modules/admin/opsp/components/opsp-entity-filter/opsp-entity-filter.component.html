@@ -1,0 +1,26 @@
+<div *ngIf="isAdmin" class="print-hide rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm">
+  <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <div class="min-w-0">
+      <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-slate-400">Contexto OPSP</p>
+      <div class="mt-1 flex items-center gap-2">
+        <h3 class="text-sm font-semibold text-[#003660]">Entidad</h3>
+        <span class="inline-flex items-center rounded-full bg-sky-50 px-2.5 py-0.5 text-[11px] font-medium text-sky-700">
+          Filtro activo
+        </span>
+      </div>
+      <p class="mt-1 text-xs text-slate-500">
+        Cambia la entidad para consultar la informacion del formato seleccionado.
+      </p>
+    </div>
+
+    <div class="w-full md:max-w-md">
+      <select
+        [(ngModel)]="selectedEntidad"
+        (ngModelChange)="onEntidadChange()"
+        class="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm transition focus:border-[#56B4DA] focus:bg-white focus:outline-none"
+      >
+        <option *ngFor="let entidad of entidades" [ngValue]="entidad.id">{{ entidad.name }}</option>
+      </select>
+    </div>
+  </div>
+</div>

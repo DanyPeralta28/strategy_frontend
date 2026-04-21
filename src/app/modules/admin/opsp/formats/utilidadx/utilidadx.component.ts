@@ -8,6 +8,8 @@ import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
 import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
 import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
 import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+import { OpspEntityContextService } from 'app/modules/admin/services/opsp-entity-context.service';
+import { OpspEntityFilterComponent } from '../../components/opsp-entity-filter/opsp-entity-filter.component';
 
 interface ProfitPerXForm {
   definitionUtility: string;
@@ -20,7 +22,7 @@ interface ProfitPerXForm {
 @Component({
   selector: 'app-utilidadx',
   standalone: true,
-  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
+  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective, OpspEntityFilterComponent],
   templateUrl: './utilidadx.component.html',
   styleUrl: './utilidadx.component.scss'
 })
@@ -35,7 +37,14 @@ export class UtilidadxComponent implements OnInit {
   form: ProfitPerXForm = this.createEmptyForm();
   private originalSnapshot = '';
 
-  constructor(private opspService: OpspService) {}
+  constructor(
+    private opspService: OpspService,
+    private opspEntityContextService: OpspEntityContextService
+  ) {}
+
+  get currentEntityId(): number | string {
+    return this.opspEntityContextService.getCurrentEntityId();
+  }
 
   get canExportPdf(): boolean {
     return Number(getSessionLevelUser()) === 2;
@@ -44,7 +53,7 @@ export class UtilidadxComponent implements OnInit {
   get resultPreview(): string {
     const result = this.computedResult != null ? this.formatNumber(this.computedResult) : '0';
     const xLabel = this.form.definitionX.trim() || '[X]';
-    return `Motor Economico = ${result} por ${xLabel}`;
+    return `Motor Economico = $${result} por ${xLabel}`;
   }
 
   get computedResult(): number | null {
@@ -70,9 +79,9 @@ export class UtilidadxComponent implements OnInit {
         rows: [
           { Campo: 'Definicion Utilidad', Valor: this.form.definitionUtility.trim() },
           { Campo: 'Definicion X', Valor: this.form.definitionX.trim() },
-          { Campo: 'Valor Utilidad', Valor: this.form.valueUtility ?? '' },
-          { Campo: 'Valor X', Valor: this.form.valueX ?? '' },
-          { Campo: 'Resultado', Valor: this.computedResult ?? '' },
+          { Campo: 'Valor Utilidad', Valor: this.form.valueUtility != null ? `$${this.form.valueUtility}` : '' },
+          { Campo: 'Valor X', Valor: this.form.valueX != null ? `$${this.form.valueX}` : '' },
+          { Campo: 'Resultado', Valor: this.computedResult != null ? `$${this.computedResult}` : '' },
         ],
         widths: [32, 90],
       },
@@ -81,6 +90,7 @@ export class UtilidadxComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUtilidadPorX();
+    this.opspEntityContextService.entityChanges$.subscribe(() => this.loadUtilidadPorX());
   }
 
   private createEmptyForm(): ProfitPerXForm {
@@ -153,9 +163,9 @@ export class UtilidadxComponent implements OnInit {
     if (this.existingId) {
       request = this.opspService.updateProfitPerX(this.existingId, payload);
     } else {
-      request = this.opspService.createProfitPerX({
+        request = this.opspService.createProfitPerX({
         id_company: this.id_company,
-        id_entity: this.id_entity,
+        id_entity: this.currentEntityId,
         ...payload,
       });
     }

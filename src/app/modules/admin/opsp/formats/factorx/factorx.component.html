@@ -1,4 +1,5 @@
 <div #pdfContent class="opsp-format-page relative max-w-7xl mx-auto p-6 sm:p-10 space-y-10" [appPermissionEditLock]="9">
+  <app-opsp-entity-filter></app-opsp-entity-filter>
     <div *ngIf="canExportPdf" class="print-hide absolute top-6 right-6 sm:top-10 sm:right-10 z-10 flex items-center gap-2">
         <button type="button" (click)="exportExcel()"
             class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
@@ -194,8 +195,8 @@
                 <tr>
                     <th class="px-4 py-3 text-left font-semibold">Paso</th>
                     <th class="px-4 py-3 text-left font-semibold">Descripcion</th>
-                    <th class="px-4 py-3 text-left font-semibold">Ineficiencia</th>
-                    <th class="px-4 py-3 text-left font-semibold">Simbolo</th>
+                    <th class="px-4 py-3 text-left font-semibold">Tiene ineficiencia</th>
+                    <th *ngIf="hasAnyStepSymbol()" class="px-4 py-3 text-left font-semibold">Símbolo</th>
                 </tr>
             </thead>
             <tbody>
@@ -203,7 +204,7 @@
                     <td class="px-4 py-3 font-medium text-slate-800">{{ step.step_order }}</td>
                     <td class="px-4 py-3 whitespace-pre-wrap">{{ step.step_label || ' ' }}</td>
                     <td class="px-4 py-3">{{ step.has_inefficiency ? 'Si' : 'No' }}</td>
-                    <td class="px-4 py-3">{{ step.symbol || ' ' }}</td>
+                    <td *ngIf="hasAnyStepSymbol()" class="px-4 py-3">{{ step.symbol || ' ' }}</td>
                 </tr>
             </tbody>
         </table>

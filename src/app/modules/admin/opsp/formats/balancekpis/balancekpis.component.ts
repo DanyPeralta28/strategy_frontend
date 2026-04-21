@@ -6,6 +6,8 @@ import { OpspService } from '../../../services/opsp.service';
 import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
 import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
 import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+import { OpspEntityContextService } from 'app/modules/admin/services/opsp-entity-context.service';
+import { OpspEntityFilterComponent } from '../../components/opsp-entity-filter/opsp-entity-filter.component';
 
 import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
 
@@ -13,12 +15,14 @@ import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/pe
 
 @Component({
   selector: 'app-balancekpis',
-  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
+  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective, OpspEntityFilterComponent],
   templateUrl: './balancekpis.component.html',
   styleUrl: './balancekpis.component.scss',
 })
 export class BalancekpisComponent implements OnInit {
   @ViewChild('pdfReportContent') pdfReportContent?: ElementRef<HTMLElement>;
+  reportRows: Array<{ categoria: string; numero: number; kpi: string; resultado: string; color: string }> = [];
+  reportFechaCumplimiento = '';
   categorias = [
     { key: 'empleados', label: 'Empleados' },
     { key: 'clientes', label: 'Clientes' },
@@ -35,20 +39,20 @@ export class BalancekpisComponent implements OnInit {
   }
 
   exportPdf(): void {
+    this.refreshReportData();
     void exportElementToPdf(this.pdfReportContent?.nativeElement, 'opsp_balancekpis');
   }
 
   exportExcel(): void {
-    const rows = this.categorias.flatMap((categoria) =>
-      (this.kpisBalance[categoria.key] || []).map((item: any, index: number) => ({
-        Categoria: categoria.label,
-        Numero: index + 1,
-        KPI: (item.kpi || '').toString().trim(),
-        Resultado: (item.resultado || '').toString().trim(),
-        Color: this.getColorLabel(item.color),
-        FechaCumplimiento: this.fechaCumplimiento,
-      }))
-    );
+    this.refreshReportData();
+    const rows = this.reportRows.map((item) => ({
+      Categoria: item.categoria,
+      Numero: item.numero,
+      KPI: item.kpi,
+      Resultado: item.resultado,
+      Color: item.color,
+      FechaCumplimiento: this.reportFechaCumplimiento,
+    }));
 
     void exportSheetsToExcel('opsp_balancekpis', [
       {
@@ -86,10 +90,14 @@ export class BalancekpisComponent implements OnInit {
   existingKpiBalanceId: number | null = null;
   created_by = getSessionUserId();
 
-  constructor(public opspService: OpspService) {}
+  constructor(
+    public opspService: OpspService,
+    private opspEntityContextService: OpspEntityContextService
+  ) {}
 
   ngOnInit(): void {
     this.loadKpisBalance();
+    this.opspEntityContextService.entityChanges$.subscribe(() => this.loadKpisBalance());
   }
 
   private getTodayIso(): string {
@@ -102,6 +110,42 @@ export class BalancekpisComponent implements OnInit {
 
   createKpi() {
     return { kpi: '', resultado: '', color: '' };
+  }
+
+  private isKpiEmpty(item: any): boolean {
+    return !item || (
+      (item.kpi || '').toString().trim() === '' &&
+      (item.resultado || '').toString().trim() === '' &&
+      (item.color || '').toString().trim() === ''
+    );
+  }
+
+  private isKpiComplete(item: any): boolean {
+    return !!item &&
+      (item.kpi || '').toString().trim() !== '' &&
+      (item.resultado || '').toString().trim() !== '' &&
+      (item.color || '').toString().trim() !== '';
+  }
+
+  private hasPartialKpi(item: any): boolean {
+    return !this.isKpiEmpty(item) && !this.isKpiComplete(item);
+  }
+
+  getCompleteKpis(categoryKey: string): any[] {
+    return (this.kpisBalance[categoryKey] || []).filter((item: any) => this.isKpiComplete(item));
+  }
+
+  refreshReportData(): void {
+    this.reportFechaCumplimiento = this.fechaCumplimiento || '';
+    this.reportRows = this.categorias.flatMap((categoria) =>
+      this.getCompleteKpis(categoria.key).map((item: any, index: number) => ({
+        categoria: categoria.label,
+        numero: index + 1,
+        kpi: (item.kpi || '').toString().trim(),
+        resultado: (item.resultado || '').toString().trim(),
+        color: this.getColorLabel(item.color),
+      }))
+    );
   }
 
   agregarKPI(key: string): void {
@@ -165,10 +209,17 @@ export class BalancekpisComponent implements OnInit {
 
   /** Carga existente */
   loadKpisBalance(): void {
+    this.existingKpiBalanceId = null;
+    this.fechaCumplimiento = '';
+    Object.keys(this.kpisBalance).forEach((key) => {
+      this.kpisBalance[key] = [this.createKpi()];
+    });
+
     this.opspService
       .getKpiBalancesByCompany(this.id_company)
       .then(resp => {
         if (!resp?.data || resp.data.length === 0) {
+          this.refreshReportData();
           return; // no hay datos previos: quedan los defaults
         }
 
@@ -196,9 +247,11 @@ export class BalancekpisComponent implements OnInit {
             }
           }
         });
+        this.refreshReportData();
       })
       .catch(err => {
         console.error('Error cargando KPIs de Balance:', err);
+        this.refreshReportData();
       });
   }
 
@@ -207,21 +260,12 @@ export class BalancekpisComponent implements OnInit {
     const mappedKpis: any = {};
 
     Object.entries(this.uiToApiCategoryMap).forEach(([uiKey, apiKey]) => {
-      const list = this.kpisBalance[uiKey] || [];
-      mappedKpis[apiKey] = list
-        .filter((kpi: any) => {
-          // filtro de vacíos parecido a como lo hacías antes
-          return (
-            (kpi.kpi && kpi.kpi.toString().trim() !== '') ||
-            (kpi.resultado && kpi.resultado.toString().trim() !== '') ||
-            (kpi.color && kpi.color.toString().trim() !== '')
-          );
-        })
-        .map((kpi: any) => ({
-          kpi: kpi.kpi,
-          result: kpi.resultado,
-          color: this.uiToApiColor[kpi.color] || '',
-        }));
+      const list = this.getCompleteKpis(uiKey);
+      mappedKpis[apiKey] = list.map((kpi: any) => ({
+        kpi: kpi.kpi,
+        result: kpi.resultado,
+        color: this.uiToApiColor[kpi.color] || '',
+      }));
     });
 
     const payload: any = {
@@ -260,6 +304,35 @@ export class BalancekpisComponent implements OnInit {
       return;
     }
 
+    const hasPartialRows = this.categorias.some((categoria) =>
+      (this.kpisBalance[categoria.key] || []).some((item: any) => this.hasPartialKpi(item))
+    );
+
+    if (hasPartialRows) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'KPIs incompletos',
+        text: 'Completa KPI, resultado y color en cada fila iniciada antes de guardar.',
+        confirmButtonColor: '#003660',
+      });
+      return;
+    }
+
+    const totalCompleteKpis = this.categorias.reduce(
+      (total, categoria) => total + this.getCompleteKpis(categoria.key).length,
+      0
+    );
+
+    if (totalCompleteKpis === 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Sin KPIs',
+        text: 'Agrega al menos un KPI completo antes de guardar.',
+        confirmButtonColor: '#003660',
+      });
+      return;
+    }
+
     const isCreate = !this.existingKpiBalanceId;
     const payload = this.buildPayload(isCreate);
 
@@ -280,6 +353,7 @@ export class BalancekpisComponent implements OnInit {
         if (isCreate && res?.data && res.data[0]?.id) {
           this.existingKpiBalanceId = res.data[0].id;
         }
+        this.refreshReportData();
         Swal.fire({
           icon: 'success',
           title: isCreate ? '¡Creado!' : '¡Actualizado!',
@@ -298,6 +372,7 @@ export class BalancekpisComponent implements OnInit {
       });
   }
 }
+
 
 
 

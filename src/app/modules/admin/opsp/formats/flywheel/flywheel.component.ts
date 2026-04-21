@@ -14,6 +14,8 @@ import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
 import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
 import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/permission-hide-if-no-edit.directive';
 import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+import { OpspEntityContextService } from 'app/modules/admin/services/opsp-entity-context.service';
+import { OpspEntityFilterComponent } from '../../components/opsp-entity-filter/opsp-entity-filter.component';
 
 interface FlywheelItem {
   id?: number;
@@ -33,7 +35,7 @@ interface FlywheelItem {
 @Component({
   selector: 'app-flywheel',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, DragDropModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
+  imports: [CommonModule, RouterModule, FormsModule, DragDropModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective, OpspEntityFilterComponent],
   templateUrl: './flywheel.component.html',
   styleUrl: './flywheel.component.scss',
 })
@@ -51,7 +53,10 @@ export class FlywheelComponent implements OnInit {
   flywheelCode = 101;
   created_by = getSessionUserId();
 
-  constructor(public opspService: OpspService) {}
+  constructor(
+    public opspService: OpspService,
+    private opspEntityContextService: OpspEntityContextService
+  ) {}
 
   get canExportPdf(): boolean {
     return Number(getSessionLevelUser()) === 2;
@@ -85,6 +90,7 @@ export class FlywheelComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadFlywheel();
+    this.opspEntityContextService.entityChanges$.subscribe(() => this.loadFlywheel());
   }
 
   private makeUid(): string {
@@ -124,7 +130,7 @@ export class FlywheelComponent implements OnInit {
           this.flywheelCode = dataArray[0].code;
         }
 
-        this.flywheelItems = dataArray.map((d, index) => ({
+        const mappedItems = dataArray.map((d, index) => ({
           id: d.id,
           uid: d.id ? `existing-${d.id}` : this.makeUid(),
           code: d.code ?? this.flywheelCode,
@@ -139,9 +145,17 @@ export class FlywheelComponent implements OnInit {
           responsable: d.kpi_leader || '',
         }));
 
-        this.flywheelItems.sort((a, b) => (a.order_item || 0) - (b.order_item || 0));
-        this.originalFlywheelItems = this.flywheelItems.map((i) => ({ ...i }));
-        this.originalSequence = this.flywheelItems.map((i) => i.uid);
+        mappedItems.sort((a, b) => {
+          const orderDiff = (a.order_item || 0) - (b.order_item || 0);
+          if (orderDiff !== 0) return orderDiff;
+          return (a.id || 0) - (b.id || 0);
+        });
+
+        this.originalFlywheelItems = mappedItems.map((i) => ({ ...i }));
+        this.originalSequence = mappedItems.map((i) => i.uid);
+
+        this.flywheelItems = mappedItems.map((i) => ({ ...i }));
+        this.syncOrderItems();
       })
       .catch((err) => {
         console.error('Error cargando Flywheel:', err);
@@ -193,6 +207,12 @@ export class FlywheelComponent implements OnInit {
   private sequencesEqual(a: string[], b: string[]): boolean {
     if (a.length !== b.length) return false;
     return a.every((v, i) => v === b[i]);
+  }
+
+  private extractResponseId(res: any): number | null {
+    const rawId = res?.data?.[0]?.id ?? res?.data?.id ?? res?.id ?? null;
+    const parsed = Number(rawId);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
   }
 
   private buildPayloadForItem(item: FlywheelItem, isCreate: boolean): any {
@@ -259,21 +279,17 @@ export class FlywheelComponent implements OnInit {
         if (itemChanged || sequenceChanged) {
           const payload = this.buildPayloadForItem(item, false);
           promises.push(
-            this.opspService.updateFlywheel(item.id, payload).then((res) => {
-              if (original) {
-                Object.assign(original, { ...item });
-              }
-              return res;
-            })
+            this.opspService.updateFlywheel(item.id, payload)
           );
         }
       } else {
         const payload = this.buildPayloadForItem(item, true);
         promises.push(
           this.opspService.createFlywheel(payload).then((res) => {
-            if (res?.data && res.data[0]?.id) {
-              item.id = res.data[0].id;
-              this.originalFlywheelItems.push({ ...item });
+            const createdId = this.extractResponseId(res);
+            if (createdId != null) {
+              item.id = createdId;
+              item.uid = `existing-${createdId}`;
             }
             return res;
           })
@@ -299,10 +315,7 @@ export class FlywheelComponent implements OnInit {
 
     Promise.allSettled(promises).then((results) => {
       const errors = results.filter((r) => r.status !== 'fulfilled').length;
-
-      if (sequenceChanged) {
-        this.originalSequence = this.flywheelItems.map((i) => i.uid);
-      }
+      this.loadFlywheel();
 
       Swal.fire({
         icon: errors ? 'warning' : 'success',

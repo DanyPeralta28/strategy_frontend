@@ -59,18 +59,49 @@ export async function exportElementToPdf(
     const marginBottom = 10;
     const availableWidth = pageWidth - marginX * 2;
     const availableHeight = pageHeight - marginTop - marginBottom;
-    const imageHeight = (canvas.height * availableWidth) / canvas.width;
-    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+    const pageCanvasHeight = Math.max(
+      1,
+      Math.floor((availableHeight * canvas.width) / availableWidth)
+    );
 
-    let printedHeight = 0;
+    let sourceY = 0;
     let page = 0;
-    while (printedHeight < imageHeight) {
+
+    while (sourceY < canvas.height) {
+      const sliceHeight = Math.min(pageCanvasHeight, canvas.height - sourceY);
+      const pageCanvas = document.createElement('canvas');
+      pageCanvas.width = canvas.width;
+      pageCanvas.height = sliceHeight;
+
+      const context = pageCanvas.getContext('2d');
+      if (!context) {
+        throw new Error('No se pudo preparar el lienzo para la paginacion del PDF.');
+      }
+
+      context.fillStyle = '#ffffff';
+      context.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+      context.drawImage(
+        canvas,
+        0,
+        sourceY,
+        canvas.width,
+        sliceHeight,
+        0,
+        0,
+        canvas.width,
+        sliceHeight
+      );
+
+      const sliceHeightMm = (sliceHeight * availableWidth) / canvas.width;
+      const imgData = pageCanvas.toDataURL('image/jpeg', 0.98);
+
       if (page > 0) {
         pdf.addPage();
       }
-      const y = marginTop - printedHeight;
-      pdf.addImage(imgData, 'JPEG', marginX, y, availableWidth, imageHeight, undefined, 'FAST');
-      printedHeight += availableHeight;
+
+      pdf.addImage(imgData, 'JPEG', marginX, marginTop, availableWidth, sliceHeightMm, undefined, 'FAST');
+
+      sourceY += sliceHeight;
       page++;
     }
 

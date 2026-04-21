@@ -6,6 +6,8 @@ import { OpspService } from '../../../services/opsp.service';
 import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
 import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
 import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+import { OpspEntityContextService } from 'app/modules/admin/services/opsp-entity-context.service';
+import { OpspEntityFilterComponent } from '../../components/opsp-entity-filter/opsp-entity-filter.component';
 
 import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
 
@@ -14,7 +16,7 @@ import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/pe
 @Component({
   selector: 'app-central-client',
   standalone: true,
-  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
+  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective, OpspEntityFilterComponent],
   templateUrl: './centralclient.component.html',
   styleUrl: './centralclient.component.scss'
 })
@@ -85,10 +87,14 @@ export class CentralClientComponent implements OnInit {
     { key: 'key_needs_from_us', pregunta: 'Necesidades clave de nosotros', respuesta: '' },
   ];
 
-  constructor(public opspService: OpspService) {}
+  constructor(
+    public opspService: OpspService,
+    private opspEntityContextService: OpspEntityContextService
+  ) {}
 
   ngOnInit(): void {
     this.loadCentralClients();
+    this.opspEntityContextService.entityChanges$.subscribe(() => this.loadCentralClients());
   }
 
   get totalSlides(): number {
@@ -145,6 +151,11 @@ export class CentralClientComponent implements OnInit {
       }
     }
     return false;
+  }
+
+  private hasAllFieldsCompleted(): boolean {
+    return this.preguntas.every((p) => p.respuesta.trim() !== '')
+      && this.descripcionResumen.trim() !== '';
   }
 
   private applyRecord(existing: any): void {
@@ -227,6 +238,16 @@ export class CentralClientComponent implements OnInit {
         icon: 'warning',
         title: 'Sin datos',
         text: 'Por favor completa al menos un campo antes de guardar.',
+        confirmButtonColor: '#003660'
+      });
+      return;
+    }
+
+    if (!this.centralClientId && !this.hasAllFieldsCompleted()) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campos incompletos',
+        text: 'Para crear un nuevo cliente central debes completar todos los campos.',
         confirmButtonColor: '#003660'
       });
       return;

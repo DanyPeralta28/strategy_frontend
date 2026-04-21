@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { environment } from 'environments/environment';
 
 export interface User {
   id: number;
@@ -24,7 +25,7 @@ export interface LoginResponse {
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly loginUrl = 'https://qa.scalingsoft.com/api/signin.php';
+  private readonly loginUrl = environment.loginUrl;
 
   constructor(private http: HttpClient) {}
 

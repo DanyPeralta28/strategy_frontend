@@ -1,4 +1,5 @@
 <div #pdfContent class="opsp-format-page relative w-full max-w-7xl mx-auto p-6 sm:p-10 space-y-10" [appPermissionEditLock]="2">
+  <app-opsp-entity-filter></app-opsp-entity-filter>
   <div *ngIf="canExportPdf" class="print-hide absolute top-6 right-6 sm:top-10 sm:right-10 z-10 flex items-center gap-2">
     <button type="button" (click)="exportExcel()"
       class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
@@ -102,15 +103,15 @@
       <tbody>
         <tr class="border-t border-slate-200">
           <td class="px-4 py-3 font-medium text-slate-800">Valor de utilidad</td>
-          <td class="px-4 py-3">{{ form.valueUtility ?? '' }}</td>
+          <td class="px-4 py-3">${{ form.valueUtility ?? '' }}</td>
         </tr>
         <tr class="border-t border-slate-200">
           <td class="px-4 py-3 font-medium text-slate-800">Valor de X</td>
-          <td class="px-4 py-3">{{ form.valueX ?? '' }}</td>
+          <td class="px-4 py-3">${{ form.valueX ?? '' }}</td>
         </tr>
         <tr class="border-t border-slate-200 bg-slate-50">
           <td class="px-4 py-3 font-semibold text-[#003660]">Resultado</td>
-          <td class="px-4 py-3 font-semibold text-[#003660]">{{ computedResult ?? '' }}</td>
+          <td class="px-4 py-3 font-semibold text-[#003660]">${{ computedResult ?? '' }}</td>
         </tr>
       </tbody>
     </table>

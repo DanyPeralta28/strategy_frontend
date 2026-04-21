@@ -6,6 +6,8 @@ import { OpspService } from '../../../services/opsp.service';
 import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
 import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
 import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+import { OpspEntityContextService } from 'app/modules/admin/services/opsp-entity-context.service';
+import { OpspEntityFilterComponent } from '../../components/opsp-entity-filter/opsp-entity-filter.component';
 
 interface Channel {
   name: string;
@@ -33,7 +35,7 @@ import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/pe
 @Component({
   selector: 'app-territory',
   standalone: true,
-  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
+  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective, OpspEntityFilterComponent],
   templateUrl: './territory.component.html',
 })
 export class TerritoryComponent implements OnInit {
@@ -46,7 +48,10 @@ export class TerritoryComponent implements OnInit {
   id_company = getSessionCompanyId();
   created_by = getSessionUserId();
 
-  constructor(private opspService: OpspService) { }
+  constructor(
+    private opspService: OpspService,
+    private opspEntityContextService: OpspEntityContextService
+  ) { }
 
   get canExportPdf(): boolean {
     return Number(getSessionLevelUser()) === 2;
@@ -108,10 +113,13 @@ export class TerritoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTerritories();
+    this.opspEntityContextService.entityChanges$.subscribe(() => this.loadTerritories());
   }
 
   async loadTerritories(): Promise<void> {
     try {
+      this.territories = [];
+      this.territoryId = null;
       const resp = await this.opspService.getTerritoriesByCompany(this.id_company);
       if (resp?.data && Array.isArray(resp.data) && resp.data.length) {
         const found = resp.data[0];

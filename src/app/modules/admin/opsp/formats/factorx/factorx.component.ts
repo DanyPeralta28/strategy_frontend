@@ -7,6 +7,8 @@ import { OpspService } from '../../../services/opsp.service'; // ajusta la ruta 
 import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
 import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
 import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+import { OpspEntityContextService } from 'app/modules/admin/services/opsp-entity-context.service';
+import { OpspEntityFilterComponent } from '../../components/opsp-entity-filter/opsp-entity-filter.component';
 
 import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
 
@@ -15,7 +17,7 @@ import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/pe
 @Component({
   selector: 'app-factorx',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
+  imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective, OpspEntityFilterComponent],
   templateUrl: './factorx.component.html',
   styleUrl: './factorx.component.scss',
 })
@@ -49,7 +51,10 @@ export class FactorxComponent implements OnInit {
   ];
   minFutureDate = this.getTomorrowIso();
 
-  constructor(private opspService: OpspService) { }
+  constructor(
+    private opspService: OpspService,
+    private opspEntityContextService: OpspEntityContextService
+  ) { }
 
   get canExportPdf(): boolean {
     return Number(getSessionLevelUser()) === 2;
@@ -60,14 +65,22 @@ export class FactorxComponent implements OnInit {
   }
 
   exportExcel(): void {
+    const hasSymbols = this.hasAnyStepSymbol();
     const processRows = this.stepGrid
       .filter(step => step.type === 'step')
-      .map(step => ({
-        Paso: step.step_order,
-        Descripcion: (step.step_label || '').toString().trim(),
-        TieneIneficiencia: step.has_inefficiency ? 'Si' : 'No',
-        Simbolo: (step.symbol || '').toString().trim(),
-      }));
+      .map(step => {
+        const row: any = {
+          Paso: step.step_order,
+          Descripcion: (step.step_label || '').toString().trim(),
+          'Tiene ineficiencia': step.has_inefficiency ? 'Si' : 'No',
+        };
+
+        if (hasSymbols) {
+          row['Símbolo'] = (step.symbol || '').toString().trim();
+        }
+
+        return row;
+      });
 
     const bottleneckRows = this.bottlenecks.map((item, index) => ({
       Numero: index + 1,
@@ -84,7 +97,7 @@ export class FactorxComponent implements OnInit {
     }));
 
     void exportSheetsToExcel('opsp_factorx', [
-      { name: 'Proceso', rows: processRows, widths: [10, 52, 16, 16] },
+      { name: 'Proceso', rows: processRows, widths: hasSymbols ? [10, 52, 18, 16] : [10, 52, 18] },
       { name: 'Cuellos de Botella', rows: bottleneckRows, widths: [10, 60, 28, 18] },
       { name: 'Ferias', rows: tradeRows, widths: [10, 60, 28, 18] },
     ]);
@@ -92,9 +105,20 @@ export class FactorxComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadFactorX();
+    this.opspEntityContextService.entityChanges$.subscribe(() => this.loadFactorX());
   }
 
   loadFactorX(): void {
+    this.factorXId = null;
+    this.stepGrid.forEach((box) => {
+      if (box.type === 'step') {
+        box.step_label = '';
+        box.has_inefficiency = false;
+        box.symbol = '';
+      }
+    });
+    this.bottlenecks = [{ descripcion: '', lider: '', fecha: '' }];
+    this.ferias = [{ descripcion: '', lider: '', fecha: '' }];
     // Asegúrate de que exista getFactorXByCompany en el servicio; si no lo tienes, lo agregamos abajo.
     this.opspService
       // @ts-ignore: si usas un método nuevo en el service que aún no está tipado aquí
@@ -181,6 +205,12 @@ export class FactorxComponent implements OnInit {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return selected.getTime() > today.getTime();
+  }
+
+  hasAnyStepSymbol(): boolean {
+    return this.stepGrid.some(
+      (step) => step.type === 'step' && (step.symbol || '').toString().trim() !== ''
+    );
   }
 
   save(): void {

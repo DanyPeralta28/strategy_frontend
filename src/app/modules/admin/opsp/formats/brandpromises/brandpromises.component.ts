@@ -7,6 +7,8 @@ import { OpspService } from '../../../services/opsp.service';
 import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
 import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
 import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+import { OpspEntityContextService } from 'app/modules/admin/services/opsp-entity-context.service';
+import { OpspEntityFilterComponent } from '../../components/opsp-entity-filter/opsp-entity-filter.component';
 
 import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
 
@@ -15,7 +17,7 @@ import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/pe
 @Component({
   selector: 'app-brandpromises',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
+  imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective, OpspEntityFilterComponent],
   templateUrl: './brandpromises.component.html',
   styleUrl: './brandpromises.component.scss'
 })
@@ -107,14 +109,40 @@ export class BrandpromisesComponent implements OnInit {
     tertiaryKpiRed: null as number | null
   };
 
-  constructor(public opspService: OpspService) {}
+  constructor(
+    public opspService: OpspService,
+    private opspEntityContextService: OpspEntityContextService
+  ) {}
 
   ngOnInit(): void {
     this.loadBrandPromises();
+    this.opspEntityContextService.entityChanges$.subscribe(() => this.loadBrandPromises());
   }
 
   async loadBrandPromises(): Promise<void> {
     try {
+      this.id = null as any;
+      this.centralClientId = null as any;
+      this.clienteCentral = '';
+      this.promesaLider = '';
+      this.promesa2 = '';
+      this.promesa3 = '';
+      this.primaryKpiType = '';
+      this.primaryKpiTypeNumber = '';
+      this.primaryKpiSuperGreen = null;
+      this.primaryKpiGreen = null;
+      this.primaryKpiRed = null;
+      this.secondaryKpiType = '';
+      this.secondaryKpiTypeNumber = '';
+      this.secondaryKpiSuperGreen = null;
+      this.secondaryKpiGreen = null;
+      this.secondaryKpiRed = null;
+      this.tertiaryKpiType = '';
+      this.tertiaryKpiTypeNumber = '';
+      this.tertiaryKpiSuperGreen = null;
+      this.tertiaryKpiGreen = null;
+      this.tertiaryKpiRed = null;
+
       const [brandResp, centralResp] = await Promise.all([
         this.opspService.getBrandPromiseByCompany(this.id_company),
         this.opspService.getCentralClientByCompany(this.id_company)

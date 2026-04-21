@@ -7,6 +7,8 @@ import { OpspService } from '../../../services/opsp.service'; // ajusta la ruta 
 import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
 import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
 import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+import { OpspEntityContextService } from 'app/modules/admin/services/opsp-entity-context.service';
+import { OpspEntityFilterComponent } from '../../components/opsp-entity-filter/opsp-entity-filter.component';
 
 interface GoalField {
   title: string;
@@ -25,7 +27,7 @@ import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/pe
 
 @Component({
   selector: 'app-goals',
-  imports: [CommonModule, FormsModule, MatIconModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
+  imports: [CommonModule, FormsModule, MatIconModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective, OpspEntityFilterComponent],
   templateUrl: './goals.component.html',
   styleUrl: './goals.component.scss'
 })
@@ -70,7 +72,10 @@ export class GoalsComponent implements OnInit {
 
   quarterKeys = ['trimesterOne', 'trimesterTwo', 'trimesterThree', 'trimesterFour'];
 
-  constructor(private opspService: OpspService) {}
+  constructor(
+    private opspService: OpspService,
+    private opspEntityContextService: OpspEntityContextService
+  ) {}
 
   get canExportPdf(): boolean {
     return Number(getSessionLevelUser()) === 2;
@@ -101,6 +106,7 @@ export class GoalsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadGoals();
+    this.opspEntityContextService.entityChanges$.subscribe(() => this.loadGoals());
   }
 
   /** Alterna modo edición de la etiqueta */
@@ -168,6 +174,11 @@ export class GoalsComponent implements OnInit {
 
   async loadGoals(): Promise<void> {
     try {
+      this.recordId = null;
+      Object.values(this.goalData).forEach((section) => {
+        section.values = [];
+      });
+
       const resp = await this.opspService.getGoalsByCompany(this.id_company);
       if (resp?.data && Array.isArray(resp.data) && resp.data.length) {
         const existing = resp.data[0];

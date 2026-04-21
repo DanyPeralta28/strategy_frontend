@@ -12,6 +12,8 @@ import { OpspService } from '../../../services/opsp.service';
 import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
 import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
 import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+import { OpspEntityContextService } from 'app/modules/admin/services/opsp-entity-context.service';
+import { OpspEntityFilterComponent } from '../../components/opsp-entity-filter/opsp-entity-filter.component';
 
 import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
 
@@ -20,7 +22,7 @@ import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/pe
 @Component({
   selector: 'app-strata',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective, OpspEntityFilterComponent],
   templateUrl: './strata.component.html',
   styleUrl: './strata.component.scss',
 })
@@ -47,7 +49,11 @@ export class StrataComponent implements OnInit {
     tertiary_promise?: string;
   } | null = null;
 
-  constructor(private fb: FormBuilder, public opspService: OpspService) { }
+  constructor(
+    private fb: FormBuilder,
+    public opspService: OpspService,
+    private opspEntityContextService: OpspEntityContextService
+  ) { }
 
   get canExportPdf(): boolean {
     return Number(getSessionLevelUser()) === 2;
@@ -113,10 +119,18 @@ export class StrataComponent implements OnInit {
     this.loadBrandPromise();
     this.loadBhag();
     this.loadProfitPerX();
+    this.opspEntityContextService.entityChanges$.subscribe(() => {
+      this.loadStrata();
+      this.loadCentralClientSummary();
+      this.loadBrandPromise();
+      this.loadBhag();
+      this.loadProfitPerX();
+    });
   }
 
   private async loadCentralClientSummary(): Promise<void> {
     try {
+      this.centralClientSummary = '';
       const resp = await this.opspService.getCentralClientByCompany(this.id_company);
       if (resp?.data && resp.data.length > 0) {
         this.centralClientSummary = resp.data[0].core_client_summary || '';
@@ -128,6 +142,8 @@ export class StrataComponent implements OnInit {
 
   private async loadBrandPromise(): Promise<void> {
     try {
+      this.brandPromiseId = undefined;
+      this.existingBrandPromise = null;
       const resp = await this.opspService.getBrandPromiseByCompany(this.id_company);
       if (resp?.data && resp.data.length > 0) {
         const bp = resp.data[0];
@@ -175,6 +191,10 @@ export class StrataComponent implements OnInit {
       .getStrataByCompany(this.id_company)
       .then(resp => {
         if (!resp?.data || resp.data.length === 0) {
+          this.existingStrataId = null;
+          this.sevenForm.reset();
+          this.differentiators.clear();
+          this.addDifferentiator();
           // no hay datos previos, dejamos el array vacío para que se vea "No hay actividades aún."
           return;
         }
@@ -224,7 +244,12 @@ export class StrataComponent implements OnInit {
     this.opspService
       .getBhagByCompany(this.id_company)
       .then(bhagResp => {
-        if (!bhagResp?.data || bhagResp.data.length === 0) return;
+        if (!bhagResp?.data || bhagResp.data.length === 0) {
+          this.existingBhagId = null;
+          this.originalBhagDescription = '';
+          this.sevenForm.patchValue({ bhag: '' });
+          return;
+        }
         const b = bhagResp.data[0];
         if (b.id) this.existingBhagId = b.id;
         this.originalBhagDescription = b.description || '';
@@ -242,7 +267,12 @@ export class StrataComponent implements OnInit {
     this.opspService
       .getProfitPerXByCompany(this.id_company)
       .then(resp => {
-        if (!resp?.data || resp.data.length === 0) return;
+        if (!resp?.data || resp.data.length === 0) {
+          this.existingProfitPerXId = null;
+          this.originalProfitPerXDefinition = '';
+          this.sevenForm.patchValue({ profitPerX: '' });
+          return;
+        }
         const p = resp.data[0];
         if (p.id) this.existingProfitPerXId = p.id;
         this.originalProfitPerXDefinition = p.profit_per_x_definition || '';

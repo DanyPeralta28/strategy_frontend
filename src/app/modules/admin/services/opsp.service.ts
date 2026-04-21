@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { getSessionEntityId } from 'app/core/auth/auth-session';
 import { firstValueFrom } from 'rxjs';
 import { environment } from 'environments/environment';
+import { OpspEntityContextService } from './opsp-entity-context.service';
 
 export const ApiRoutes = {
   formatVisions: '/api/format-visions',
@@ -33,21 +33,24 @@ export const ApiRoutes = {
 export class OpspService {
   private readonly baseUrl = environment.apiBaseUrl;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private opspEntityContextService: OpspEntityContextService
+  ) { }
 
   private withEntityQuery(url: string): string {
     const separator = url.includes('?') ? '&' : '?';
-    return `${url}${separator}id_entity=${getSessionEntityId()}`;
+    return `${url}${separator}id_entity=${this.opspEntityContextService.getCurrentEntityId()}`;
   }
 
   private withEntityPayload(data: any): any {
     if (!data || typeof data !== 'object') {
-      return { id_entity: getSessionEntityId() };
+      return { id_entity: this.opspEntityContextService.getCurrentEntityId() };
     }
     if (Object.prototype.hasOwnProperty.call(data, 'id_entity')) {
       return data;
     }
-    return { ...data, id_entity: getSessionEntityId() };
+    return { ...data, id_entity: this.opspEntityContextService.getCurrentEntityId() };
   }
 
   // Format BHAG

@@ -6,6 +6,8 @@ import { OpspService } from '../../../services/opsp.service';
 import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
 import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
 import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+import { OpspEntityContextService } from 'app/modules/admin/services/opsp-entity-context.service';
+import { OpspEntityFilterComponent } from '../../components/opsp-entity-filter/opsp-entity-filter.component';
 
 import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
 
@@ -14,7 +16,7 @@ import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/pe
 @Component({
   selector: 'app-culture',
   standalone: true,
-  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
+  imports: [CommonModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective, OpspEntityFilterComponent],
   templateUrl: './culture.component.html',
   styleUrl: './culture.component.scss'
 })
@@ -32,7 +34,7 @@ export class CultureComponent implements OnInit {
   cultureId?: number;
 
   get canExportPdf(): boolean {
-    return Number(getSessionLevelUser()) === 2;
+    return true;
   }
 
   exportPdf(): void {
@@ -56,14 +58,26 @@ export class CultureComponent implements OnInit {
     descripcion: ''
   };
 
-  constructor(public opspService: OpspService) {}
+  constructor(
+    public opspService: OpspService,
+    private opspEntityContextService: OpspEntityContextService
+  ) {}
 
   ngOnInit(): void {
     this.loadCulture();
+    this.opspEntityContextService.entityChanges$.subscribe(() => this.loadCulture());
   }
 
   private async loadCulture(): Promise<void> {
     try {
+      this.cultureId = null;
+      this.form.nombre = '';
+      this.form.descripcion = '';
+      this.originalSnapshot = {
+        nombre: '',
+        descripcion: ''
+      };
+
       const resp = await this.opspService.getCultureByCompany(this.id_company);
       if (resp?.data && resp.data.length > 0) {
         const existing = resp.data[0];

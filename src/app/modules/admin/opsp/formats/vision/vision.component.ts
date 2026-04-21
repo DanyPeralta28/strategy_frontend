@@ -7,6 +7,8 @@ import Swal from 'sweetalert2';
 import { OpspService } from '../../../services/opsp.service'
 import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
 import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+import { OpspEntityContextService } from 'app/modules/admin/services/opsp-entity-context.service';
+import { OpspEntityFilterComponent } from '../../components/opsp-entity-filter/opsp-entity-filter.component';
 
 import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
 
@@ -14,7 +16,7 @@ import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/pe
 
 @Component({
   selector: 'app-vision',
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective, OpspEntityFilterComponent],
   templateUrl: './vision.component.html',
   styleUrl: './vision.component.scss'
 })
@@ -48,7 +50,15 @@ export class VisionComponent {
 
   usuarios: Array<{ id: string | number; nombre: string }> = [];
 
-  constructor(public opspService: OpspService, private fb: FormBuilder) { }
+  constructor(
+    public opspService: OpspService,
+    private fb: FormBuilder,
+    private opspEntityContextService: OpspEntityContextService
+  ) { }
+
+  get currentEntityId(): number | string {
+    return this.opspEntityContextService.getCurrentEntityId();
+  }
 
   get canExportPdf(): boolean {
     return Number(getSessionLevelUser()) === 2;
@@ -84,20 +94,19 @@ export class VisionComponent {
 
       const prioridadesEstrategicas = [
         ...this.strategic3to5.controls.map((group, index) => ({
-          Horizonte: '3-5 anos',
+          Horizonte: '3-5 años',
           Numero: index + 1,
           Prioridad: (group.get('value')?.value || '').toString().trim(),
-          Quien: (group.get('titulo')?.value || '').toString().trim(),
         })),
         ...this.strategic1Year.controls.map((group, index) => ({
-          Horizonte: '1 ano',
+          Horizonte: '1 año',
           Numero: index + 1,
           Prioridad: (group.get('value')?.value || '').toString().trim(),
           Quien: (group.get('titulo')?.value || '').toString().trim(),
         })),
       ];
 
-      this.appendSheet(XLSX, workbook, 'Prioridades Estrategicas', prioridadesEstrategicas, [16, 10, 70, 28]);
+      this.appendSheet(XLSX, workbook, 'Prioridades Estratégicas', prioridadesEstrategicas, [16, 10, 70, 28]);
 
       const prioridadesTrimestrales = this.priority_list.controls.map((group, index) => {
         const subprioridades = this.getSubprioridades(index).controls
@@ -105,14 +114,11 @@ export class VisionComponent {
           .filter(Boolean)
           .join(' | ');
 
-        const quienId = group.get('quien')?.value;
-        const usuario = this.usuarios.find((item) => String(item.id) === String(quienId));
-
         return {
           Numero: index + 1,
           Prioridad: (group.get('prioridad')?.value || '').toString().trim(),
           Plazo: (group.get('plazo')?.value || '').toString().trim(),
-          Quien: usuario?.nombre || (quienId ?? '').toString().trim(),
+          Quien: this.getPriorityResponsibleName(group),
           EsIndividual: group.get('esIndividual')?.value ? 'Si' : 'No',
           EsOKR: group.get('esOKR')?.value ? 'Si' : 'No',
           Subprioridades: subprioridades,
@@ -177,11 +183,16 @@ export class VisionComponent {
     this.loadBhag();
     this.loadPurpose();
     this.loadCollaborators();
+    this.opspEntityContextService.entityChanges$.subscribe(() => {
+      this.loadBhag();
+      this.loadPurpose();
+      this.loadCollaborators();
+    });
   }
 
   private loadCollaborators(): void {
     this.opspService
-      .getTeamViewerCollaborators(this.id_company, this.id_entity)
+      .getTeamViewerCollaborators(this.id_company, this.currentEntityId)
       .then((resp: any) => {
         const rows = Array.isArray(resp?.data) ? resp.data : [];
         this.usuarios = rows
@@ -213,6 +224,11 @@ export class VisionComponent {
       .getBhagByCompany(this.id_company)
       .then(bhag => {
         if (!bhag?.data || bhag.data.length === 0) {
+          this.existingBhagId = null;
+          this.originalBhagDescription = '';
+          this.bhag = '';
+          this.visionForm.patchValue({ bhag: '' });
+          this.loadVisionData();
           // no existe todavía
           return;
         }
@@ -277,6 +293,9 @@ export class VisionComponent {
       .getPurposeByCompany(this.id_company)
       .then(purposeResp => {
         if (!purposeResp?.data || purposeResp.data.length === 0) {
+          this.existingPurposeId = null;
+          this.originalPurposeDescription = '';
+          this.visionForm.patchValue({ proposito: '' });
           return; // no hay propósito aún
         }
         const p = purposeResp.data[0];
@@ -336,6 +355,20 @@ export class VisionComponent {
       .then(resp => {
         console.log("VISION recibido:", resp.data);
         if (!resp?.data || resp.data.length === 0) {
+          this.existingVisionId = null;
+          this.visionForm.patchValue({
+            valores: '',
+            promesas: '',
+            game_title_1: 'Ganar el Juego Anual',
+            game_title_2: 'Ganar el Juego Trimestre'
+          });
+          this.coreValuesBackup = '';
+          this.strategic3to5.clear();
+          this.strategic1Year.clear();
+          this.priority_list.clear();
+          this.kpis.clear();
+          this.ganarJuego1.controls.forEach((group) => group.get('descripcion')!.setValue(''));
+          this.ganarJuego2.controls.forEach((group) => group.get('descripcion')!.setValue(''));
           // no hay visión previa; puedes dejar el form en blanco y salir
           return;
         }
@@ -396,6 +429,7 @@ export class VisionComponent {
             plazo: [item.plazo || ''],
             prioridad: [item.prioridad || ''],
             quien: [item.who || ''],
+            quienNombre: [item.who_name || ''],
             esIndividual: [item.esIndividual || false],
             subprioridades: subs
           }));
@@ -574,6 +608,7 @@ export class VisionComponent {
       subprioridades: this.fb.array([]),
       esIndividual: [false],
       quien: [''],
+      quienNombre: [''],
     });
   }
 
@@ -595,6 +630,13 @@ export class VisionComponent {
 
   removeSubprioridad(prioridadIndex: number, subIndex: number): void {
     this.getSubprioridades(prioridadIndex).removeAt(subIndex);
+  }
+
+  getPriorityResponsibleName(group: any): string {
+    const quienId = group?.get?.('quien')?.value ?? group?.quien;
+    const quienNombre = (group?.get?.('quienNombre')?.value ?? group?.quienNombre ?? '').toString().trim();
+    const usuario = this.usuarios.find((item) => String(item.id) === String(quienId));
+    return usuario?.nombre || quienNombre || (quienId ?? '').toString().trim();
   }
 
   // GENERAR PAYLOADS

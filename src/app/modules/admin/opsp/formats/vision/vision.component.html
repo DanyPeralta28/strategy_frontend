@@ -1,4 +1,5 @@
 <div #pdfContent class="opsp-format-page relative max-w-7xl mx-auto p-6 sm:p-10 space-y-12" [formGroup]="visionForm" [appPermissionEditLock]="3">
+  <app-opsp-entity-filter></app-opsp-entity-filter>
   <div *ngIf="canExportPdf" class="print-hide absolute top-6 right-6 sm:top-10 sm:right-10 z-10 flex items-center gap-2">
     <button type="button" (click)="exportExcel()"
       class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 px-4 rounded-xl shadow">
@@ -469,23 +470,22 @@
   </div>
 
   <section class="rounded-2xl border border-slate-200 overflow-hidden">
-    <div class="bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">Prioridades estrategicas 3-5 anos</div>
+    <div class="bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">Prioridades estratégicas 3-5 años</div>
     <table class="min-w-full text-sm">
       <thead class="bg-slate-50 text-slate-700">
-        <tr><th class="px-4 py-3 text-left font-semibold">#</th><th class="px-4 py-3 text-left font-semibold">Prioridad</th><th class="px-4 py-3 text-left font-semibold">Quien</th></tr>
+        <tr><th class="px-4 py-3 text-left font-semibold">#</th><th class="px-4 py-3 text-left font-semibold">Prioridad</th></tr>
       </thead>
       <tbody>
         <tr *ngFor="let item of strategic3to5.controls; let i = index" class="border-t border-slate-200">
           <td class="px-4 py-3">{{ i + 1 }}</td>
           <td class="px-4 py-3 whitespace-pre-wrap">{{ item.get('value')?.value || ' ' }}</td>
-          <td class="px-4 py-3">{{ item.get('titulo')?.value || ' ' }}</td>
         </tr>
       </tbody>
     </table>
   </section>
 
   <section class="rounded-2xl border border-slate-200 overflow-hidden">
-    <div class="bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">Prioridades estrategicas 1 ano</div>
+    <div class="bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">Prioridades estratégicas 1 año</div>
     <table class="min-w-full text-sm">
       <thead class="bg-slate-50 text-slate-700">
         <tr><th class="px-4 py-3 text-left font-semibold">#</th><th class="px-4 py-3 text-left font-semibold">Prioridad</th><th class="px-4 py-3 text-left font-semibold">Quien</th></tr>
@@ -519,7 +519,7 @@
           <td class="px-4 py-3">{{ i + 1 }}</td>
           <td class="px-4 py-3 whitespace-pre-wrap">{{ item.get('prioridad')?.value || ' ' }}</td>
           <td class="px-4 py-3">{{ item.get('plazo')?.value || ' ' }}</td>
-          <td class="px-4 py-3">{{ item.get('quien')?.value || ' ' }}</td>
+          <td class="px-4 py-3">{{ getPriorityResponsibleName(item) || ' ' }}</td>
           <td class="px-4 py-3">{{ item.get('esOKR')?.value ? 'Si' : 'No' }}</td>
           <td class="px-4 py-3">{{ item.get('esIndividual')?.value ? 'Si' : 'No' }}</td>
           <td class="px-4 py-3 whitespace-pre-wrap">{{ getSubprioridades(i).value.join(' | ') || ' ' }}</td>

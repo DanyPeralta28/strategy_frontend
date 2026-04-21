@@ -7,6 +7,8 @@ import { OpspService } from '../../../services/opsp.service'
 import { exportSheetsToExcel } from 'app/modules/admin/utils/excel-export.util';
 import { exportElementToPdf } from 'app/modules/admin/utils/pdf-export.util';
 import { getSessionCompanyId, getSessionEntityId, getSessionUserId, getSessionTeam, getSessionLevelUser } from 'app/core/auth/auth-session';
+import { OpspEntityContextService } from 'app/modules/admin/services/opsp-entity-context.service';
+import { OpspEntityFilterComponent } from '../../components/opsp-entity-filter/opsp-entity-filter.component';
 
 import { PermissionEditLockDirective } from 'app/modules/admin/directives/permission-edit-lock.directive';
 
@@ -14,7 +16,7 @@ import { PermissionHideIfNoEditDirective } from 'app/modules/admin/directives/pe
 
 @Component({
   selector: 'app-bhag',
-  imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective],
+  imports: [CommonModule, RouterModule, FormsModule, PermissionEditLockDirective, PermissionHideIfNoEditDirective, OpspEntityFilterComponent],
   templateUrl: './bhag.component.html',
   styleUrl: './bhag.component.scss'
 })
@@ -27,7 +29,10 @@ export class BhagComponent {
   };
   id_company = getSessionCompanyId();
 
-  constructor(public opspService: OpspService) { }
+  constructor(
+    public opspService: OpspService,
+    private opspEntityContextService: OpspEntityContextService
+  ) { }
 
   get canExportPdf(): boolean {
     return Number(getSessionLevelUser()) === 2;
@@ -54,12 +59,18 @@ export class BhagComponent {
 
   ngOnInit() {
     this.loadBhag();
+    this.opspEntityContextService.entityChanges$.subscribe(() => this.loadBhag());
   }
 
   loadBhag() {
     this.opspService
       .getBhagByCompany(this.id_company)
       .then(bhag => {
+        if (!bhag?.data || bhag.data.length === 0) {
+          this.form.description = '';
+          this.form.id = '';
+          return;
+        }
         this.form.description = bhag.data[0].description;
         this.form.id = bhag.data[0].id;
         console.log("BHAG recibido:", bhag.data);

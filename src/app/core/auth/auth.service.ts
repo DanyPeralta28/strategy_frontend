@@ -4,6 +4,7 @@ import { clearStoredAuthSession, getStoredAuthUser, setStoredAuthSession } from 
 import { AuthUtils } from 'app/core/auth/auth.utils';
 import { UserService } from 'app/core/user/user.service';
 import { catchError, Observable, of, switchMap, throwError } from 'rxjs';
+import { environment } from 'environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -59,7 +60,7 @@ export class AuthService {
             return throwError('User is already logged in.');
         }
 
-        return this._httpClient.post('https://qa.scalingsoft.com/api/signin.php', {
+        return this._httpClient.post(environment.loginUrl, {
             username: credentials.username,
             password: credentials.password,
         }).pipe(
