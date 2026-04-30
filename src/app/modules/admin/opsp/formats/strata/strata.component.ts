@@ -35,8 +35,6 @@ export class StrataComponent implements OnInit {
   existingStrataId: number | null = null;
   existingBhagId: number | null = null;
   originalBhagDescription: string = '';
-  existingProfitPerXId: number | null = null;
-  originalProfitPerXDefinition: string = '';
   centralClientSummary: string = '';
   status = 1;
   created_by = getSessionUserId();
@@ -268,16 +266,13 @@ export class StrataComponent implements OnInit {
       .getProfitPerXByCompany(this.id_company)
       .then(resp => {
         if (!resp?.data || resp.data.length === 0) {
-          this.existingProfitPerXId = null;
-          this.originalProfitPerXDefinition = '';
           this.sevenForm.patchValue({ profitPerX: '' });
           return;
         }
         const p = resp.data[0];
-        if (p.id) this.existingProfitPerXId = p.id;
-        this.originalProfitPerXDefinition = p.profit_per_x_definition || '';
+        const valueResult = p.value_result ?? '';
         this.sevenForm.patchValue({
-          profitPerX: this.originalProfitPerXDefinition,
+          profitPerX: valueResult.toString(),
         });
       })
       .catch(err => {
@@ -377,36 +372,6 @@ export class StrataComponent implements OnInit {
       });
     }
   }
-
-  private saveProfitPerXIfNeeded(): Promise<any> {
-    const current = (this.sevenForm.get('profitPerX')?.value || '').trim();
-    if (!current) return Promise.resolve(null);
-    if (this.existingProfitPerXId && current === this.originalProfitPerXDefinition) return Promise.resolve(null);
-
-    const payload: any = {
-      profit_per_x_definition: current,
-      created_by: this.created_by,
-    };
-
-    if (!this.existingProfitPerXId) {
-      // creación
-      payload.id_company = this.id_company;
-      return this.opspService.createProfitPerX(payload).then(res => {
-        if (res?.data && res.data[0]?.id) {
-          this.existingProfitPerXId = res.data[0].id;
-        }
-        this.originalProfitPerXDefinition = current;
-        return res;
-      });
-    } else {
-      // update
-      return this.opspService.updateProfitPerX(this.existingProfitPerXId, payload).then(res => {
-        this.originalProfitPerXDefinition = current;
-        return res;
-      });
-    }
-  }
-
   /** ---------- save todo junto ---------- */
   save(): void {
     if (this.sevenForm.invalid) {
@@ -433,11 +398,10 @@ export class StrataComponent implements OnInit {
         const strataPayload = this.buildStrataPayload(wasCreate);
         const strataPromise = this.persistStrataPayload(strataPayload);
         const bhagPromise = this.saveBhagIfNeeded();
-        const profitPerXPromise = this.saveProfitPerXIfNeeded();
-        return Promise.allSettled([strataPromise, bhagPromise, profitPerXPromise]);
+        return Promise.allSettled([strataPromise, bhagPromise]);
       })
       .then(results => {
-      const [strataRes, bhagRes, profitRes] = results;
+      const [strataRes, bhagRes] = results;
       const successMsgs: string[] = [];
       const errorMsgs: string[] = [];
 
@@ -455,15 +419,6 @@ export class StrataComponent implements OnInit {
       } else {
         console.error('Error guardando BHAG:', bhagRes.reason);
         errorMsgs.push('BHAG: ' + (bhagRes.reason?.message || 'Error al guardar'));
-      }
-
-      if (profitRes.status === 'fulfilled') {
-        if (profitRes.value) {
-          successMsgs.push(this.existingProfitPerXId ? 'Utilidad por X actualizada' : 'Utilidad por X creada');
-        }
-      } else {
-        console.error('Error guardando Utilidad por X:', profitRes.reason);
-        errorMsgs.push('Utilidad por X: ' + (profitRes.reason?.message || 'Error al guardar'));
       }
 
       const title = errorMsgs.length ? 'Resultado mixto' : '¡Guardado!';
