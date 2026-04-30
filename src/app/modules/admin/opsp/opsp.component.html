@@ -743,15 +743,16 @@
                                             {{ prioridad.plazo }}
                                         </span>
                                     </div>
-                                    <div *ngIf="prioridad.subprioridades?.length"
-                                        class="rounded-lg bg-slate-50 border border-slate-200 p-2">
-                                        <div class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 mb-1">
-                                            Subprioridades
-                                        </div>
-                                        <ul class="list-disc pl-4 space-y-1 text-xs text-slate-600">
+                                    <details *ngIf="prioridad.subprioridades?.length"
+                                        class="rounded-lg bg-slate-50 border border-slate-200">
+                                        <summary
+                                            class="cursor-pointer select-none px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                                            Subprioridades ({{ prioridad.subprioridades.length }})
+                                        </summary>
+                                        <ul class="list-disc pl-8 pr-3 pb-3 max-h-32 overflow-y-auto space-y-1 text-xs text-slate-600">
                                             <li *ngFor="let sub of prioridad.subprioridades">{{ sub }}</li>
                                         </ul>
-                                    </div>
+                                    </details>
                                 </div>
                             </li>
                         </ul>
